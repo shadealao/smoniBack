@@ -2,24 +2,27 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MeetingPoint extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'monitor_id', 'name', 'address', 'city', 'long', 'lat', 'is_active',
+        'instructor_id', 'label', 'address', 'city', 'postal_code',
+        'latitude', 'longitude', 'is_active',
     ];
 
     protected $casts = [
-        'address' => 'array',
         'is_active' => 'boolean',
-        'long' => 'decimal:8',
-        'lat' => 'decimal:8',
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
     ];
 
-    public function monitor(): BelongsTo
+    public function instructor()
     {
-        return $this->belongsTo(User::class, 'monitor_id');
+        return $this->belongsTo(User::class, 'instructor_id');
     }
 }

@@ -6,10 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\LearnerProfile;
 use App\Models\InstructorProfile;
+use App\Models\OtpCode;
+use App\Notifications\SendOtpCode;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -183,6 +188,113 @@ class UserController extends Controller
             'success' => true,
             'data' => $user,
             'message' => 'Détails du profil administrateur récupérés avec succès.',
+        ], 200);
+    }
+
+    /**
+     * Send OTP code for password reset.
+     */
+    public function sendOtpCode(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        // Generate a 6-digit OTP code
+        $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store OTP code in database
+        OtpCode::create([
+            'user_id' => $user->id,
+            'code' => $otpCode,
+            'expires_at' => Carbon::now()->addMinutes(10),
+            'is_used' => false,
+        ]);
+
+        // Send OTP code via email
+        Notification::send($user, new SendOtpCode($otpCode));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Code OTP envoyé à votre email.',
+        ], 200);
+    }
+
+    /**
+     * Verify OTP code.
+     */
+    public function verifyOtpCode(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'code' => 'required|string|size:6',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        $otp = OtpCode::where('user_id', $user->id)
+                      ->where('code', $validated['code'])
+                      ->where('is_used', false)
+                      ->where('expires_at', '>=', Carbon::now())
+                      ->first();
+
+        if (!$otp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Code OTP invalide ou expiré.',
+            ], 400);
+        }
+
+        // Mark OTP as used
+        $otp->update(['is_used' => true]);
+
+        // Generate a temporary token for password reset
+        // $resetToken = Str::random(60);
+        // $user->update(['password_reset_token' => $resetToken]);
+
+        return response()->json([
+            'success' => true,
+            // 'reset_token' => $resetToken,
+            'message' => 'Code OTP vérifié avec succès.',
+        ], 200);
+    }
+
+    /**
+     * Update password after OTP verification.
+     */
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email|exists:users,email',
+            // 'reset_token' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::where('email', $validated['email'])
+                    // ->where('password_reset_token', $validated['reset_token'])
+                    ->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token de réinitialisation invalide.',
+            ], 400);
+        }
+
+        // Update password and clear reset token
+        $user->update([
+            'password' => Hash::make($validated['password']),
+            // 'password_reset_token' => null,
+        ]);
+
+        // Revoke all existing tokens (optional, for security)
+        $user->tokens()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mot de passe mis à jour avec succès.',
         ], 200);
     }
 }
