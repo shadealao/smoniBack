@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\MeetingPointController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VehicleController;
@@ -37,5 +38,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show']);
     Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update']);
     Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy']);
-    
+
+    // Availability Routes
+    Route::post('/availabilities', [AvailabilityController::class, 'store']);
+    Route::get('/availabilities', [AvailabilityController::class, 'index']);
+    Route::get('/availabilities/{availability}', [AvailabilityController::class, 'show']);
+    Route::put('/availabilities/{availability}', [AvailabilityController::class, 'update']);
+    Route::delete('/availabilities/{availability}', [AvailabilityController::class, 'destroy']);
+
 });
