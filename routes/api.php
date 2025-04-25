@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\MeetingPointController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserDocController;
 use App\Http\Controllers\Api\VehicleController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,5 +54,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel']);
     Route::post('/appointments/{appointment}/presence', [AppointmentController::class, 'markPresence']);
     Route::post('/appointments/{appointment}/finished', [AppointmentController::class, 'markFinished']);
+
+    // UserDoc Routes
+    Route::post('/user-docs', [UserDocController::class, 'store']);
+    Route::get('/user-docs', [UserDocController::class, 'index']);
+    Route::delete('/user-docs/{userDoc}', [UserDocController::class, 'destroy']);
 
 });
