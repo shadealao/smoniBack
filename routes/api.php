@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\MeetingPointController;
@@ -45,5 +46,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/availabilities/{availability}', [AvailabilityController::class, 'show']);
     Route::put('/availabilities/{availability}', [AvailabilityController::class, 'update']);
     Route::delete('/availabilities/{availability}', [AvailabilityController::class, 'destroy']);
+
+    // Appointment Routes
+    Route::post('/appointments', [AppointmentController::class, 'store']);
+    Route::put('/appointments/{appointment}', [AppointmentController::class, 'update']);
+    Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel']);
+    Route::post('/appointments/{appointment}/presence', [AppointmentController::class, 'markPresence']);
+    Route::post('/appointments/{appointment}/finished', [AppointmentController::class, 'markFinished']);
 
 });

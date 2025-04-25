@@ -11,32 +11,24 @@ class Appointment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'learner_id',
-        'instructor_id',
-        'availability_id',
-        'vehicle_id',
-        'date',
-        'start_time',
-        'end_time',
-        'duration',
-        'status',
-        'cancellation_reason',
-        'price',
-        'lesson_notes',
-        'presence_student',
-        'presence_monitor',
-        'finished',
-        'tag',
+        'learner_id', 'instructor_id', 'availability_id', 'vehicle_id',
+        'date', 'start_time', 'end_time', 'duration', 'status',
+        'cancellation_reason', 'price', 'lesson_notes',
+        'presence_student', 'presence_monitor', 'finished', 'tag',
     ];
 
     protected $casts = [
-        'lesson_notes' => 'array',
         'date' => 'date',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
+        'status' => 'string',
+        'lesson_notes' => 'array',
+        'presence_student' => 'boolean',
+        'presence_monitor' => 'boolean',
+        'finished' => 'boolean',
+        'price' => 'decimal:2',
     ];
 
-    // 🔁 Relations
     public function learner()
     {
         return $this->belongsTo(User::class, 'learner_id');
