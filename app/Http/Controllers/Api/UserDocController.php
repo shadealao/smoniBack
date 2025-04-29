@@ -12,6 +12,7 @@ class UserDocController extends Controller
 {
     /**
      * Upload a document.
+     * @requestMediaType multipart/form-data
      */
     public function store(Request $request)
     {
