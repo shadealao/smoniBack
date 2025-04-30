@@ -2,11 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
-    protected $fillable = ['category_service_id', 'sub_category_service_id', 'title', 'price'];
+    use HasFactory;
+
+    protected $fillable = [
+        'category_service_id', 'sub_category_service_id', 'title', 'price',
+    ];
+
+    protected $casts = [
+        'price' => 'integer',
+    ];
 
     public function category()
     {
@@ -20,7 +29,7 @@ class Service extends Model
 
     public function items()
     {
-        return $this->hasMany(ServiceItem::class);
+        return $this->hasMany(ServiceItem::class, 'service_id');
     }
 
     public function subscriptions()

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\BankAccountController;
 use App\Http\Controllers\Api\LearnerProgressController;
 use App\Http\Controllers\Api\MeetingPointController;
+use App\Http\Controllers\Api\SubscriptionServiceController;
 use App\Http\Controllers\Api\TrainingModuleController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserDocController;
@@ -23,6 +24,8 @@ Route::post('/password/reset', [UserController::class, 'updatePassword']);
 
 // TrainingModule Routes
 Route::get('/training-modules', [TrainingModuleController::class, 'index']);
+// SubscriptionService Routes
+Route::get('/services', [SubscriptionServiceController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // Update profile routes
@@ -89,5 +92,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/learner-progress/{learnerProgress}/badge', [LearnerProgressController::class, 'awardBadge']);
     Route::get('/learners/{learner}/badges', [LearnerProgressController::class, 'listBadges']);
     Route::get('/learners/{learner}/progress', [LearnerProgressController::class, 'listProgress']);
+
+    // SubscriptionService Routes
+    Route::post('/services', [SubscriptionServiceController::class, 'store']);
+    Route::put('/services/{service}', [SubscriptionServiceController::class, 'update']);
+    Route::delete('/services/{service}', [SubscriptionServiceController::class, 'destroy']);
 
 });

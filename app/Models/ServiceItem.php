@@ -2,14 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ServiceItem extends Model
 {
-    protected $fillable = ['service_id', 'label', 'status'];
+    use HasFactory;
+
+    protected $fillable = [
+        'service_id', 'label', 'status',
+    ];
+
+    protected $casts = [
+        'status' => 'boolean',
+    ];
 
     public function service()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(Service::class, 'service_id');
     }
 }
