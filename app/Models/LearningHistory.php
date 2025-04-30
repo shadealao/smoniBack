@@ -10,19 +10,15 @@ class LearningHistory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'monitor_id',
-        'student_id',
-        'appointment_id',
-        'duration',
-        'intervention_date',
-        'invoiced',
-        'status',
+        'monitor_id', 'student_id', 'appointment_id', 'duration',
+        'intervention_date', 'invoiced', 'status',
     ];
 
     protected $casts = [
-        'intervention_date' => 'date',
         'invoiced' => 'boolean',
         'status' => 'boolean',
+        'duration' => 'integer',
+        'intervention_date' => 'date',
     ];
 
     public function monitor()

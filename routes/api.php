@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\BankAccountController;
+use App\Http\Controllers\Api\LearnerProgressController;
 use App\Http\Controllers\Api\MeetingPointController;
+use App\Http\Controllers\Api\TrainingModuleController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserDocController;
 use App\Http\Controllers\Api\VehicleController;
@@ -18,6 +20,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/password/send-otp', [UserController::class, 'sendOtpCode']);
 Route::post('/password/verify-otp', [UserController::class, 'verifyOtpCode']);
 Route::post('/password/reset', [UserController::class, 'updatePassword']);
+
+// TrainingModule Routes
+Route::get('/training-modules', [TrainingModuleController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // Update profile routes
@@ -73,5 +78,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/withdraws', [WithdrawController::class, 'store']);
     Route::get('/withdraws', [WithdrawController::class, 'index']);
     Route::post('/withdraws/{withdraw}/approve', [WithdrawController::class, 'approve']);
+
+    // TrainingModule Routes
+    Route::post('/training-modules', [TrainingModuleController::class, 'store']);
+    Route::put('/training-modules/{trainingModule}', [TrainingModuleController::class, 'update']);
+    Route::delete('/training-modules/{trainingModule}', [TrainingModuleController::class, 'destroy']);
+
+    // LearnerProgress Routes
+    Route::post('/learning-histories/{learningHistory}/track', [LearnerProgressController::class, 'trackProgress']);
+    Route::post('/learner-progress/{learnerProgress}/badge', [LearnerProgressController::class, 'awardBadge']);
+    Route::get('/learners/{learner}/badges', [LearnerProgressController::class, 'listBadges']);
+    Route::get('/learners/{learner}/progress', [LearnerProgressController::class, 'listProgress']);
 
 });

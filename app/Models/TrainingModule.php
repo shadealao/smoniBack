@@ -2,22 +2,27 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TrainingModule extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name', 'description', 'duration_hours', 'required_for_license',
-        'display_order', 'file', 'is_active'
+        'display_order', 'file', 'is_active',
     ];
 
     protected $casts = [
         'required_for_license' => 'boolean',
         'is_active' => 'boolean',
+        'duration_hours' => 'integer',
+        'display_order' => 'integer',
     ];
 
-    public function steps(): HasMany
+    public function steps()
     {
         return $this->hasMany(ModuleStep::class, 'module_id');
     }
