@@ -2,21 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Withdraw extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'monitor_id', 'ammount', 'duration', 'payed', 'currency', 'invoice_code',
+        'monitor_id', 'ammount', 'duration', 'payed', 'currency', 'invoice_code', 'invoice_file',
     ];
 
     protected $casts = [
         'payed' => 'boolean',
-        'invoice_code' => 'boolean',
+        'ammount' => 'integer',
+        'duration' => 'integer',
     ];
 
-    public function monitor(): BelongsTo
+    public function monitor()
     {
         return $this->belongsTo(User::class, 'monitor_id');
     }

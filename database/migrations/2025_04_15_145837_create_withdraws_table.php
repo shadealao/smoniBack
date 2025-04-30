@@ -18,7 +18,8 @@ return new class extends Migration
             $table->integer('duration');
             $table->boolean('payed')->default(false);
             $table->string('currency');
-            $table->boolean('invoice_code')->default(false);
+            $table->string('invoice_code')->nullable();
+	        $table->string('invoice_file')->nullable();
             $table->timestamps();
         });
     }

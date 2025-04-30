@@ -3,10 +3,12 @@
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
+use App\Http\Controllers\Api\BankAccountController;
 use App\Http\Controllers\Api\MeetingPointController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserDocController;
 use App\Http\Controllers\Api\VehicleController;
+use App\Http\Controllers\Api\WithdrawController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -59,5 +61,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user-docs', [UserDocController::class, 'store']);
     Route::get('/user-docs', [UserDocController::class, 'index']);
     Route::delete('/user-docs/{userDoc}', [UserDocController::class, 'destroy']);
+
+    // BankAccount Routes
+    Route::post('/bank-accounts', [BankAccountController::class, 'store']);
+    Route::get('/bank-accounts', [BankAccountController::class, 'index']);
+    Route::get('/bank-accounts/{bankAccount}', [BankAccountController::class, 'show']);
+    Route::put('/bank-accounts/{bankAccount}', [BankAccountController::class, 'update']);
+    Route::delete('/bank-accounts/{bankAccount}', [BankAccountController::class, 'destroy']);
+
+    // Withdraw Routes
+    Route::post('/withdraws', [WithdrawController::class, 'store']);
+    Route::get('/withdraws', [WithdrawController::class, 'index']);
+    Route::post('/withdraws/{withdraw}/approve', [WithdrawController::class, 'approve']);
 
 });
