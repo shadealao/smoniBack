@@ -2,11 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Note extends Model
 {
-    protected $fillable = ['monitor_id', 'student_id', 'module_id', 'module_step_id', 'comment', 'date'];
+    use HasFactory;
+
+    protected $fillable = [
+        'monitor_id', 'student_id', 'module_id', 'module_step_id', 'comment', 'date',
+    ];
+
+    protected $casts = [
+        'date' => 'date',
+    ];
 
     public function monitor()
     {

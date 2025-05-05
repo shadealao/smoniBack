@@ -2,15 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Contract extends Model
 {
-    protected $fillable = ['subscription_id', 'student_id', 'file_original', 'file_signed', 'tag', 'date'];
+    use HasFactory;
+
+    protected $fillable = [
+        'subscription_id', 'student_id', 'file_original', 'file_signed', 'tag', 'date',
+    ];
+
+    protected $casts = [
+        'date' => 'date',
+        'tag' => 'string',
+    ];
 
     public function subscription()
     {
-        return $this->belongsTo(Subscription::class);
+        return $this->belongsTo(Subscription::class, 'subscription_id');
     }
 
     public function student()

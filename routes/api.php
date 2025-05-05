@@ -4,9 +4,12 @@ use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\BankAccountController;
+use App\Http\Controllers\Api\ExamNoteController;
 use App\Http\Controllers\Api\LearnerProgressController;
 use App\Http\Controllers\Api\MeetingPointController;
+use App\Http\Controllers\Api\SubscriptionRegistrationController;
 use App\Http\Controllers\Api\SubscriptionServiceController;
+use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TrainingModuleController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserDocController;
@@ -97,5 +100,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/services', [SubscriptionServiceController::class, 'store']);
     Route::put('/services/{service}', [SubscriptionServiceController::class, 'update']);
     Route::delete('/services/{service}', [SubscriptionServiceController::class, 'destroy']);
+
+    // SubscriptionRegistration Routes
+    Route::post('/subscriptions', [SubscriptionRegistrationController::class, 'store']);
+    Route::post('/payments/{payment}/record', [SubscriptionRegistrationController::class, 'recordPayment']);
+    Route::post('/contracts/{contract}/update', [SubscriptionRegistrationController::class, 'updateContract']);
+    Route::get('/subscriptions', [SubscriptionRegistrationController::class, 'index']);
+
+    // ExamNote Routes
+    Route::post('/exam-registrations', [ExamNoteController::class, 'registerExam']);
+    Route::put('/exam-registrations/{examRegistration}', [ExamNoteController::class, 'updateExamResult']);
+    Route::post('/notes', [ExamNoteController::class, 'createNote']);
+    Route::get('/learners/{learner}/exam-registrations', [ExamNoteController::class, 'listExamRegistrations']);
+    Route::get('/learners/{student}/notes', [ExamNoteController::class, 'listNotes']);
+
+// SupportTicket Routes
+    Route::post('/support-tickets', [SupportTicketController::class, 'store']);
+    Route::get('/support-tickets', [SupportTicketController::class, 'index']);
+    Route::post('/support-tickets/{supportTicket}/assign', [SupportTicketController::class, 'assign']);
+    Route::put('/support-tickets/{supportTicket}/status', [SupportTicketController::class, 'updateStatus']);
+    Route::post('/support-tickets/{supportTicket}/response', [SupportTicketController::class, 'addResponse']);
 
 });
