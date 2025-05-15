@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('training_modules', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique()->nullable(); // Ex: "C1", "C2"
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('duration_hours');
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+
     }
 
     /**

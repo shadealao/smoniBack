@@ -11,6 +11,7 @@ class TrainingModule extends Model
     use HasFactory;
 
     protected $fillable = [
+        'code',
         'name', 'description', 'duration_hours', 'required_for_license',
         'display_order', 'file', 'is_active',
     ];

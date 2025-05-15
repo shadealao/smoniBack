@@ -11,14 +11,15 @@ class ModuleStep extends Model
     use HasFactory;
 
     protected $fillable = [
-        'module_id', 'name', 'description', 'duration_minutes',
-        'step_type', 'display_order', 'required_for_completion',
+        'module_id', 'name', 'code', 'description', 'duration_minutes',
+        'step_type', 'display_order', 'required_for_completion', 'validation_criteria', 'status'
     ];
 
     protected $casts = [
         'duration_minutes' => 'integer',
         'display_order' => 'integer',
         'required_for_completion' => 'boolean',
+        'validation_criteria' => 'array',
     ];
 
     public function module()

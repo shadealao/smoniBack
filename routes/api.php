@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\BankAccountController;
+use App\Http\Controllers\Api\EvaluationController;
 use App\Http\Controllers\Api\ExamNoteController;
 use App\Http\Controllers\Api\LearnerProgressController;
 use App\Http\Controllers\Api\MeetingPointController;
@@ -15,9 +16,17 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserDocController;
 use App\Http\Controllers\Api\VehicleController;
 use App\Http\Controllers\Api\WithdrawController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
+//Verification Email
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])->middleware(['auth:sanctum'])->name('verification.verify');
+
+Route::post('/email/verification-notification', [AuthController::class, 'verificationNotification'])->middleware(['throttle:6,1'])->name('verification.send');
+
+//Auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -29,6 +38,8 @@ Route::post('/password/reset', [UserController::class, 'updatePassword']);
 Route::get('/training-modules', [TrainingModuleController::class, 'index']);
 // SubscriptionService Routes
 Route::get('/services', [SubscriptionServiceController::class, 'index']);
+
+Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meeting_points']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // Update profile routes
@@ -121,4 +132,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/support-tickets/{supportTicket}/status', [SupportTicketController::class, 'updateStatus']);
     Route::post('/support-tickets/{supportTicket}/response', [SupportTicketController::class, 'addResponse']);
 
+    // Évaluations
+    Route::prefix('students/{student}')->group(function () {
+        Route::apiResource('evaluations', EvaluationController::class);
+        Route::get('latest-evaluation', [EvaluationController::class, 'latest']);
+        Route::post('evaluations/{evaluation}/accept-proposal', [EvaluationController::class, 'acceptProposal']);
+        
+        // Expérience de conduite
+        // Route::apiResource('driving-experiences', DrivingExperienceController::class)->only(['show', 'update']);
+        
+        // // Connaissance véhicule
+        // Route::apiResource('vehicle-knowledge', VehicleKnowledgeController::class)->only(['show', 'update']);
+    });
+    
+    // Statistiques
+    Route::get('evaluation-stats', [EvaluationController::class, 'stats']);
 });

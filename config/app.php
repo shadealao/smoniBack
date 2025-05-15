@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    //Redirestion login
+    'frontend_url' => env('FRONTEND_URL', 'https://default-frontend.com'),
 ];

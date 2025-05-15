@@ -11,8 +11,8 @@ class LearnerProgres extends Model
     use HasFactory;
 
     protected $fillable = [
-        'learner_id', 'module_id', 'current_step_id', 'status',
-        'started_at', 'completed_at', 'instructor_notes',
+        'monitor_id', 'learner_id', 'module_id', 'current_step_id', 'status',
+        'started_at', 'completed_at', 'instructor_notes', 'is_completed'
     ];
 
     protected $casts = [
@@ -20,6 +20,11 @@ class LearnerProgres extends Model
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
+
+    public function monitor()
+    {
+        return $this->belongsTo(User::class, 'monitor_id');
+    }
 
     public function learner()
     {

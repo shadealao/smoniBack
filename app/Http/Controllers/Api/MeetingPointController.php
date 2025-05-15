@@ -149,4 +149,25 @@ class MeetingPointController extends Controller
             'message' => 'Liste des lieux de rendez-vous récupérée avec succès.',
         ], 200);
     }
+
+    /**
+     * Recherche meeting points.
+     */
+    public function get_meeting_points(Request $request)
+    {
+        $request->validate([
+            'search' => 'required',
+        ]);
+
+        $meetingPoints = MeetingPoint::whereRaw('LOWER(label) like ?', '%'. strtolower($request->search).'%')
+            ->whereRaw('LOWER(address) like ?', '%'.strtolower($request->search).'%');
+
+        return response()->json([
+            'success' => true,
+            // 'data' => $meetingPoints->get(),
+            'countMeetingPoints' => $meetingPoints->count(),
+            'message' => 'Liste des lieux de rendez-vous récupérée avec succès.',
+        ], 200);
+    }
+    
 }
