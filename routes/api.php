@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 
 //Verification Email
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])->middleware(['auth:sanctum'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])->name('verification.verify');
 
 Route::post('/email/verification-notification', [AuthController::class, 'verificationNotification'])->middleware(['throttle:6,1'])->name('verification.send');
 

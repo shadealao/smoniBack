@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -234,7 +235,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function emailVerify(EmailVerificationRequest $request)
+    public function emailVerify(Request $request)
     {
         try {
             // Vérification standard de la requête
@@ -260,13 +261,14 @@ class AuthController extends Controller
             }
 
             // URL de redirection externe (à personnaliser)
-            $frontendUrl = config('app.frontend_url') . '/login?email_verified=1&email=' . urlencode($user->email);
+            $frontendUrl = config('app.frontend_url') . "/connexion" . '/' .Str::random(10);
+            // $frontendUrl = config('app.frontend_url') . '/connexion?email_verified=1&email=' . urlencode($user->email);
             
             // Redirection HTTP vers le frontend
             return redirect()->away($frontendUrl);
         } catch (\Exception $e) {
             // URL de fallback en cas d'erreur
-            $fallbackUrl = config('app.frontend_url') . '/login?verification_error=1';
+            $fallbackUrl = config('app.frontend_url') . '/connexion';
             return redirect()->away($fallbackUrl);
         }
     }
