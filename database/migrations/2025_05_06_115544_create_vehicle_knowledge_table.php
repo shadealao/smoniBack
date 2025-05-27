@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('vehicle_knowledge', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained();
+            $table->foreignId('student_id')->constrained('users')->onDelete('cascade');
             $table->boolean('steering')->default(false);
             $table->boolean('clutch')->default(false);
             $table->boolean('gearbox')->default(false);

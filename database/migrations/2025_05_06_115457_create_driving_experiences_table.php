@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('driving_experiences', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained();
+            $table->foreignId('student_id')->constrained('users')->onDelete('cascade');
             $table->enum('license_type', ['B1_AM', 'A1', 'A2', 'A'])->nullable();
             $table->enum('driving_experience', ['never', 'less_than_5h', 'more_than_5h'])->nullable();
             $table->enum('accompanied_by', ['friends', 'parents', 'driving_school'])->nullable();

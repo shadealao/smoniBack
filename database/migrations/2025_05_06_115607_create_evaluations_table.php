@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained();
-            $table->foreignId('instructor_id')->constrained('users');
+            $table->foreignId('student_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('instructor_id')->constrained('users')->onDelete('cascade');
             
             // Attitude
             $table->boolean('attitude_control_priority')->default(false);

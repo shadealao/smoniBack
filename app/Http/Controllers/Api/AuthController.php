@@ -58,7 +58,7 @@ class AuthController extends Controller
             'certification_number' => 'nullable|numeric|min:0',
 
             'workZones' => 'sometimes|array',
-            'vehicles' => 'sometimes|array',
+            // 'vehicles' => 'sometimes|array',
 
             'workZones.*.label' => 'required_if:role,instructor|string|max:255',
             'workZones.*.address' => 'nullable|string|max:255',
@@ -67,11 +67,11 @@ class AuthController extends Controller
             'workZones.*.latitude' => 'nullable|numeric|between:-90,90',
             'workZones.*.longitude' => 'nullable|numeric|between:-180,180',
 
-            'vehicles.*.brand' => 'required_if:role,instructor|string|max:100',
-            'vehicles.*.plate_number' => 'required_if:role,instructor|string|max:20|unique:vehicles,plate_number',
-            'vehicles.*.registrationDocument' => 'file',
-            'vehicles.*.gearbox_type' => 'required_if:role,instructor|in:manual,automatic',
-            'vehicles.*.status' => 'sometimes|in:available,maintenance,out_of_service',
+            // 'vehicles.*.brand' => 'required_if:role,instructor|string|max:100',
+            // 'vehicles.*.plate_number' => 'required_if:role,instructor|string|max:20|unique:vehicles,plate_number',
+            // 'vehicles.*.registrationDocument' => 'file',
+            // 'vehicles.*.gearbox_type' => 'required_if:role,instructor|in:manual,automatic',
+            // 'vehicles.*.status' => 'sometimes|in:available,maintenance,out_of_service',
         ]);
 
         // Hachage du mot de passe
@@ -149,21 +149,21 @@ class AuthController extends Controller
                         'is_active' => $zone['is_active'] ?? true,
                     ]);
                 }
-                foreach($request->vehicles as $vehicle){
-                    if ($vehicle['registrationDocument']) {
-                        $vehicleFile = $vehicle['registrationDocument'];
-                        $vehiclePhotoPath = $vehicleFile->store('vehicles', 'public');
-                    }
+                // foreach($request->vehicles as $vehicle){
+                //     if ($vehicle['registrationDocument']) {
+                //         $vehicleFile = $vehicle['registrationDocument'];
+                //         $vehiclePhotoPath = $vehicleFile->store('vehicles', 'public');
+                //     }
 
-                    Vehicle::create([
-                        'instructor_id' => $user->id,
-                        'brand' => $vehicle['brand'],
-                        'plate_number' => $vehicle['plate_number'],
-                        'photo_url' => $vehiclePhotoPath ?? null,
-                        'gearbox_type' => $vehicle['gearbox_type'],
-                        'status' => $vehicle['status'] ?? 'available',
-                    ]);
-                }
+                //     Vehicle::create([
+                //         'instructor_id' => $user->id,
+                //         'brand' => $vehicle['brand'],
+                //         'plate_number' => $vehicle['plate_number'],
+                //         'photo_url' => $vehiclePhotoPath ?? null,
+                //         'gearbox_type' => $vehicle['gearbox_type'],
+                //         'status' => $vehicle['status'] ?? 'available',
+                //     ]);
+                // }
             }
             // Pour le rôle 'admin', aucun profil supplémentaire n'est créé (ou ajoutez un modèle AdminProfile si nécessaire)
             DB::commit();
