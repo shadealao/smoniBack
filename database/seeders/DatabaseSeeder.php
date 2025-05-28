@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             AppointmentSeeder::class,
             TrainingModuleSeeder::class,
             ModuleStepSeeder::class,
-            LearnerProgressSeeder::class,
+            // LearnerProgressSeeder::class,
         ]);
     }
 }

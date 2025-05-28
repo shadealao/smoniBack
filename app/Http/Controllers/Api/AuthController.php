@@ -213,6 +213,11 @@ class AuthController extends Controller
             ], 401);
         }
 
+        if (!$user->hasVerifiedEmail()) {
+            $user->sendEmailVerificationNotification();
+            return response()->json(['message' => 'Compte non vérifié. Un mail a été envoyé sur votre email', "success"=>false], 403);
+        }
+
         // Générer un jeton
         $token = $user->createToken('auth-token')->plainTextToken;
 
@@ -279,8 +284,8 @@ class AuthController extends Controller
             'email' => 'required|exists:users,email'
         ]);
         $user = User::where('email', $request->email)->first();
-        $user()->sendEmailVerificationNotification();
-        return response()->json(['message' => 'Lien de vérification envoyé']);
+        $user->sendEmailVerificationNotification();
+        return response()->json(['message' => 'Lien de vérification envoyé','success' => true]);
     }
 
 }
