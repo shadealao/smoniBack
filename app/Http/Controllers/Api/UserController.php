@@ -37,6 +37,7 @@ class UserController extends Controller
             'lastname' => 'sometimes|string|max:255',
             'firstname' => 'sometimes|string|max:255',
             'phone' => 'sometimes|string|max:20',
+            'genre' => ['required', Rule::in(['homme', 'femme', 'autre'])],
             'birthdate' => 'sometimes|date|before:today',
             'address' => 'nullable|string',
             'postal_code' => 'nullable|string',
@@ -53,6 +54,7 @@ class UserController extends Controller
             'lastname' => $validated['lastname'] ?? $user->lastname,
             'firstname' => $validated['firstname'] ?? $user->firstname,
             'phone' => $validated['phone'] ?? $user->phone,
+            'genre' => $validated['genre'],
         ]));
 
         // Update or create learner profile
@@ -94,6 +96,7 @@ class UserController extends Controller
             'lastname' => 'sometimes|string|max:255',
             'firstname' => 'sometimes|string|max:255',
             'phone' => 'sometimes|string|max:20',
+            'genre' => ['required', Rule::in(['homme', 'femme', 'autre'])],
             'specialty' => 'sometimes|string',
             'city' => 'sometimes|string',
             'address' => 'nullable|string',
@@ -108,6 +111,7 @@ class UserController extends Controller
             'lastname' => $validated['lastname'] ?? $user->lastname,
             'firstname' => $validated['firstname'] ?? $user->firstname,
             'phone' => $validated['phone'] ?? $user->phone,
+            'genre' => $validated['genre'],
         ]));
 
         // Update or create instructor profile
@@ -298,4 +302,47 @@ class UserController extends Controller
             'message' => 'Mot de passe mis à jour avec succès.',
         ], 200);
     }
+
+    /**
+     * Update profil Image.
+     */
+    public function updateImage(Request $request)
+    {
+        $validated = $request->validate([
+            'photo' => 'file',
+        ]);
+
+        if($request->photo){
+            $photo = $request->photo;
+            $photoPath = $photo->store('profil', 'public');
+        }
+
+        auth()->user()->update([
+            'photo' => $request->photo ? $photoPath : null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => auth()->user(),
+            'message' => 'Photo Bien changer.',
+        ], 200);
+    }
+
+    /**
+     * Drop profil Image.
+     */
+    public function dropImage(Request $request)
+    {
+        
+        auth()->user()->update([
+            'photo' => null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => auth()->user(),
+            'message' => 'Photo Bien supprimer.',
+        ], 200);
+    }
+
 }

@@ -90,6 +90,7 @@ class AuthController extends Controller
                 'email' => $validated['email'],
                 'password' => $validated['password'],
                 'phone' => $validated['phone'],
+                'genre' => $validated['genre'],
                 'role' => $validated['role'],
                 'photo' => $request->photo ? $photoPath : null,
             ]);

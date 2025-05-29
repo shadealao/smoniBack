@@ -96,11 +96,19 @@ class MeetingPointController extends Controller
             'is_active' => 'sometimes|boolean',
         ]);
 
-        $meetingPoint->update(array_filter($validated));
+        $meetingPoint->update([
+            'label' => $request->label,
+            'address' => $request->address,
+            'city' => $request->city,
+            'postal_code' => $request->postal_code,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'is_active' => $request->is_active,
+        ]);
 
         return response()->json([
             'success' => true,
-            'data' => $meetingPoint->fresh(),
+            'data' => $meetingPoint,
             'message' => 'Lieu de rendez-vous mis à jour avec succès.',
         ], 200);
     }

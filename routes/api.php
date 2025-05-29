@@ -45,6 +45,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Update profile routes
     Route::put('/profile/update/learner', [UserController::class, 'updateLearnerProfile']);
     Route::put('/profile/update/instructor', [UserController::class, 'updateInstructorProfile']);
+    Route::put('/profile/update/photo', [UserController::class, 'updateImage']);
+    Route::put('/profile/update/dropPhoto', [UserController::class, 'dropImage']);
 
     // View profile routes
     Route::get('/profile/learner', [UserController::class, 'viewLearnerProfile']);
