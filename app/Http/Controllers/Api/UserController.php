@@ -305,6 +305,9 @@ class UserController extends Controller
 
     /**
      * Update profil Image.
+     * * @param Request $request
+     * 
+     * @requestMediaType multipart/form-data
      */
     public function updateImage(Request $request)
     {
@@ -312,13 +315,10 @@ class UserController extends Controller
             'photo' => 'file',
         ]);
 
-        if($request->photo){
-            $photo = $request->photo;
-            $photoPath = $photo->store('profil', 'public');
-        }
+        $photoPath = $request->file('photo')->store('profil', 'public');
 
         auth()->user()->update([
-            'photo' => $request->photo ? $photoPath : null,
+            'photo' => $photoPath,
         ]);
 
         return response()->json([

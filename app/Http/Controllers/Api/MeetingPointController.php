@@ -77,6 +77,16 @@ class MeetingPointController extends Controller
      */
     public function update(Request $request, MeetingPoint $meetingPoint)
     {
+        $validated = $request->validate([
+            'label' => 'string|max:255',
+            'address' => 'string|max:255',
+            'city' => 'string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'is_active' => 'boolean',
+        ]);
+
         $user = Auth::user();
 
         if ($user->role !== 'instructor' || $meetingPoint->instructor_id !== $user->id) {
@@ -85,16 +95,6 @@ class MeetingPointController extends Controller
                 'message' => 'Vous n\'êtes pas autorisé à modifier ce lieu de rendez-vous.',
             ], 403);
         }
-
-        $validated = $request->validate([
-            'label' => 'sometimes|string|max:255',
-            'address' => 'sometimes|string|max:255',
-            'city' => 'sometimes|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'is_active' => 'sometimes|boolean',
-        ]);
 
         $meetingPoint->update([
             'label' => $request->label,

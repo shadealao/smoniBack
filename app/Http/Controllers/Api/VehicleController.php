@@ -11,6 +11,10 @@ class VehicleController extends Controller
 {
     /**
      * Create a new vehicle.
+     * 
+     * * @param Request $request
+     * 
+     * @requestMediaType multipart/form-data
      */
     public function store(Request $request)
     {
@@ -31,11 +35,16 @@ class VehicleController extends Controller
             'fuel_type' => 'required|in:essence,diesel,électrique,hybride',
             'insurance_expiry' => 'nullable|date|after:today',
             'technical_inspection_date' => 'nullable|date|after:today',
-            'photo_url' => 'nullable|url|max:255',
+            'photo_url' => 'nullable|file',
             'color' => 'nullable|string|max:50',
             'gearbox_type' => 'required|in:manual,automatic',
             'status' => 'sometimes|in:available,maintenance,out_of_service',
         ]);
+
+        if($request->hasFile('photo'))
+            $photoUrl = $request->file('photo_url')->store('vehicule', 'public');
+        else 
+        $photoUrl = null;
 
         $vehicle = Vehicle::create([
             'instructor_id' => $user->id,
@@ -46,7 +55,7 @@ class VehicleController extends Controller
             'fuel_type' => $validated['fuel_type'],
             'insurance_expiry' => $validated['insurance_expiry'],
             'technical_inspection_date' => $validated['technical_inspection_date'],
-            'photo_url' => $validated['photo_url'],
+            'photo_url' => $photoUrl,
             'color' => $validated['color'],
             'gearbox_type' => $validated['gearbox_type'],
             'status' => $validated['status'] ?? 'available',
@@ -82,6 +91,10 @@ class VehicleController extends Controller
 
     /**
      * Update a vehicle.
+     * 
+     * * @param Request $request
+     * 
+     * @requestMediaType multipart/form-data
      */
     public function update(Request $request, Vehicle $vehicle)
     {
@@ -102,13 +115,31 @@ class VehicleController extends Controller
             'fuel_type' => 'sometimes|in:essence,diesel,électrique,hybride',
             'insurance_expiry' => 'nullable|date|after:today',
             'technical_inspection_date' => 'nullable|date|after:today',
-            'photo_url' => 'nullable|url|max:255',
+            'photo_url' => 'nullable|file',
             'color' => 'nullable|string|max:50',
             'gearbox_type' => 'sometimes|in:manual,automatic',
             'status' => 'sometimes|in:available,maintenance,out_of_service',
         ]);
 
-        $vehicle->update(array_filter($validated));
+        
+        if($request->hasFile('photo'))
+            $photoUrl = $request->file('photo_url')->store('vehicule', 'public');
+        else 
+            $photoUrl = $vehicle->photo_url;
+
+        $vehicle->update([
+            'brand' => $validated['brand'],
+            'model' => $validated['model'],
+            'year' => $validated['year'],
+            'plate_number' => $validated['plate_number'],
+            'fuel_type' => $validated['fuel_type'],
+            'insurance_expiry' => $validated['insurance_expiry'],
+            'technical_inspection_date' => $validated['technical_inspection_date'],
+            'photo_url' => $photoUrl,
+            'color' => $validated['color'],
+            'gearbox_type' => $validated['gearbox_type'],
+            'status' => $validated['status'] ?? 'available',
+        ]);
 
         return response()->json([
             'success' => true,
