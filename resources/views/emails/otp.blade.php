@@ -116,18 +116,18 @@
     <div class="email-container">
         <div class="header">
             <img src="{{ asset('images/logo.png') }}" alt="Logo SMONI Auto-Moto École">
-            </div>
+        </div>
 
         <h1 class="email-title">Réinitialisation de votre mot de passe</h1>
 
-        <p class="content-paragraph">Hello John 👋</p>
+        <p class="content-paragraph">Hello 👋</p>
         <p class="content-paragraph">Une demande de réinitialisation de votre mot de passe SMONI a été faite.</p>
         <p class="content-paragraph">Si ce n'était pas vous, ignorez simplement cet email.</p>
-        <p class="content-paragraph">Sinon, cliquez ci-dessous pour choisir un nouveau mot de passe :</p>
+        <p class="content-paragraph">Ce code est valable pendant 10 minutes.</p>
 
         <div class="button-container">
-            <a href="[LIEN_DE_RÉINITIALISATION]" class="button" target="_blank">Réinitialiser mon mot de passe</a>
-            </div>
+            <a href="#" class="button" target="_blank">{{$otp}}</a>
+        </div>
 
         <p class="info-text">Si le bouton ne fonctionne pas, vous pouvez copier/coller le lien dans votre navigateur.</p>
         <p class="info-text">Et si jamais ça bloque encore, n'hésitez pas à passer par notre centre d'aide.</p>

@@ -25,10 +25,16 @@ class SendOtpCode extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Votre code de réinitialisation de mot de passe')
-                    ->line('Vous avez demandé à réinitialiser votre mot de passe.')
-                    ->line('Votre code OTP est : **' . $this->otpCode . '**')
-                    ->line('Ce code est valable pendant 10 minutes.')
-                    ->line('Si vous n\'avez pas fait cette demande, veuillez ignorer cet email.');
+            ->subject('Votre code de réinitialisation de mot de passe')
+            ->markdown('emails.otp', [
+                'otp' => $this->otpCode,
+            ]);
+
+        // return (new MailMessage)
+                    // ->subject('Votre code de réinitialisation de mot de passe')
+                    // ->line('Vous avez demandé à réinitialiser votre mot de passe.')
+                    // ->line('Votre code OTP est : **' . $this->otpCode . '**')
+                    // ->line('Ce code est valable pendant 10 minutes.')
+                    // ->line('Si vous n\'avez pas fait cette demande, veuillez ignorer cet email.');
     }
 }
