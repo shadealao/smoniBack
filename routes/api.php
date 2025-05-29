@@ -80,6 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel']);
     Route::post('/appointments/{appointment}/presence', [AppointmentController::class, 'markPresence']);
     Route::post('/appointments/{appointment}/finished', [AppointmentController::class, 'markFinished']);
+    Route::get('/appointments/{user}/instructor', [AppointmentController::class, 'listLearner']);
 
     // UserDoc Routes
     Route::post('/user-docs', [UserDocController::class, 'store']);

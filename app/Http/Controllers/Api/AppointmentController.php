@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Appointment;
 use App\Models\Availability;
 use App\Models\Vehicle;
@@ -319,6 +320,32 @@ class AppointmentController extends Controller
         return response()->json([
             'success' => true,
             'data' => $appointment->fresh(),
+            'message' => 'Rendez-vous marqué comme terminé avec succès.',
+        ], 200);
+    }
+
+    /**
+     * LIst Learner By Instrutor
+     */
+    public function listLearner(Request $request, User $user)
+    {
+        if($user->role != 'instructor')
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette utilisateur n\'est pas un instructeur',
+            ], 403);
+
+        $learners = Appointment::query()
+            ->select('learner_id')
+            ->selectRaw('SUM(duration) as total_duration') 
+            ->where('instructor_id', $user->id)
+            ->with('learner') 
+            ->groupBy('learner_id') 
+            ->paginate(10); 
+
+        return response()->json([
+            'success' => true,
+            'data' => $learners,
             'message' => 'Rendez-vous marqué comme terminé avec succès.',
         ], 200);
     }
