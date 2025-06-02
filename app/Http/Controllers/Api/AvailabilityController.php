@@ -215,7 +215,7 @@ class AvailabilityController extends Controller
         $endDate = $startDate->copy()->addDays(6);
 
         $availabilities = Availability::whereBetween('date', [$startDate, $endDate])->where('instructor_id', $user->id)
-                ->with(['meetingPoint', 'vehicle'])
+                ->with(['meetingPoint', 'vehicle','appointment.learner'])
                 ->get();
 
         return response()->json([

@@ -223,6 +223,8 @@ class AppointmentController extends Controller
         $appointment->update([
             'status' => 'cancelled',
             'cancellation_reason' => $validated['cancellation_reason'],
+            'canceled_by_monitor' => $user->role === 'learner' ? false : true,
+            'availability_id' => null,
         ]);
 
         return response()->json([

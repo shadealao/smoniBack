@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('learner_id')->constrained('users');
             $table->foreignId('instructor_id')->constrained('users');
-            $table->foreignId('availability_id')->constrained('availabilities');
+            $table->foreignId('availability_id')->constrained('availabilities')->nullable();
             $table->foreignId('vehicle_id')->constrained('vehicles');
             $table->date('date');
             $table->time('start_time');

@@ -37,4 +37,9 @@ class Availability extends Model
     {
         return $this->belongsTo(Vehicle::class);
     }
+
+    public function appointment()
+    {
+        return $this->hasOne(Appointment::class);
+    }
 }
