@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\Availability;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use App\Http\Resources\AppointmentLearnerResource;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -335,18 +336,22 @@ class AppointmentController extends Controller
                 'message' => 'Cette utilisateur n\'est pas un instructeur',
             ], 403);
 
-        $learners = Appointment::query()
-            ->select('learner_id')
-            ->selectRaw('SUM(duration) as total_duration') 
-            ->where('instructor_id', $user->id)
-            ->with('learner') 
-            ->groupBy('learner_id') 
-            ->paginate(10); 
+        // $learners = Appointment::query()
+        //     ->select('learner_id')
+        //     ->selectRaw('SUM(duration) as total_duration') 
+        //     ->where('instructor_id', $user->id)
+        //     ->with('learner') 
+        //     ->groupBy('learner_id') 
+        //     ->paginate(10); 
 
-        return response()->json([
-            'success' => true,
-            'data' => $learners,
-            'message' => 'Rendez-vous marqué comme terminé avec succès.',
-        ], 200);
+        $learners = Appointment::query()
+            ->select('learner_id','id')
+            ->selectRaw('SUM(CASE WHEN status = \'completed\' THEN duration ELSE 0 END) as total_duration')
+            ->where('instructor_id', $user->id)
+            ->groupBy('learner_id')
+            ->groupBy('id')
+            ->paginate(10);
+
+        return AppointmentLearnerResource::collection($learners);
     }
 }

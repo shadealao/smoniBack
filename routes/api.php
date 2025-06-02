@@ -97,6 +97,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Withdraw Routes
     Route::post('/withdraws', [WithdrawController::class, 'store']);
     Route::get('/withdraws', [WithdrawController::class, 'index']);
+    Route::get('/withdraws/list_monitor', [WithdrawController::class, 'list']);
     Route::post('/withdraws/{withdraw}/approve', [WithdrawController::class, 'approve']);
 
     // TrainingModule Routes

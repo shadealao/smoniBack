@@ -14,7 +14,7 @@ class Appointment extends Model
         'learner_id', 'instructor_id', 'availability_id', 'vehicle_id',
         'date', 'start_time', 'end_time', 'duration', 'status',
         'cancellation_reason', 'price', 'lesson_notes',
-        'presence_student', 'presence_monitor', 'finished', 'tag',
+        'presence_student', 'presence_monitor', 'finished', 'tag','reason','canceled_by_monitor'
     ];
 
     protected $casts = [

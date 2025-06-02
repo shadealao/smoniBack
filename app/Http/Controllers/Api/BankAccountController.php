@@ -24,8 +24,8 @@ class BankAccountController extends Controller
         }
 
         $validated = $request->validate([
-            'iban' => 'required|string|max:34|regex:/^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/',
-            'bic' => 'required|string|max:11|regex:/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/',
+            'iban' => 'required|string|max:34|regex:/^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{1,30}$/',
+            'bic' => 'required|string|max:11|regex:/^[a-zA-Z]{6}[a-zA-Z0-9]{2}([a-zA-Z0-9]{3})?$/',
             'bank_name' => 'required|string|max:255',
         ]);
 
@@ -125,8 +125,8 @@ class BankAccountController extends Controller
         }
 
         $validated = $request->validate([
-            'iban' => 'sometimes|string|max:34|regex:/^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/',
-            'bic' => 'sometimes|string|max:11|regex:/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/',
+            'iban' => 'sometimes|string|max:34|regex:/^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{1,30}$/',
+            'bic' => 'sometimes|string|max:11|regex:/^[a-zA-Z]{6}[a-zA-Z0-9]{2}([a-zA-Z0-9]{3})?$/',
             'bank_name' => 'sometimes|string|max:255',
             'status' => 'sometimes|boolean',
         ]);

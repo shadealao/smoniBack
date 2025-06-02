@@ -7,6 +7,7 @@ use App\Models\Availability;
 use App\Models\MeetingPoint;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class AvailabilityController extends Controller
@@ -30,8 +31,8 @@ class AvailabilityController extends Controller
             'vehicle_id' => 'required|exists:vehicles,id',
             'day_of_week' => 'required|in:lundi,mardi,mercredi,jeudi,vendredi,samedi,dimanche',
             'date' => 'required|date|after_or_equal:today',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
+            'start_time' => 'required',
+            'end_time' => 'required',
             'status' => 'sometimes|boolean',
         ]);
 
@@ -193,8 +194,12 @@ class AvailabilityController extends Controller
     /**
      * List all availabilities created by the instructor.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $validated = $request->validate([
+            'date' => 'required|date',
+        ]);
+
         $user = Auth::user();
 
         if ($user->role !== 'instructor') {
@@ -204,9 +209,14 @@ class AvailabilityController extends Controller
             ], 403);
         }
 
-        $availabilities = Availability::where('instructor_id', $user->id)
-                                     ->with(['meetingPoint', 'vehicle'])
-                                     ->get();
+        $startDate = Carbon::createFromFormat('Y-m-d', $request->date);
+
+        // Calculate the end date (7 days from the start date)
+        $endDate = $startDate->copy()->addDays(6);
+
+        $availabilities = Availability::whereBetween('date', [$startDate, $endDate])->where('instructor_id', $user->id)
+                ->with(['meetingPoint', 'vehicle'])
+                ->get();
 
         return response()->json([
             'success' => true,

@@ -44,7 +44,8 @@ class WithdrawController extends Controller
             'duration' => $validated['duration'],
             'currency' => $validated['currency'],
             'payed' => false,
-            'invoice_code' => $invoiceFilePath ? $this->generateInvoiceCode() : null,
+            // 'invoice_code' => $invoiceFilePath ? $this->generateInvoiceCode() : null,
+            'invoice_code' => $this->generateInvoiceCode(),
             'invoice_file' => $invoiceFilePath,
         ]);
 
@@ -58,9 +59,15 @@ class WithdrawController extends Controller
     /**
      * View all withdrawal requests (admin only).
      */
-    public function index()
+    public function index(Request $request)
     {
+        $validated = $request->validate([
+            'status' => 'nullable|string',
+            'per_page' => 'integer'
+        ]);
+
         $user = Auth::user();
+        $per_page = $request->per_page ?? 10;
 
         if ($user->role !== 'admin') {
             return response()->json([
@@ -69,7 +76,41 @@ class WithdrawController extends Controller
             ], 403);
         }
 
-        $withdraws = Withdraw::with('monitor')->get();
+        if($request->status)
+            $withdraws = Withdraw::where('payed',$request->status)->with('monitor')->paginate($per_page);
+        else
+            $withdraws = Withdraw::where('payed',$request->status)->with('monitor')->paginate($per_page);
+
+        return response()->json([
+            'success' => true,
+            'data' => $withdraws,
+            'message' => 'Liste des demandes de retrait récupérée avec succès.',
+        ], 200);
+    }
+
+    /**
+     * View all withdrawal requests (Instructor).
+     */
+    public function list(Request $request)
+    {
+        $validated = $request->validate([
+            'status' => 'nullable|string',
+            'per_page' => 'integer'
+        ]);
+        $user = Auth::user();
+        $per_page = $request->per_page ?? 10;
+
+        if ($user->role !== 'instructor') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seuls les moniteurs peuvent demander des retraits.',
+            ], 403);
+        }
+
+        if($request->status)
+            $withdraws = Withdraw::where('monitor_id',$user->id)->where('payed',$request->status)->with('monitor')->paginate($per_page);
+        else
+            $withdraws = Withdraw::where('monitor_id',$user->id)->with('monitor')->paginate($per_page);
 
         return response()->json([
             'success' => true,
