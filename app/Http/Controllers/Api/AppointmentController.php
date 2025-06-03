@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Appointment;
 use App\Models\Availability;
+use App\Models\Note;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use App\Http\Resources\AppointmentLearnerResource;
@@ -179,6 +180,38 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Confirme an appointment. (Only Instructor)
+     */
+    public function confirme(Request $request, Appointment $appointment)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'instructor') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seuls les moniteurs peuvent confirmer des rendez-vous.',
+            ], 403);
+        }
+
+        // Prevent canceling already canceled or completed appointments
+        if ($appointment->status === 'cancelled' || $appointment->status === 'completed') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce rendez-vous est déjà annulé ou terminé.',
+            ], 422);
+        }
+
+        $appointment->update([
+            'status' => 'comfirmed',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $appointment->fresh(),
+            'message' => 'Rendez-vous confirmé avec succès.',
+        ], 200);
+    }
+
+    /**
      * Cancel an appointment.
      */
     public function cancel(Request $request, Appointment $appointment)
@@ -269,8 +302,51 @@ class AppointmentController extends Controller
 
         // Update status to confirmed if both are present
         if ($appointment->presence_student && $appointment->presence_monitor) {
-            $appointment->status = 'confirmed';
+            $appointment->status = 'pending';
         }
+
+        $appointment->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => $appointment->fresh(),
+            'message' => 'Présence marquée avec succès.',
+        ], 200);
+    }
+
+    /**
+     * Mark Absence for an appointment.
+     */
+    public function markAbsence(Request $request, Appointment $appointment)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'reason' => 'nullable|string',
+        ]);
+
+        // Only learner or instructor of the appointment can mark presence
+        if (
+            ($user->role === 'learner' && $appointment->learner_id !== $user->id) ||
+            ($user->role === 'instructor' && $appointment->instructor_id !== $user->id) ||
+            ($user->role !== 'learner' && $user->role !== 'instructor')
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous n\'êtes pas autorisé à marquer la présence pour ce rendez-vous.',
+            ], 403);
+        }
+
+        // Prevent marking presence for canceled or completed appointments
+        if ($appointment->status === 'cancelled' || $appointment->status === 'completed') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Impossible de marquer la présence pour un rendez-vous annulé ou terminé.',
+            ], 422);
+        }
+
+        $appointment->status = 'completed';
+        $appointment->reason = $request->reason;
 
         $appointment->save();
 
@@ -317,7 +393,7 @@ class AppointmentController extends Controller
         }
 
         $appointment->finished = true;
-        $appointment->status = 'completed';
+        $appointment->status = 'notation';
         $appointment->save();
 
         return response()->json([
@@ -338,14 +414,6 @@ class AppointmentController extends Controller
                 'message' => 'Cette utilisateur n\'est pas un instructeur',
             ], 403);
 
-        // $learners = Appointment::query()
-        //     ->select('learner_id')
-        //     ->selectRaw('SUM(duration) as total_duration') 
-        //     ->where('instructor_id', $user->id)
-        //     ->with('learner') 
-        //     ->groupBy('learner_id') 
-        //     ->paginate(10); 
-
         $learners = Appointment::query()
             ->select('learner_id','id')
             ->selectRaw('SUM(CASE WHEN status = \'completed\' THEN duration ELSE 0 END) as total_duration')
@@ -355,5 +423,92 @@ class AppointmentController extends Controller
             ->paginate(10);
 
         return AppointmentLearnerResource::collection($learners);
+    }
+
+    /**
+     * LIst Apointment
+     */
+    public function lists(Request $request)
+    {
+        if(auth()->user()->role != 'instructor')
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette utilisateur n\'est pas un instructeur',
+            ], 403);
+
+        $appointments = Appointment::where('instructor_id', auth()->user()->id)->with('learner')->orderBy('created_at','desc')->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $appointments,
+        ], 200);
+    }
+
+    /**
+     * Lesson by Learner
+     */
+    public function lessonLearner(Request $request)
+    {
+        if(auth()->user()->role != 'learner')
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette utilisateur n\'est pas un apprenant',
+            ], 403);
+
+        $lessons = Appointment::where('learner_id', auth()->user()->id)->with('instructor')->orderBy('created_at','desc')->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $lessons,
+        ], 200);
+    }
+
+    /**
+     * Comments by Learner
+     */
+    public function comments(Request $request)
+    {
+        if(auth()->user()->role != 'instructor')
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette utilisateur n\'est pas un moniteur',
+            ], 403);
+
+        $lessons = Note::where('student_id', auth()->user()->id)->with('monitor')->orderBy('created_at','desc')->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $lessons,
+        ], 200);
+    }
+
+    /**
+     * Add Comment.
+     */
+    public function addComment(Request $request)
+    {
+        $user = Auth::user();
+
+        if(auth()->user()->role != 'instructor')
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette utilisateur n\'est pas un moniteur',
+            ], 403);
+
+        $validated = $request->validate([
+            'student_id' => 'required|exists:users,id',
+            'comment' => 'required|string|min:0',
+        ]);
+
+        $note = Note::create([
+            'student_id' => $request->student_id,
+            'monitor_id' => Auth::user(),
+            'comment' => $request->comment,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Commentaire Pédagogique bien envoyé.',
+        ], 201);
     }
 }

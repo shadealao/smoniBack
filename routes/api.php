@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserDocController;
 use App\Http\Controllers\Api\VehicleController;
 use App\Http\Controllers\Api\WithdrawController;
+use App\Http\Controllers\Api\DashboardMonitorController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,12 @@ Route::get('/services', [SubscriptionServiceController::class, 'index']);
 Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meeting_points']);
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Dashboard Monitor
+    Route::get('/dashboard/stat', [DashboardMonitorController::class, 'stat']);
+    Route::get('/dashboard/listLearner', [DashboardMonitorController::class, 'listLearner']);
+    Route::get('/dashboard/lists', [DashboardMonitorController::class, 'lists']);
+
     // Update profile routes
     Route::put('/profile/update/learner', [UserController::class, 'updateLearnerProfile']);
     Route::put('/profile/update/instructor', [UserController::class, 'updateInstructorProfile']);
@@ -77,10 +84,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // Appointment Routes
     Route::post('/appointments', [AppointmentController::class, 'store']);
     Route::put('/appointments/{appointment}', [AppointmentController::class, 'update']);
+    Route::post('/appointments/{appointment}/confirme', [AppointmentController::class, 'confirme']);
     Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel']);
     Route::post('/appointments/{appointment}/presence', [AppointmentController::class, 'markPresence']);
+    Route::post('/appointments/{appointment}/absence', [AppointmentController::class, 'markAbsence']);
     Route::post('/appointments/{appointment}/finished', [AppointmentController::class, 'markFinished']);
     Route::get('/appointments/{user}/instructor', [AppointmentController::class, 'listLearner']);
+    Route::get('/appointments/lists', [AppointmentController::class, 'lists']);
+    Route::get('/appointments/lessons', [AppointmentController::class, 'lessonLearner']);
+    Route::get('/appointments/comments', [AppointmentController::class, 'comments']);
+    Route::post('/appointments/addComment', [AppointmentController::class, 'addComment']);
+
 
     // UserDoc Routes
     Route::post('/user-docs', [UserDocController::class, 'store']);

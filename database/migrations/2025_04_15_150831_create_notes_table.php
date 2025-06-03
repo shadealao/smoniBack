@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('module_id')->nullable();
             $table->unsignedBigInteger('module_step_id')->nullable();
             $table->text('comment');
-            $table->date('date');
+            $table->date('date')->nullable();
             $table->timestamps();
         });
     }
