@@ -20,9 +20,10 @@ class DatabaseSeeder extends Seeder
             VehicleSeeder::class,
             AvailabilitySeeder::class,
             AppointmentSeeder::class,
-            TrainingModuleSeeder::class,
-            ModuleStepSeeder::class,
+            // TrainingModuleSeeder::class,
+            // ModuleStepSeeder::class,
             // LearnerProgressSeeder::class,
+            ModuleSeeder::class,
         ]);
     }
 }
