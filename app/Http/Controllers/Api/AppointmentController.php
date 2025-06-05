@@ -201,12 +201,12 @@ class AppointmentController extends Controller
         }
 
         $appointment->update([
-            'status' => 'comfirmed',
+            'status' => 'confirmed',
         ]);
 
         return response()->json([
             'success' => true,
-            'data' => $appointment->fresh(),
+            'data' => $appointment,
             'message' => 'Rendez-vous confirmé avec succès.',
         ], 200);
     }
@@ -447,15 +447,15 @@ class AppointmentController extends Controller
     /**
      * Lesson by Learner
      */
-    public function lessonLearner(Request $request)
+    public function lessonLearner(Request $request, User $user)
     {
-        if(auth()->user()->role != 'learner')
+        if($user->role != 'learner')
             return response()->json([
                 'success' => false,
                 'message' => 'Cette utilisateur n\'est pas un apprenant',
             ], 403);
 
-        $lessons = Appointment::where('learner_id', auth()->user()->id)->with('instructor')->orderBy('created_at','desc')->paginate(10);
+        $lessons = Appointment::where('learner_id', $user->id)->with('instructor')->orderBy('created_at','desc')->paginate(10);
 
         return response()->json([
             'success' => true,

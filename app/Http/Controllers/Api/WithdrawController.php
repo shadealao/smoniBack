@@ -4,12 +4,69 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Withdraw;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class WithdrawController extends Controller
 {
+
+    /**
+     * Wallet Info.
+     */
+    public function stat(){
+        $hour_billable = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration') - Withdraw::where('monitor_id', auth()->user()->id)->sum('duration');
+        $billable = [
+            'hour' => $hour_billable,
+            'cash' => $hour_billable * auth()->user()->instructorProfile->hourPrice,
+        ];
+
+        $hour_no_billable = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'notation')->sum('duration');
+        $no_billable = [
+            'hour' => $hour_no_billable,
+            'cash' => $hour_no_billable * auth()->user()->instructorProfile->hourPrice,
+        ];
+
+        $admin_cash = $hour_billable * auth()->user()->instructorProfile->hourDiscount;
+        $tva_cash = $hour_billable * auth()->user()->instructorProfile->tva;
+        $my_cash = $billable['cash'] - ($admin_cash + $tva_cash);
+
+        return response()->json([
+            'success' => true,
+            'billable' => $billable ,
+            'no_billable' => $no_billable ,
+            'admin_cash' => $admin_cash,
+            'tva_cash' => $tva_cash,
+            'my_cash' => $my_cash,
+        ], 200);
+
+    }
+
+    /**
+     * List No-billable
+     */
+    public function no_billable(Request $request)
+    {
+        if(auth()->user()->role != 'instructor')
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette utilisateur n\'est pas un instructeur',
+            ], 403);
+
+        $appointments = Appointment::where([
+            'instructor_id' => auth()->user()->id,
+            'status' => 'notation'
+        ])->with('learner')->orderBy('created_at','desc')->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $appointments,
+        ], 200);
+    }
+
+
+
     /**
      * Register a new withdrawal request (instructor only).
      */
@@ -25,28 +82,24 @@ class WithdrawController extends Controller
         }
 
         $validated = $request->validate([
-            'ammount' => 'required|integer|min:100', // Minimum 1.00 (in cents)
-            'duration' => 'required|integer|min:1|max:30', // Duration in days
-            'currency' => 'required|string|in:EUR,USD', // Supported currencies
-            'invoice_file' => 'nullable|file|mimes:pdf|max:2048', // Optional invoice PDF, max 2MB
+            // 'ammount' => 'required|integer|min:100',
+            // 'duration' => 'required|integer|min:1|max:30',
+            // 'currency' => 'required|string|in:EUR,USD',
+            'numero' => 'required|string',
         ]);
 
-        $invoiceFilePath = null;
-        if ($request->hasFile('invoice_file')) {
-            $file = $request->file('invoice_file');
-            $fileName = $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $invoiceFilePath = $file->storeAs('invoices', $fileName, 'public');
-        }
+        $hour = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration') - Withdraw::where('monitor_id', auth()->user()->id)->sum('duration');
+        $cash = $hour * auth()->user()->instructorProfile->hourPrice;
 
+        
+        
         $withdraw = Withdraw::create([
             'monitor_id' => $user->id,
-            'ammount' => $validated['ammount'],
-            'duration' => $validated['duration'],
-            'currency' => $validated['currency'],
+            'ammount' => $cash,
+            'duration' => $hour,
+            'currency' => 'EUR',
             'payed' => false,
-            // 'invoice_code' => $invoiceFilePath ? $this->generateInvoiceCode() : null,
-            'invoice_code' => $this->generateInvoiceCode(),
-            'invoice_file' => $invoiceFilePath,
+            'invoice_code' => $request->numero,
         ]);
 
         return response()->json([

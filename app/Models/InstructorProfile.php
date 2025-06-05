@@ -19,6 +19,9 @@ class InstructorProfile extends Model
         'solde',
         'certification_number',
         'certification_issue_date',
+        'hourPrice',
+        'hourDiscount',
+        'tva',
     ];
 
     protected $casts = [

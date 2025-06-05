@@ -91,7 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/appointments/{appointment}/finished', [AppointmentController::class, 'markFinished']);
     Route::get('/appointments/{user}/instructor', [AppointmentController::class, 'listLearner']);
     Route::get('/appointments/lists', [AppointmentController::class, 'lists']);
-    Route::get('/appointments/lessons', [AppointmentController::class, 'lessonLearner']);
+    Route::get('/appointments/{user}/lessons', [AppointmentController::class, 'lessonLearner']);
     Route::get('/appointments/comments', [AppointmentController::class, 'comments']);
     Route::post('/appointments/addComment', [AppointmentController::class, 'addComment']);
 
@@ -109,6 +109,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/bank-accounts/{bankAccount}', [BankAccountController::class, 'destroy']);
 
     // Withdraw Routes
+    Route::get('/withdraws/stat', [WithdrawController::class, 'stat']);
+    Route::get('/withdraws/no_billable', [WithdrawController::class, 'no_billable']);
     Route::post('/withdraws', [WithdrawController::class, 'store']);
     Route::get('/withdraws', [WithdrawController::class, 'index']);
     Route::get('/withdraws/list_monitor', [WithdrawController::class, 'list']);

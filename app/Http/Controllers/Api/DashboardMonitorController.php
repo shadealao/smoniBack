@@ -21,7 +21,7 @@ class DashboardMonitorController extends Controller
         ->groupBy('learner_id')
         ->count('learner_id');
 
-        $cash = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration');
+        $hour = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration');
 
         $count_learners_exam = ExamRegistration::where([
             'monitor_id' =>  auth()->user()->id,
@@ -33,7 +33,8 @@ class DashboardMonitorController extends Controller
         return response()->json([
             'success' => true,
             'rdv_pending' => $rdv_pending ,
-            'cash' => $cash ,
+            'cash' => $hour * auth()->user()->instructorProfile->hourPrice,
+            'hour' => $hour ,
             'learners_count' => $learners_count ,
             'count_learners_exam' => $count_learners_exam ,
         ], 200);
@@ -74,7 +75,7 @@ class DashboardMonitorController extends Controller
                 'message' => 'Cette utilisateur n\'est pas un instructeur',
             ], 403);
 
-        $appointments = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'confirmed')->with('learner')->orderBy('created_at','desc')->paginate(10);
+        $appointments = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'confirmed')->with('learner')->with('availability.meetingPoint')->orderBy('created_at','desc')->paginate(10);
 
         return response()->json([
             'success' => true,
