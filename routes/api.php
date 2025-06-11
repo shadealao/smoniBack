@@ -54,6 +54,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile/update/instructor', [UserController::class, 'updateInstructorProfile']);
     Route::post('/profile/update/photo', [UserController::class, 'updateImage']);
     Route::put('/profile/update/dropPhoto', [UserController::class, 'dropImage']);
+    Route::put('/first_login_planning', [UserController::class, 'first_login_planning']);
+    Route::put('/first_login_dashboard', [UserController::class, 'first_login_dashboard']);
 
     // View profile routes
     Route::get('/profile/learner', [UserController::class, 'viewLearnerProfile']);

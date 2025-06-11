@@ -345,4 +345,34 @@ class UserController extends Controller
         ], 200);
     }
 
+    /**
+     * First login planning 
+     */
+    public function first_login_planning(){
+        
+        auth()->user()->update([
+            'first_login_planning' => true
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => auth()->user(),
+        ], 200); 
+    }
+
+    /**
+     * First login dashboard 
+     */
+    public function first_login_dashboard(){
+        
+        auth()->user()->update([
+            'first_login_dashboard' => true
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => auth()->user(),
+        ], 200); 
+    }
+
 }

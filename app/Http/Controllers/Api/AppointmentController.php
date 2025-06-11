@@ -408,6 +408,12 @@ class AppointmentController extends Controller
      */
     public function listLearner(Request $request, User $user)
     {
+        
+        $validated = $request->validate([
+            'per_page' => 'nullable|integer',
+        ]);
+        $per_page = $request->per_page ?? 10;
+
         if($user->role != 'instructor')
             return response()->json([
                 'success' => false,
@@ -420,7 +426,7 @@ class AppointmentController extends Controller
             ->where('instructor_id', $user->id)
             ->groupBy('learner_id')
             ->groupBy('id')
-            ->paginate(10);
+            ->paginate($per_page);
 
         return AppointmentLearnerResource::collection($learners);
     }
@@ -455,7 +461,7 @@ class AppointmentController extends Controller
                 'message' => 'Cette utilisateur n\'est pas un apprenant',
             ], 403);
 
-        $lessons = Appointment::where('learner_id', $user->id)->with('instructor')->orderBy('created_at','desc')->paginate(10);
+        $lessons = Appointment::where('learner_id', $user->id)->with('instructor')->orderBy('created_at','desc')->get();
 
         return response()->json([
             'success' => true,
