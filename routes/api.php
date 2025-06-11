@@ -94,7 +94,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/appointments/{user}/instructor', [AppointmentController::class, 'listLearner']);
     Route::get('/appointments/lists', [AppointmentController::class, 'lists']);
     Route::get('/appointments/{user}/lessons', [AppointmentController::class, 'lessonLearner']);
-    Route::get('/appointments/comments', [AppointmentController::class, 'comments']);
+    Route::get('/appointments/{user}/comments', [AppointmentController::class, 'comments']);
     Route::post('/appointments/addComment', [AppointmentController::class, 'addComment']);
 
 

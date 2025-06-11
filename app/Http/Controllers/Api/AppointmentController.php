@@ -472,7 +472,7 @@ class AppointmentController extends Controller
     /**
      * Comments by Learner
      */
-    public function comments(Request $request)
+    public function comments(Request $request, User $user)
     {
         if(auth()->user()->role != 'instructor')
             return response()->json([
@@ -480,7 +480,7 @@ class AppointmentController extends Controller
                 'message' => 'Cette utilisateur n\'est pas un moniteur',
             ], 403);
 
-        $lessons = Note::where('student_id', auth()->user()->id)->with('monitor')->orderBy('created_at','desc')->paginate(10);
+        $lessons = Note::where('student_id', $user->id)->with('monitor')->orderBy('created_at','desc')->paginate(10);
 
         return response()->json([
             'success' => true,
