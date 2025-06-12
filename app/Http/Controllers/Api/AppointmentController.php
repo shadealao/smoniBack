@@ -474,13 +474,17 @@ class AppointmentController extends Controller
      */
     public function comments(Request $request, User $user)
     {
+        $validated = $request->validate([
+            'per_page' => 'integer|nullable',
+        ]);
+        $per_page = $request->per_page ?? 10;
         if(auth()->user()->role != 'instructor')
             return response()->json([
                 'success' => false,
                 'message' => 'Cette utilisateur n\'est pas un moniteur',
             ], 403);
 
-        $lessons = Note::where('student_id', $user->id)->with('monitor')->orderBy('created_at','desc')->paginate(10);
+        $lessons = Note::where('student_id', $user->id)->with('monitor')->orderBy('created_at','desc')->paginate($per_page);
 
         return response()->json([
             'success' => true,
@@ -503,18 +507,45 @@ class AppointmentController extends Controller
 
         $validated = $request->validate([
             'student_id' => 'required|exists:users,id',
-            'comment' => 'required|string|min:0',
+            'comment' => 'required|string',
         ]);
 
         $note = Note::create([
             'student_id' => $request->student_id,
-            'monitor_id' => Auth::user(),
+            'monitor_id' => Auth::user()->id,
             'comment' => $request->comment,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Commentaire Pédagogique bien envoyé.',
+        ], 201);
+    }
+
+    /**
+     * Update Comment.
+     */
+    public function updateComment(Request $request, Note $note)
+    {
+        $user = Auth::user();
+
+        if(auth()->user()->role != 'instructor')
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette utilisateur n\'est pas un moniteur',
+            ], 403);
+
+        $validated = $request->validate([
+            'comment' => 'required|string',
+        ]);
+
+        $note->update([
+            'comment' => $request->comment,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Commentaire Pédagogique bien modifié.',
         ], 201);
     }
 }

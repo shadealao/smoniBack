@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/stat', [DashboardMonitorController::class, 'stat']);
     Route::get('/dashboard/listLearner', [DashboardMonitorController::class, 'listLearner']);
     Route::get('/dashboard/lists', [DashboardMonitorController::class, 'lists']);
+    Route::get('/dashboard/graph', [DashboardMonitorController::class, 'graph']);
 
     // Update profile routes
     Route::put('/profile/update/learner', [UserController::class, 'updateLearnerProfile']);
@@ -96,6 +97,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/appointments/{user}/lessons', [AppointmentController::class, 'lessonLearner']);
     Route::get('/appointments/{user}/comments', [AppointmentController::class, 'comments']);
     Route::post('/appointments/addComment', [AppointmentController::class, 'addComment']);
+    Route::put('/appointments/{note}/updateComment', [AppointmentController::class, 'updateComment']);
 
 
     // UserDoc Routes

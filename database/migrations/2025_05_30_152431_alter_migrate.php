@@ -12,8 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('appointments', function (Blueprint $table) {
-            $table->enum('status', ['scheduled', 'confirmed', 'completed','notation', 'pending', 'cancelled'])->default('scheduled');
-
             $table->boolean('canceled_by_monitor')->nullable();
             $table->text('reason')->nullable();
         });
@@ -33,7 +31,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('appointments', function (Blueprint $table) {            
-            $table->dropColumn('canceled_by_monitor');
             $table->dropColumn('canceled_by_monitor');
             $table->dropColumn('reason');
         });
