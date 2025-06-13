@@ -26,4 +26,9 @@ class ModuleStep extends Model
     {
         return $this->belongsTo(TrainingModule::class, 'module_id');
     }
+
+    public function competences()
+    {
+        return $this->hasMany(StepModuleItem::class,'id');
+    }
 }

@@ -11,19 +11,12 @@ class LearnerProgres extends Model
     use HasFactory;
 
     protected $fillable = [
-        'monitor_id', 'learner_id', 'module_id', 'current_step_id', 'status',
-        'started_at', 'completed_at', 'instructor_notes', 'is_completed'
+        'appointment_id', 'learner_id', 'step_item_id'
     ];
 
-    protected $casts = [
-        'status' => 'string',
-        'started_at' => 'datetime',
-        'completed_at' => 'datetime',
-    ];
-
-    public function monitor()
+    public function appointment()
     {
-        return $this->belongsTo(User::class, 'monitor_id');
+        return $this->belongsTo(Appointment::class, 'appointment_id');
     }
 
     public function learner()
@@ -31,13 +24,8 @@ class LearnerProgres extends Model
         return $this->belongsTo(User::class, 'learner_id');
     }
 
-    public function module()
+    public function stepItem()
     {
-        return $this->belongsTo(TrainingModule::class, 'module_id');
-    }
-
-    public function currentStep()
-    {
-        return $this->belongsTo(ModuleStep::class, 'current_step_id');
+        return $this->belongsTo(StepModuleItem::class, 'step_item_id');
     }
 }

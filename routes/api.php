@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\UserDocController;
 use App\Http\Controllers\Api\VehicleController;
 use App\Http\Controllers\Api\WithdrawController;
 use App\Http\Controllers\Api\DashboardMonitorController;
+use App\Http\Controllers\Api\ModuleController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,10 @@ Route::get('/services', [SubscriptionServiceController::class, 'index']);
 Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meeting_points']);
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Module Routes
+    Route::get('/modules/{user}/module', [ModuleController::class, 'index']);
+    Route::post('/modules/{appointment}/store', [ModuleController::class, 'store']);
 
     // Dashboard Monitor
     Route::get('/dashboard/stat', [DashboardMonitorController::class, 'stat']);
@@ -104,6 +109,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user-docs', [UserDocController::class, 'store']);
     Route::get('/user-docs', [UserDocController::class, 'index']);
     Route::delete('/user-docs/{userDoc}', [UserDocController::class, 'destroy']);
+
 
     // BankAccount Routes
     Route::post('/bank-accounts', [BankAccountController::class, 'store']);

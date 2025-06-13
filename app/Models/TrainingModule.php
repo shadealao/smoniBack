@@ -25,7 +25,7 @@ class TrainingModule extends Model
 
     public function steps()
     {
-        return $this->hasMany(ModuleStep::class, 'module_id');
+        return $this->hasMany(ModuleStep::class,'id');
     }
 
     public function progresses(): HasMany
