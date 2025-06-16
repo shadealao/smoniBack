@@ -8,6 +8,7 @@ use App\Models\MeetingPoint;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class AvailabilityController extends Controller
@@ -214,9 +215,64 @@ class AvailabilityController extends Controller
         // Calculate the end date (7 days from the start date)
         $endDate = $startDate->copy()->addDays(6);
 
-        $availabilities = Availability::whereBetween('date', [$startDate, $endDate])->where('instructor_id', $user->id)
-                ->with(['meetingPoint', 'vehicle','appointment.learner'])
+        Log::info('Fetching availabilities for instructor ID: ' . $user->id . ' from ' . $startDate . ' to ' . $endDate);
+
+
+        // Force the date format to 'Y-m-d' before the whereBetween query
+        $startDate = $startDate->format('Y-m-d');
+        $endDate = $endDate->format('Y-m-d');
+
+        Log::info('Fetching availabilities for instructor ID: ' . $user->id . ' from ' . $startDate . ' to ' . $endDate);
+
+        // Générer les disponibilités récurrentes manquantes pour la semaine
+        $currentDate = Carbon::parse($startDate);
+        $endDateObj = Carbon::parse($endDate);
+        while ($currentDate->lte($endDateObj)) {
+            $dayOfWeek = strtolower($currentDate->locale('fr')->dayName);
+            $repeateds = \App\Models\AvailabilityRepeated::where('monitor_id', $user->id)
+                ->where('day_of_week', $dayOfWeek)
                 ->get();
+            foreach ($repeateds as $repeated) {
+                $times = json_decode($repeated->time, true);
+                foreach ($times as $time) {
+                    $exists = Availability::where('instructor_id', $user->id)
+                        ->where('date', $currentDate->format('Y-m-d'))
+                        ->where('start_time', $time['start'])
+                        ->where('end_time', $time['end'])
+                        ->where('meeting_point_id', $repeated->meeting_point_id)
+                        ->where('vehicle_id', $repeated->vehicle_id)
+                        ->exists();
+                    if (!$exists) {
+                        Availability::create([
+                            'instructor_id' => $user->id,
+                            'meeting_point_id' => $repeated->meeting_point_id,
+                            'vehicle_id' => $repeated->vehicle_id,
+                            'day_of_week' => $dayOfWeek,
+                            'date' => $currentDate->format('Y-m-d'),
+                            'start_time' => $time['start'],
+                            'end_time' => $time['end'],
+                            'status' => $repeated->status,
+                        ]);
+                    }
+                }
+            }
+            $currentDate->addDay();
+        }
+
+        $availabilities = Availability::whereBetween('date', [$startDate, $endDate])
+            ->where('instructor_id', $user->id)
+            ->with(['meetingPoint', 'vehicle', 'appointment.learner'])
+            ->get();
+
+        // Ajout des infos de l'apprenant si la disponibilité a un rendez-vous (appointment)
+        $availabilities = $availabilities->map(function ($availability) {
+            if ($availability->appointment && $availability->appointment->learner) {
+                $availability->learner = $availability->appointment->learner;
+            } else {
+                $availability->learner = null;
+            }
+            return $availability;
+        });
 
         return response()->json([
             'success' => true,

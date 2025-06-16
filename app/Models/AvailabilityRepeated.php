@@ -10,11 +10,12 @@ class AvailabilityRepeated extends Model
 
     protected $fillable = [
         'monitor_id', 'meeting_point_id', 'vehicle_id',
-        'day', 'start_time', 'end_time', 'status',
+        'day_of_week', 'time', 'status',
     ];
 
     protected $casts = [
         'status' => 'boolean',
+        'time' => 'array',
     ];
 
     public function monitor(): BelongsTo
