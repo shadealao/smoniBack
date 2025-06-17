@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('learner_id')->constrained('users');
             $table->foreignId('module_id')->constrained('training_modules');
+            $table->foreignId('list_badge_id')->constrained('list_badges');
             $table->timestamp('awarded_at');
             $table->foreignId('validation_instructor_id')->constrained('users');
             $table->string('certification_url')->nullable();

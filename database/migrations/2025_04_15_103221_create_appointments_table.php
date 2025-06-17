@@ -21,7 +21,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->integer('duration');
-            $table->enum('status', ['scheduled', 'confirmed', 'completed', 'cancelled']);
+            $table->enum('status', ['scheduled', 'confirmed', 'completed', 'cancelled','pending','notation']);
             $table->text('cancellation_reason')->nullable();
             $table->decimal('price', 8, 2)->nullable();
             $table->json('lesson_notes')->nullable();

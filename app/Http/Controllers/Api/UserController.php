@@ -304,6 +304,56 @@ class UserController extends Controller
     }
 
     /**
+     * Update Password
+     */
+    public function changePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'older' => 'required|string|min:8',
+            'password' => 'required|string|min:8',
+            'confirm' => 'required|string|same:password',
+        ]);
+
+        $verify = Hash::check($request->older, auth()->user()->password);
+        if (!$verify) {
+            return response()->json([
+                'status' => false,
+                'code' => 400,
+                'message' => 'Mot de passe incorrect',
+            ]);
+        }
+
+        auth()->user()->update([
+            "password" => $request->password,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mot de passe mis à jour avec succès.',
+        ], 200);
+    }
+
+    /**
+     * Supprimer Compte
+     */
+    public function deleteCompte(Request $request)
+    {
+        $n = time();
+
+        auth()->user()->update([
+            "email" => time().'-'.auth()->user()->email,
+            "is_active" => false,
+            "lastname" => 'Compte Supprimer'.$n,
+            'firstname' => 'Compte Supprimer'.$n,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Compte supprimer',
+        ], 200);
+    }
+
+    /**
      * Update profil Image.
      * * @param Request $request
      * 

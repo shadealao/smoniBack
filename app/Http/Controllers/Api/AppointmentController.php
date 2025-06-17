@@ -207,6 +207,7 @@ class AppointmentController extends Controller
         return response()->json([
             'success' => true,
             'data' => $appointment,
+            'learner' => $appointment->learner,
             'message' => 'Rendez-vous confirmé avec succès.',
         ], 200);
     }
@@ -294,7 +295,7 @@ class AppointmentController extends Controller
             ], 422);
         }
 
-        if ($user->role === 'learner') {
+        if ($user->role == 'learner') {
             $appointment->presence_student = true;
         } else {
             $appointment->presence_monitor = true;

@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\VehicleController;
 use App\Http\Controllers\Api\WithdrawController;
 use App\Http\Controllers\Api\DashboardMonitorController;
 use App\Http\Controllers\Api\ModuleController;
+use App\Http\Controllers\Api\LearnerController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,10 @@ Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meetin
 
 Route::middleware('auth:sanctum')->group(function () {
 
+    // Learner Routes
+    Route::get('/modules/{user}/module', [LearnerController::class, 'index']);
+    Route::post('/modules/{appointment}/store', [LearnerController::class, 'store']);
+
     // Module Routes
     Route::get('/modules/{user}/module', [ModuleController::class, 'index']);
     Route::post('/modules/{appointment}/store', [ModuleController::class, 'store']);
@@ -58,10 +63,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Update profile routes
     Route::put('/profile/update/learner', [UserController::class, 'updateLearnerProfile']);
     Route::put('/profile/update/instructor', [UserController::class, 'updateInstructorProfile']);
+    Route::put('/profile/update/password', [UserController::class, 'changePassword']);
     Route::post('/profile/update/photo', [UserController::class, 'updateImage']);
     Route::put('/profile/update/dropPhoto', [UserController::class, 'dropImage']);
     Route::put('/first_login_planning', [UserController::class, 'first_login_planning']);
     Route::put('/first_login_dashboard', [UserController::class, 'first_login_dashboard']);
+    Route::put('/profile/deleteCompte', [UserController::class, 'deleteCompte']);
 
     // View profile routes
     Route::get('/profile/learner', [UserController::class, 'viewLearnerProfile']);
