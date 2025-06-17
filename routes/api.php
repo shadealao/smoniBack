@@ -47,8 +47,9 @@ Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meetin
 Route::middleware('auth:sanctum')->group(function () {
 
     // Learner Routes
-    Route::get('/modules/{user}/module', [LearnerController::class, 'index']);
-    Route::post('/modules/{appointment}/store', [LearnerController::class, 'store']);
+    Route::get('/userBadges', [LearnerController::class, 'userBadges']);
+    Route::get('/userNotification', [LearnerController::class, 'userNotification']);
+    Route::get('/userProgress', [LearnerController::class, 'userProgress']);
 
     // Module Routes
     Route::get('/modules/{user}/module', [ModuleController::class, 'index']);
