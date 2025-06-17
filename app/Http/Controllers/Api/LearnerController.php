@@ -4,6 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Badge;
+use App\Models\ListBadge;
+use App\Models\Notification;
+use App\Models\LearnerProgres;
+use App\Models\TrainingModule;
 
 class LearnerController extends Controller
 {
