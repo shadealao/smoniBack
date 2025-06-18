@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
+use App\Http\Controllers\Api\AvailabilityRepeatedController;
 use App\Http\Controllers\Api\BankAccountController;
 use App\Http\Controllers\Api\EvaluationController;
 use App\Http\Controllers\Api\ExamNoteController;
@@ -96,6 +97,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/availabilities/{availability}', [AvailabilityController::class, 'show']);
     Route::put('/availabilities/{availability}', [AvailabilityController::class, 'update']);
     Route::delete('/availabilities/{availability}', [AvailabilityController::class, 'destroy']);
+
+    // AvailabilityRepeated Routes
+    Route::get('/availability-repeateds', [AvailabilityRepeatedController::class, 'index']);
+    Route::post('/availability-repeateds', [AvailabilityRepeatedController::class, 'store']);
+    Route::get('/availability-repeateds/{availabilityRepeated}', [AvailabilityRepeatedController::class, 'show']);
+    Route::put('/availability-repeateds/{availabilityRepeated}', [AvailabilityRepeatedController::class, 'update']);
+    Route::delete('/availability-repeateds/{availabilityRepeated}', [AvailabilityRepeatedController::class, 'destroy']);
 
     // Appointment Routes
     Route::post('/appointments', [AppointmentController::class, 'store']);
