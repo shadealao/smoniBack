@@ -19,7 +19,7 @@ class ModuleController extends Controller
      */
     public function store(Request $request,Appointment $appointment){
 
-        if ($user->role !== 'instructor') {
+        if (auth()->user()->role !== 'instructor') {
             return response()->json([
                 'success' => false,
                 'message' => 'Seuls les moniteurs peut mettre à jour la progression.',
@@ -43,6 +43,8 @@ class ModuleController extends Controller
                     'step_item_id' => $competence, 
                 ]);
             }
+
+
 
         DB::commit();
 
