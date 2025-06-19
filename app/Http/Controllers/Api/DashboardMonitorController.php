@@ -54,11 +54,10 @@ class DashboardMonitorController extends Controller
             ], 403);
 
         $learners = Appointment::query()
-            ->select('learner_id','id')
+            ->select('learner_id')
             ->selectRaw('SUM(CASE WHEN status = \'completed\' THEN duration ELSE 0 END) as total_duration')
             ->where('instructor_id', auth()->user()->id)
             ->groupBy('learner_id')
-            ->groupBy('id')
             ->limit(10)
             ->get();
 

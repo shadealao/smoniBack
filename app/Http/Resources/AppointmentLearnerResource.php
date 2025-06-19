@@ -20,14 +20,12 @@ class AppointmentLearnerResource extends JsonResource
             $status = $exam->status == "registered" ? true : false;
         else $status = false;
         return [
-            'id' => $this->id,
+            'id' => $this->learner->id,
             'learner' => $this->learner,
             'total_duration' => $this->total_duration,
             'status' => $status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            
-            
         ];
     }
 }

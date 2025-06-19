@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\VehicleController;
 use App\Http\Controllers\Api\WithdrawController;
 use App\Http\Controllers\Api\DashboardMonitorController;
 use App\Http\Controllers\Api\ModuleController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\LearnerController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -49,8 +50,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Learner Routes
     Route::get('/userBadges', [LearnerController::class, 'userBadges']);
-    Route::get('/userNotification', [LearnerController::class, 'userNotification']);
     Route::get('/userProgress', [LearnerController::class, 'userProgress']);
+
+    // Notifications Routes
+    Route::get('/notif/allAsRead', [NotificationController::class, 'allAsRead']);
+    Route::get('/userNotification', [NotificationController::class, 'userNotification']);
+    Route::get('/notif/{notification}/oneAsRead', [NotificationController::class, 'oneAsRead']);
 
     // Module Routes
     Route::get('/modules/{user}/module', [ModuleController::class, 'index']);
@@ -94,6 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Availability Routes
     Route::post('/availabilities', [AvailabilityController::class, 'store']);
     Route::get('/availabilities', [AvailabilityController::class, 'index']);
+    Route::get('/listByDate', [AvailabilityController::class, 'listByDate']);
     Route::get('/availabilities/{availability}', [AvailabilityController::class, 'show']);
     Route::put('/availabilities/{availability}', [AvailabilityController::class, 'update']);
     Route::delete('/availabilities/{availability}', [AvailabilityController::class, 'destroy']);

@@ -422,11 +422,10 @@ class AppointmentController extends Controller
             ], 403);
 
         $learners = Appointment::query()
-            ->select('learner_id','id')
+            ->select('learner_id')
             ->selectRaw('SUM(CASE WHEN status = \'completed\' THEN duration ELSE 0 END) as total_duration')
             ->where('instructor_id', $user->id)
             ->groupBy('learner_id')
-            ->groupBy('id')
             ->paginate($per_page);
 
         return AppointmentLearnerResource::collection($learners);

@@ -280,4 +280,40 @@ class AvailabilityController extends Controller
             'message' => 'Liste des disponibilités récupérée avec succès.',
         ], 200);
     }
+
+    /**
+     * Availabilities By Date.
+     */
+    public function listByDate(Request $request)
+    {
+        $validated = $request->validate([
+            'date' => 'required|date',
+        ]);
+
+        $user = Auth::user();
+
+        if ($user->role !== 'instructor') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seuls les moniteurs peuvent voir leurs disponibilités.',
+            ], 403);
+        }
+
+        $date = Carbon::createFromFormat('Y-m-d', $request->date);
+
+
+        // Force the date format to 'Y-m-d' before the whereBetween query
+        $date = $date->format('Y-m-d');
+
+        $availabilities = Availability::whereDate('date', $date)
+            ->where('instructor_id', $user->id)
+            ->with(['meetingPoint', 'vehicle', 'appointment.learner'])
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $availabilities,
+            'message' => 'Liste des disponibilités récupérée avec succès.',
+        ], 200);
+    }
 }

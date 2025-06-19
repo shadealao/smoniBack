@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             // ModuleStepSeeder::class,
             // LearnerProgressSeeder::class,
             ModuleSeeder::class,
+            BadgeSeeder::class,
             AvailabilityRepeatedSeeder::class,
         ]);
     }

@@ -9,6 +9,7 @@ use App\Models\ListBadge;
 use App\Models\Notification;
 use App\Models\LearnerProgres;
 use App\Models\TrainingModule;
+use Illuminate\Validation\Rule;
 
 class LearnerController extends Controller
 {
@@ -33,20 +34,6 @@ class LearnerController extends Controller
     }
 
     /**
-     * Notifications
-     * 
-     */
-     public function userNotification(){
-    
-        $notifications = Notification::where('user_id', auth()->user()->id)->paginate(10);
-
-        return response()->json([
-            'success' => true,
-            'data' => $notifications,
-        ], 200);
-    }
-
-     /**
      * User Progress
      */
     public function userProgress(){
@@ -56,6 +43,8 @@ class LearnerController extends Controller
         $trainingModules = TrainingModule::all();
 
         $module = array();
+        $progress = 0;
+
         foreach ($trainingModules as $trainingModule) {
             
             $subModule = array();
@@ -96,16 +85,15 @@ class LearnerController extends Controller
                 'subModule' => $subModule,
             ];
             array_push($module, $detail_module );
+            $progress = $progress + $detail_module['stat'];
 
         }
 
         return response()->json([
             'success' => true,
+            'progress' =>$progress,
             'data' => $module,
         ], 200); 
         
     }
-
-    
-
 }
