@@ -37,14 +37,19 @@ class ModuleController extends Controller
                 'status' => 'completed',
             ]);
             foreach ($request->competences as $competence) {
-                $progress = LearnerProgres::create([
+                
+                $progress = LearnerProgres::firstOrCreate([
+                    'appointment_id' => $appointment->id, 
+                    'learner_id' => auth()->user()->id, 
+                    'step_item_id' => $competence, 
+                ],
+                [
                     'appointment_id' => $appointment->id, 
                     'learner_id' => auth()->user()->id, 
                     'step_item_id' => $competence, 
                 ]);
+
             }
-
-
 
         DB::commit();
 
@@ -70,11 +75,14 @@ class ModuleController extends Controller
             $subModule = array();
             $total_check_comp = 0;
             $total_comp = 0;
-            foreach ($trainingModule->steps as $moduleStep) {
+            $moduleSteps = ModuleStep::where('module_id',$trainingModule->id)->get();
+            foreach ($moduleSteps as $moduleStep) {
             
                 $compet = array();
                 $check=0;
-                foreach ($moduleStep->competences as $competence) {
+                
+                $competences = StepModuleItem::where('step_id',$moduleStep->id)->get();
+                foreach ($competences as $competence) {
                     
                     $detail_compet = [
                         'id' => $competence->id,
@@ -92,6 +100,23 @@ class ModuleController extends Controller
                     'stat' => ($check * 100)/$moduleStep->competences->count(),
                     'competence' => $compet,
                 ];
+                if($detail_subModule['stat'] == 100){
+                    Badge::firstOrCreate([
+                        'learner_id' => $user->id, 
+                        'module_id' => $moduleStep->id,
+                        'list_badge_id' => $moduleStep->id, 
+                        'awarded_at' => new \DateTime(), 
+                        'validation_instructor_id' => auth()->user()->id, 
+                    ],
+                    [
+                        'learner_id' => $user->id, 
+                        'module_id' => $moduleStep->id,
+                        'list_badge_id' => $moduleStep->id, 
+                        'awarded_at' => new \DateTime(), 
+                        'validation_instructor_id' => auth()->user()->id, 
+                    ]);
+                }
+
                 array_push($subModule, $detail_subModule );
                 $total_check_comp = $total_check_comp + $check;
                 $total_comp = $total_comp + $moduleStep->competences->count();

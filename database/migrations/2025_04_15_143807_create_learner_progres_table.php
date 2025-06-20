@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('learner_progres', function (Blueprint $table) {
             $table->id();
             $table->foreignId('learner_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('monitor_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('appointment_id')->constrained('appointments')->onDelete('cascade');
             $table->foreignId('step_item_id')->constrained('step_module_items')->unique()->onDelete('cascade');
             $table->timestamps();
         });

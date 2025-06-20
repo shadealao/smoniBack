@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\Badge;
 use App\Models\ListBadge;
 use App\Models\Notification;
+use App\Models\ModuleStep;
+use App\Models\StepModuleItem;
 use App\Models\LearnerProgres;
+use App\Models\Appointment;
 use App\Models\TrainingModule;
 use Illuminate\Validation\Rule;
 
@@ -18,7 +21,7 @@ class LearnerController extends Controller
      */
     public function userBadges()
     {
-        $badges = Badge::where('learner_id',auth()->user()->id)->get();
+        $badges = Badge::where('learner_id',auth()->user()->id)->with('list_badge')->get();
         $ids = Badge::where('learner_id',auth()->user()->id)->pluck('id')->toArray();
 
         $nobadges = ListBadge::whereNotIn('id',$ids)->get();
@@ -50,11 +53,13 @@ class LearnerController extends Controller
             $subModule = array();
             $total_check_comp = 0;
             $total_comp = 0;
-            foreach ($trainingModule->steps as $moduleStep) {
+            $moduleSteps = ModuleStep::where('module_id',$trainingModule->id)->get();
+            foreach ($moduleSteps as $moduleStep) {
             
                 $compet = array();
                 $check=0;
-                foreach ($moduleStep->competences as $competence) {
+                $competences = StepModuleItem::where('step_id',$moduleStep->id)->get();
+                foreach ($competences as $competence) {
                     
                     $detail_compet = [
                         'id' => $competence->id,
@@ -95,5 +100,18 @@ class LearnerController extends Controller
             'data' => $module,
         ], 200); 
         
+    }
+
+    /**
+     * Lesson
+     */
+    public function lessonLearner(Request $request)
+    {
+        $lessons = Appointment::where('learner_id', auth()->user()->id)->with('instructor')->with('availability.meetingPoint')->orderBy('created_at','desc')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $lessons,
+        ], 200);
     }
 }

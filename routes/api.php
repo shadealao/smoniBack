@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Learner Routes
     Route::get('/userBadges', [LearnerController::class, 'userBadges']);
     Route::get('/userProgress', [LearnerController::class, 'userProgress']);
+    Route::get('/lessonLearner', [LearnerController::class, 'lessonLearner']);
 
     // Notifications Routes
     Route::get('/notif/allAsRead', [NotificationController::class, 'allAsRead']);
