@@ -413,7 +413,7 @@ class AppointmentController extends Controller
         $validated = $request->validate([
             'per_page' => 'nullable|integer',
         ]);
-        $per_page = $request->per_page ?? 10;
+        $per_page = $request->per_page ?? 200;
 
         if($user->role != 'instructor')
             return response()->json([
@@ -425,6 +425,7 @@ class AppointmentController extends Controller
             ->select('learner_id')
             ->selectRaw('SUM(CASE WHEN status = \'completed\' THEN duration ELSE 0 END) as total_duration')
             ->where('instructor_id', $user->id)
+            ->whereIn('status', ['pending', 'notation', 'completed'])
             ->groupBy('learner_id')
             ->paginate($per_page);
 
@@ -436,13 +437,19 @@ class AppointmentController extends Controller
      */
     public function lists(Request $request)
     {
+
+        $validated = $request->validate([
+            'per_page' => 'nullable|integer',
+        ]);
+        $per_page = $request->per_page ?? 200;
+
         if(auth()->user()->role != 'instructor')
             return response()->json([
                 'success' => false,
                 'message' => 'Cette utilisateur n\'est pas un instructeur',
             ], 403);
 
-        $appointments = Appointment::where('instructor_id', auth()->user()->id)->with('learner')->orderBy('created_at','desc')->paginate(10);
+        $appointments = Appointment::where('instructor_id', auth()->user()->id)->with('learner')->orderBy('created_at','desc')->paginate($per_page);
 
         return response()->json([
             'success' => true,

@@ -33,6 +33,27 @@ class MeetingPointController extends Controller
             'is_active' => 'sometimes|boolean',
         ]);
 
+        $existing = MeetingPoint::where('user_id', $user->id)
+        ->where('label', $validated['label'])
+        ->first();
+
+        if ($existing) {
+            if ($existing->is_active) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ce point de rendez-vous existe déjà.',
+                ], 409);
+            } else {
+                $existing->is_active = true;
+                $existing->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => $existing,
+                    'message' => 'Point de rendez-vous réactivé.',
+                ], 200);
+            }
+        }
+
         $meetingPoint = MeetingPoint::create([
             'instructor_id' => $user->id,
             'label' => $validated['label'],
@@ -127,7 +148,8 @@ class MeetingPointController extends Controller
             ], 403);
         }
 
-        $meetingPoint->delete();
+        $meetingPoint->is_active = false;
+        $meetingPoint->save();
 
         return response()->json([
             'success' => true,
@@ -149,7 +171,7 @@ class MeetingPointController extends Controller
             ], 403);
         }
 
-        $meetingPoints = MeetingPoint::where('instructor_id', $user->id)->get();
+        $meetingPoints = MeetingPoint::where('instructor_id', $user->id)->where('is_active',true)->get();
 
         return response()->json([
             'success' => true,

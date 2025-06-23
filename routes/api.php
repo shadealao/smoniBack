@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\ModuleController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\LearnerController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Api\StripeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -50,8 +51,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Learner Routes
     Route::get('/userBadges', [LearnerController::class, 'userBadges']);
+    Route::get('learner/badges/qty', [LearnerController::class, 'userBadgesQty']);
     Route::get('/userProgress', [LearnerController::class, 'userProgress']);
     Route::get('/lessonLearner', [LearnerController::class, 'lessonLearner']);
+    Route::post('/learner/cancel/rdv', [LearnerController::class, 'cancelrRdv']);
+    Route::post('/learner/display/availabilities', [LearnerController::class, 'instructorsAvailable']);
 
     // Notifications Routes
     Route::get('/notif/allAsRead', [NotificationController::class, 'allAsRead']);
@@ -200,4 +204,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Statistiques
     Route::get('evaluation-stats', [EvaluationController::class, 'stats']);
+
+    // Paiement
+    Route::post('/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
 });

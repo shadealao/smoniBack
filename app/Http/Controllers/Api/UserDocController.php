@@ -23,6 +23,17 @@ class UserDocController extends Controller
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // 2MB max
         ]);
 
+        $exists = UserDoc::where('user_id', $user->id)
+        ->where('name', $validated['name'])
+        ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Un document avec ce nom existe déjà pour cet utilisateur.'
+            ], 409);
+        }
+
         $file = $request->file('file');
         $fileName = $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
         $filePath = $file->storeAs('documents', $fileName, 'public');

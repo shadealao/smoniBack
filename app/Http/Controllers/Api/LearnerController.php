@@ -12,7 +12,9 @@ use App\Models\StepModuleItem;
 use App\Models\LearnerProgres;
 use App\Models\Appointment;
 use App\Models\TrainingModule;
+use App\Models\Availability;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class LearnerController extends Controller
 {
@@ -32,6 +34,19 @@ class LearnerController extends Controller
                 "badges" => $badges,
                 "nobadges" => $nobadges,
             ],
+            'message' => 'Nombre de badge récupérer avec succès.',
+        ], 200);
+    }
+
+    /**
+     * Nombre de badge obtenu
+     */
+    public function userBadgesQty() {
+        $badges = Badge::where('learner_id',auth()->user()->id)->with('list_badge')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' =>  count($badges),
             'message' => 'Liste des badges récupérée avec succès.',
         ], 200);
     }
@@ -107,11 +122,97 @@ class LearnerController extends Controller
      */
     public function lessonLearner(Request $request)
     {
-        $lessons = Appointment::where('learner_id', auth()->user()->id)->with('instructor')->with('availability.meetingPoint')->orderBy('created_at','desc')->get();
+        $lessons = Appointment::where('learner_id', auth()->user()->id)->with(['instructor', 'availability.meetingPoint', 'vehicle'])->orderBy('created_at','desc')->get();
 
         return response()->json([
             'success' => true,
             'data' => $lessons,
+        ], 200);
+    }
+
+    /**
+     * Annuler un rendez-vous
+     */
+    public function cancelrRdv(Request $request) {
+        
+        $validated = $request->validate([
+            'learner_id' => ['required', 'integer', 'exists:users,id'],
+            'appointment_id' => ['required', 'integer', 'exists:appointments,id'],
+            'cancellation_reason' => ['required', 'string']
+        ]);
+
+        // Vérifier si le rendez-vous existe
+        $appointment = Appointment::where('id', $validated['appointment_id'])
+            ->where('learner_id', $validated['learner_id'])
+            ->first();
+
+        if (!$appointment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Rendez-vous introuvable.'
+            ], 404);
+        }
+
+        // Vérifier la différence de temps
+        $now = now();
+        $rdvDate = $appointment->date instanceof Carbon ? $appointment->date : Carbon::parse($appointment->date);
+        $diffInHours = $now->diffInHours($rdvDate, false);
+        if ($diffInHours < 48) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Annulation impossible : moins de 48h avant le rendez-vous.'
+            ], 403);
+        }
+
+        // Annulation possible
+        $appointment->status = 'canceled';
+        $appointment->cancellation_reason = $validated['cancellation_reason'];
+        $appointment->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rendez-vous annulé avec succès.'
+        ], 200);
+    }
+
+    /**
+     * Liste les moniteurs disponibles à une date, avec un type de boîte de vitesses et éventuellement un point de rendez-vous.
+     * Retourne pour chaque moniteur : ses disponibilités non reliées à un rendez-vous (appointment), et le véhicule associé.
+     */
+    public function instructorsAvailable(Request $request)
+    {
+        $validated = $request->validate([
+            'datesearch' => 'required|date',
+            'gearbox' => 'required|string',
+            'meeting_point' => 'nullable|integer',
+        ]);
+
+        $query = Availability::where('date', $validated['datesearch'])
+            ->whereHas('vehicle', function($q) use ($validated) {
+                $q->where('gearbox_type', $validated['gearbox']);
+            })
+            ->whereDoesntHave('appointment');
+
+        if (!empty($validated['meeting_point'])) {
+            $query->where('meeting_point_id', $validated['meeting_point']);
+        }
+
+        $availabilities = $query->with(['instructor', 'vehicle', 'meetingPoint'])->get();
+
+        // Grouper par moniteur
+        $result = $availabilities->groupBy('instructor_id')->map(function($items) {
+            $instructor = $items->first()->instructor;
+            return [
+                'instructor' => $instructor,
+                'availabilities' => $items->values(),
+                'vehicles' => $items->pluck('vehicle')->unique('id')->values(),
+            ];
+        })->values();
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+            'message' => 'Liste des moniteurs et disponibilités sans rendez-vous.',
         ], 200);
     }
 }
