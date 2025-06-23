@@ -22,6 +22,14 @@ class InstructorProfile extends Model
         'hourPrice',
         'hourDiscount',
         'tva',
+
+        'juridic_form',
+        'siret',
+        'num_activity',
+        'num_tva',
+        'num_teach_authorization',
+        'date_teach_permit',
+        'date_medical_visit'
     ];
 
     protected $casts = [

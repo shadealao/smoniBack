@@ -43,7 +43,7 @@ Route::post('/password/reset', [UserController::class, 'updatePassword']);
 // TrainingModule Routes
 Route::get('/training-modules', [TrainingModuleController::class, 'index']);
 // SubscriptionService Routes
-Route::get('/services', [SubscriptionServiceController::class, 'index']);
+// Route::get('/services', [SubscriptionServiceController::class, 'index']);
 
 Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meeting_points']);
 
@@ -114,7 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/availability-repeateds', [AvailabilityRepeatedController::class, 'store']);
     Route::get('/availability-repeateds/{availabilityRepeated}', [AvailabilityRepeatedController::class, 'show']);
     Route::put('/availability-repeateds/{availabilityRepeated}', [AvailabilityRepeatedController::class, 'update']);
-    Route::delete('/availability-repeateds/{availabilityRepeated}', [AvailabilityRepeatedController::class, 'destroy']);
+    Route::delete('/availability-repeateds/{day}', [AvailabilityRepeatedController::class, 'destroy']);
 
     // Appointment Routes
     Route::post('/appointments', [AppointmentController::class, 'store']);
@@ -134,6 +134,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // UserDoc Routes
     Route::post('/user-docs', [UserDocController::class, 'store']);
+    Route::post('/info-docs', [UserDocController::class, 'save_doc']);
     Route::get('/user-docs', [UserDocController::class, 'index']);
     Route::delete('/user-docs/{userDoc}', [UserDocController::class, 'destroy']);
 
@@ -165,9 +166,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/learners/{learner}/progress', [LearnerProgressController::class, 'listProgress']);
 
     // SubscriptionService Routes
-    Route::post('/services', [SubscriptionServiceController::class, 'store']);
-    Route::put('/services/{service}', [SubscriptionServiceController::class, 'update']);
-    Route::delete('/services/{service}', [SubscriptionServiceController::class, 'destroy']);
+    // Route::post('/services', [SubscriptionServiceController::class, 'store']);
+    // Route::put('/services/{service}', [SubscriptionServiceController::class, 'update']);
+    // Route::delete('/services/{service}', [SubscriptionServiceController::class, 'destroy']);
 
     // SubscriptionRegistration Routes
     Route::post('/subscriptions', [SubscriptionRegistrationController::class, 'store']);

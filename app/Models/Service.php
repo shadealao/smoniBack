@@ -10,7 +10,7 @@ class Service extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category_service_id', 'sub_category_service_id', 'title', 'price',
+        'category_service_id', 'title', 'price', 'type',
     ];
 
     protected $casts = [
@@ -20,11 +20,6 @@ class Service extends Model
     public function category()
     {
         return $this->belongsTo(CategoryService::class, 'category_service_id');
-    }
-
-    public function subCategory()
-    {
-        return $this->belongsTo(SubCategoryService::class, 'sub_category_service_id');
     }
 
     public function items()

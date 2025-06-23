@@ -295,17 +295,9 @@ class AppointmentController extends Controller
             ], 422);
         }
 
-        if ($user->role == 'learner') {
-            $appointment->presence_student = true;
-        } else {
-            $appointment->presence_monitor = true;
-        }
-
-        // Update status to confirmed if both are present
-        if ($appointment->presence_student && $appointment->presence_monitor) {
-            $appointment->status = 'pending';
-        }
-
+        $appointment->presence_student = true;
+        $appointment->presence_monitor = true;
+        $appointment->status = 'pending';
         $appointment->save();
 
         return response()->json([

@@ -17,7 +17,15 @@ class AvailabilityRepeatedController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $repeateds = AvailabilityRepeated::where('monitor_id', $user->id)->get();
+        $repeateds = array();
+        $days = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+        foreach ($days as $day) {
+            $repeated = AvailabilityRepeated::where('monitor_id', $user->id)->where('day_of_week', $day)->get();
+            $info = [
+                $day => $repeated
+            ];
+            array_push($repeateds,$info);
+        }
         return response()->json(['success' => true, 'data' => $repeateds]);
     }
 
@@ -39,10 +47,13 @@ class AvailabilityRepeatedController extends Controller
             'vehicle_id' => 'required|exists:vehicles,id',
             'day_of_week' => 'required|in:lundi,mardi,mercredi,jeudi,vendredi,samedi,dimanche',
             'time' => 'required|array',
-            'time.*.start' => 'required|date_format:H:i',
-            'time.*.end' => 'required|date_format:H:i|after:time.*.start',
+            // 'time.*.start' => 'required|date_format:H:i',
+            // 'time.*.end' => 'required|date_format:H:i|after:time.*.start',
+            'time.*.start' => 'required',
+            'time.*.end' => 'required',
             'status' => 'sometimes|boolean',
         ]);
+
         $repeated = AvailabilityRepeated::create([
             'monitor_id' => $user->id,
             'meeting_point_id' => $validated['meeting_point_id'],
@@ -91,8 +102,10 @@ class AvailabilityRepeatedController extends Controller
             'vehicle_id' => 'sometimes|exists:vehicles,id',
             'day_of_week' => 'sometimes|in:lundi,mardi,mercredi,jeudi,vendredi,samedi,dimanche',
             'time' => 'sometimes|array',
-            'time.*.start' => 'required_with:time|date_format:H:i',
-            'time.*.end' => 'required_with:time|date_format:H:i|after:time.*.start',
+            'time.*.start' => 'required',
+            'time.*.end' => 'required',
+            // 'time.*.start' => 'required_with:time|date_format:H:i',
+            // 'time.*.end' => 'required_with:time|date_format:H:i|after:time.*.start',
             'status' => 'sometimes|boolean',
         ]);
         $availabilityRepeated->update($validated);
@@ -105,13 +118,11 @@ class AvailabilityRepeatedController extends Controller
      * @urlParam availabilityRepeated int required ID de la disponibilité récurrente
      * @response 200 {"success":true,"message":"Supprimé avec succès."}
      */
-    public function destroy(AvailabilityRepeated $availabilityRepeated)
+    public function destroy($day)
     {
         $user = Auth::user();
-        if ($availabilityRepeated->monitor_id !== $user->id) {
-            return response()->json(['success' => false, 'message' => 'Non autorisé.'], 403);
-        }
-        $availabilityRepeated->delete();
+        $repeated = AvailabilityRepeated::where('monitor_id', $user->id)->where('day_of_week', $day)->delete();
+
         return response()->json(['success' => true, 'message' => 'Supprimé avec succès.']);
     }
 }

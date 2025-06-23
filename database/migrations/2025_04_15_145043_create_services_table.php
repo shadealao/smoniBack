@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_service_id')->constrained('category_services')->onDelete('cascade');
-            $table->foreignId('sub_category_service_id')->constrained('sub_category_services')->onDelete('cascade');
             $table->string('title');
             $table->integer('price');
+            $table->enum('type', ['automatique', 'manual']);
             $table->timestamps();
         });
     }

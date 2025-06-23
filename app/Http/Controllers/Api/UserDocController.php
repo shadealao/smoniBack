@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserDoc;
+use App\Models\InstructorProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -55,6 +56,51 @@ class UserDocController extends Controller
     }
 
     /**
+     * Save info Doc.
+     */
+    public function save_doc(Request $request)
+    {
+        $validated = $request->validate([
+            'juridic_form' => 'required|string|max:255',
+            'siret' => 'required|string|max:255',
+            'num_activity' => 'required|string|max:255',
+            'num_tva' => 'required|string|max:255',
+            'num_teach_authorization' => 'required|string|max:255',
+            'date_teach_permit' => 'required',
+            'date_medical_visit' => 'required'
+        ]);
+
+        $exist = InstructorProfile::where('user_id',auth()->user()->id)->first();
+
+        if($exist)
+            $exist->update([
+                'juridic_form' => $request->juridic_form,
+                'siret' => $request->siret,
+                'num_activity' => $request->num_activity,
+                'num_tva' => $request->num_tva,
+                'num_teach_authorization' => $request->num_teach_authorization,
+                'date_teach_permit' => $request->date_teach_permit,
+                'date_medical_visit' => $request->date_medical_visit
+            ]);
+        else 
+            $create = InstructorProfile::create([
+                'user_id' => $request->auth()->user()->id,
+                'juridic_form' => $request->juridic_form,
+                'siret' => $request->siret,
+                'num_activity' => $request->num_activity,
+                'num_tva' => $request->num_tva,
+                'num_teach_authorization' => $request->num_teach_authorization,
+                'date_teach_permit' => $request->date_teach_permit,
+                'date_medical_visit' => $request->date_medical_visit
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Document téléchargé avec succès.',
+        ], 201);
+    }
+
+    /**
      * Delete a document.
      */
     public function destroy(UserDoc $userDoc)
@@ -92,6 +138,7 @@ class UserDocController extends Controller
 
         return response()->json([
             'success' => true,
+            'info' => auth()->user()->instructorProfile(),
             'data' => $userDocs,
             'message' => 'Liste des documents récupérée avec succès.',
         ], 200);

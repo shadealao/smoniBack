@@ -233,7 +233,8 @@ class AvailabilityController extends Controller
                 ->where('day_of_week', $dayOfWeek)
                 ->get();
             foreach ($repeateds as $repeated) {
-                $times = json_decode($repeated->time, true);
+                $times = $repeated->time;
+                // $times = json_decode($repeated->time, true);
                 foreach ($times as $time) {
                     $exists = Availability::where('instructor_id', $user->id)
                         ->where('date', $currentDate->format('Y-m-d'))
