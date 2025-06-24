@@ -99,7 +99,7 @@ class ServiceController extends Controller
     */
     public function mySubscribe(User $user){
         
-        $subscriptions = Subscription::where('learner_id', $user->id)->with(['service','learner']) ->paginate(10);
+        $subscriptions = Subscription::where('learner_id', $user->id)->with(['service.items','learner']) ->paginate(10);
 
         return response()->json([
             'success' => true,
