@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('learner_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('plan_id')->constrained('services')->onDelete('cascade');
+            $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
             $table->date('start_date');
             $table->date('end_date');
-            $table->enum('type_service', ['on_site', 'online', 'hybrid'])->default('online'); // à adapter selon les types prévus
+            $table->float('amount');
+            $table->text('transaction_id');
+            $table->string('mode');
             $table->enum('status', ['active', 'expired', 'cancelled'])->default('active');
-            $table->boolean('auto_renewal')->default(false);
-            $table->foreignId('payment_id')->nullable()->constrained('payments');
             $table->timestamps();
         });
     }

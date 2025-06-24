@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('category_service_id')->constrained('category_services')->onDelete('cascade');
             $table->string('title');
-            $table->integer('price');
+            $table->float('price');
+            $table->integer('time')->default(60);
             $table->enum('type', ['automatique', 'manual']);
             $table->timestamps();
         });

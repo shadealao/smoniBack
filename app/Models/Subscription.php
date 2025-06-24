@@ -10,16 +10,8 @@ class Subscription extends Model
     use HasFactory;
 
     protected $fillable = [
-        'learner_id', 'plan_id', 'start_date', 'end_date', 'type_service',
-        'status', 'auto_renewal', 'payment_id',
-    ];
-
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'type_service' => 'string',
-        'status' => 'string',
-        'auto_renewal' => 'boolean',
+        'learner_id', 'service_id', 'start_date', 'end_date',
+        'status', 'mode','amount','transaction_id'
     ];
 
     public function learner()
@@ -27,18 +19,13 @@ class Subscription extends Model
         return $this->belongsTo(User::class, 'learner_id');
     }
 
-    public function plan()
+    public function service()
     {
-        return $this->belongsTo(Service::class, 'plan_id');
-    }
-
-    public function payment()
-    {
-        return $this->belongsTo(Payment::class, 'payment_id');
+        return $this->belongsTo(Service::class, 'service_id');
     }
 
     public function contract()
     {
-        return $this->hasOne(Contract::class, 'subscription_id');
+        return $this->hasOne(Contract::class, 'contrat_id');
     }
 }

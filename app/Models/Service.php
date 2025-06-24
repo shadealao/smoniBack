@@ -10,11 +10,7 @@ class Service extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category_service_id', 'title', 'price', 'type',
-    ];
-
-    protected $casts = [
-        'price' => 'integer',
+        'category_service_id', 'title', 'price', 'type', 'time'
     ];
 
     public function category()

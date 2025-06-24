@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\ExamNoteController;
 use App\Http\Controllers\Api\LearnerProgressController;
 use App\Http\Controllers\Api\MeetingPointController;
 use App\Http\Controllers\Api\SubscriptionRegistrationController;
-use App\Http\Controllers\Api\SubscriptionServiceController;
+use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TrainingModuleController;
 use App\Http\Controllers\Api\UserController;
@@ -42,8 +42,10 @@ Route::post('/password/reset', [UserController::class, 'updatePassword']);
 
 // TrainingModule Routes
 Route::get('/training-modules', [TrainingModuleController::class, 'index']);
-// SubscriptionService Routes
-// Route::get('/services', [SubscriptionServiceController::class, 'index']);
+
+// Service Routes
+Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/services/categories', [ServiceController::class, 'listCategory']);
 
 Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meeting_points']);
 
@@ -166,9 +168,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/learners/{learner}/progress', [LearnerProgressController::class, 'listProgress']);
 
     // SubscriptionService Routes
-    // Route::post('/services', [SubscriptionServiceController::class, 'store']);
-    // Route::put('/services/{service}', [SubscriptionServiceController::class, 'update']);
-    // Route::delete('/services/{service}', [SubscriptionServiceController::class, 'destroy']);
+    Route::post('/services/makeSubscribe', [ServiceController::class, 'makeSubscribe']);
+    Route::get('/services/mySubscrube/{user}', [ServiceController::class, 'mySubscribe']);
 
     // SubscriptionRegistration Routes
     Route::post('/subscriptions', [SubscriptionRegistrationController::class, 'store']);

@@ -84,7 +84,7 @@ class UserDocController extends Controller
             ]);
         else 
             $create = InstructorProfile::create([
-                'user_id' => $request->auth()->user()->id,
+                'user_id' => auth()->user()->id,
                 'juridic_form' => $request->juridic_form,
                 'siret' => $request->siret,
                 'num_activity' => $request->num_activity,
@@ -138,7 +138,7 @@ class UserDocController extends Controller
 
         return response()->json([
             'success' => true,
-            'info' => auth()->user()->instructorProfile(),
+            'info' => auth()->user()->instructorProfile,
             'data' => $userDocs,
             'message' => 'Liste des documents récupérée avec succès.',
         ], 200);
