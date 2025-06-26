@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
-use App\Models\PaymentIntent;
+use Stripe\PaymentIntent;
 
 class StripeController extends Controller
 {
@@ -17,8 +17,9 @@ class StripeController extends Controller
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $paymentIntent = PaymentIntent::create([
-            'ammount' => $request->amount, // en centimes (ex: 1000 = 10€)
+            'amount' => $request->amount, // en centimes (ex: 1000 = 10€)
             'currency' => 'eur',
+            'automatic_payment_methods' => ['enabled' => true],
         ]);
 
         return response()->json([

@@ -214,10 +214,10 @@ class AuthController extends Controller
             ], 401);
         }
 
-        if (!$user->hasVerifiedEmail()) {
-            $user->sendEmailVerificationNotification();
-            return response()->json(['message' => 'Compte non vérifié. Un mail a été envoyé sur votre email', "success"=>false], 403);
-        }
+        // if (!$user->hasVerifiedEmail()) {
+        //     $user->sendEmailVerificationNotification();
+        //     return response()->json(['message' => 'Compte non vérifié. Un mail a été envoyé sur votre email', "success"=>false], 403);
+        // }
 
         // Générer un jeton
         $token = $user->createToken('auth-token')->plainTextToken;
