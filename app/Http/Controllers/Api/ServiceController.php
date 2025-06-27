@@ -7,7 +7,7 @@ use App\Models\CategoryService;
 use App\Models\Service;
 use App\Models\ServiceItem;
 use App\Models\User;
-use App\Models\Contrat;
+use App\Models\Contract;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -129,7 +129,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * List Category services.
+     * List Contrat services.
      * 
      */
     public function listContrat()
