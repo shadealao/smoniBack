@@ -170,6 +170,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // SubscriptionService Routes
     Route::post('/services/makeSubscribe', [ServiceController::class, 'makeSubscribe']);
     Route::get('/services/mySubscrube/{user}', [ServiceController::class, 'mySubscribe']);
+    Route::get('/services/packCode', [ServiceController::class, 'packCode']);
+    Route::get('/services/contrat', [ServiceController::class, 'listContrat']);
+    Route::get('/services/info', [ServiceController::class, 'infoSubscribe']);
 
     // SubscriptionRegistration Routes
     Route::post('/subscriptions', [SubscriptionRegistrationController::class, 'store']);
