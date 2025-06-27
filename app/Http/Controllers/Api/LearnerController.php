@@ -184,20 +184,22 @@ class LearnerController extends Controller
         $validated = $request->validate([
             'datesearch' => 'required|date',
             'gearbox' => 'required|string',
-            'meeting_point' => 'nullable|integer',
+            'meeting_point' => 'nullable|string',
         ]);
 
         $query = Availability::where('date', $validated['datesearch'])
-            ->whereHas('vehicle', function($q) use ($validated) {
-                $q->where('gearbox_type', $validated['gearbox']);
-            })
-            ->whereDoesntHave('appointment');
+        ->whereHas('vehicle', function($q) use ($validated) {
+            $q->where('gearbox_type', $validated['gearbox']);
+        })
+        ->whereDoesntHave('appointment');
 
         if (!empty($validated['meeting_point'])) {
-            $query->where('meeting_point_id', $validated['meeting_point']);
+            $query->whereHas('meetingPoint', function($q) use ($validated) {
+                $q->where('label', 'ilike', '%' . $validated['meeting_point'] . '%');
+            });
         }
 
-        $availabilities = $query->with(['instructor', 'vehicle', 'meetingPoint'])->get();
+        $availabilities = $query->with(['vehicle', 'meetingPoint'])->get();
 
         // Grouper par moniteur
         $result = $availabilities->groupBy('instructor_id')->map(function($items) {
@@ -205,7 +207,6 @@ class LearnerController extends Controller
             return [
                 'instructor' => $instructor,
                 'availabilities' => $items->values(),
-                'vehicles' => $items->pluck('vehicle')->unique('id')->values(),
             ];
         })->values();
 

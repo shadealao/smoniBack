@@ -7,6 +7,7 @@ use App\Models\CategoryService;
 use App\Models\Service;
 use App\Models\ServiceItem;
 use App\Models\User;
+use App\Models\Contrat;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,6 +69,7 @@ class ServiceController extends Controller
     {
         $validated = $request->validate([
             'mode' => 'required',
+            'transaction' => 'required',
             'service_id' => 'required|integer',
         ]);
 
@@ -83,7 +85,7 @@ class ServiceController extends Controller
             'end_date' => $end_date,
             'mode' => $request->mode,
             'status' => 'active',
-            'transaction_id' => 'REF'.time(),
+            'transaction_id' => $request->transaction,
             'amount' => $service->price,
         ]);
 
@@ -100,6 +102,53 @@ class ServiceController extends Controller
     public function mySubscribe(User $user){
         
         $subscriptions = Subscription::where('learner_id', $user->id)->with(['service.items','learner']) ->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $subscriptions,
+        ], 200);
+    }
+
+    /** 
+     * Pack Code Exist
+     * 
+    */
+    public function packCode(){
+        
+        $service = Service::where('title','Pack code')->first();
+
+        $exist = Subscription::where([
+            'learner_id' => auth()->user()->id,
+            'service_id' => $service->id,
+            ])->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => $exist ? true : false,
+        ], 200);
+    }
+
+    /**
+     * List Category services.
+     * 
+     */
+    public function listContrat()
+    {
+        $contrats = Contract::where('student_id',auth()->user()->id)->with(['subscription.service'])->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $contrats,
+        ], 200);
+    }
+
+    /** 
+     * My info subscribe
+     * 
+    */
+    public function infoSubscribe(User $user){
+        
+        $subscriptions = Subscription::where('learner_id', $user->id)->with(['service.items']) ->orderBy('created_at','desc')->first();
 
         return response()->json([
             'success' => true,
