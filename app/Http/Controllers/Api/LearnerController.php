@@ -165,7 +165,7 @@ class LearnerController extends Controller
         }
 
         // Annulation possible
-        $appointment->status = 'canceled';
+        $appointment->status = 'cancelled';
         $appointment->cancellation_reason = $validated['cancellation_reason'];
         $appointment->save();
 
