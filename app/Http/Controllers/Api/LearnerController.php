@@ -193,9 +193,10 @@ class LearnerController extends Controller
         })
         ->whereDoesntHave('appointment');
 
+       
         if (!empty($validated['meeting_point'])) {
             $query->whereHas('meetingPoint', function($q) use ($validated) {
-                $q->where('label', 'ilike', '%' . $validated['meeting_point'] . '%');
+                $q->where('label', 'like', '%' . $validated['meeting_point'] . '%');
             });
         }
 

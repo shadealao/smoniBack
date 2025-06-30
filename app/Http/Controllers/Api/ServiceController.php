@@ -146,9 +146,9 @@ class ServiceController extends Controller
      * My info subscribe
      * 
     */
-    public function infoSubscribe(User $user){
-        
-        $subscriptions = Subscription::where('learner_id', $user->id)->with(['service.items']) ->orderBy('created_at','desc')->first();
+public function infoSubscribe(){
+
+        $subscriptions = Subscription::where('learner_id', auth()->user()->id)->with(['service.items']) ->orderBy('created_at','desc')->first();
 
         return response()->json([
             'success' => true,
