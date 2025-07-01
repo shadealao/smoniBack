@@ -128,7 +128,7 @@ class MonitorController extends Controller
         $startDate = Carbon::createFromFormat('Y-m-d', $request->date);
 
         // Calculate the end date (7 days from the start date)
-        $endDate = $startDate->copy()->addDays(6);
+        $endDate = $startDate->addDays(6);
 
         // Force the date format to 'Y-m-d' before the whereBetween query
         $startDate = $startDate->format('Y-m-d');

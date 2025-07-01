@@ -79,6 +79,34 @@ class UserController extends Controller
     }
 
     /**
+     * Update admin profile.
+     */
+    public function updateAdminProfile(Request $request)
+    {
+        
+        $validated = $request->validate([
+            'lastname' => 'sometimes|string|max:255',
+            'firstname' => 'sometimes|string|max:255',
+            'phone' => 'sometimes|string|max:20',
+            'genre' => ['required', Rule::in(['homme', 'femme', 'autre'])],
+        ]);
+
+        // Update user fields
+        $user->update(array_filter([
+            'lastname' => $validated['lastname'] ?? $user->lastname,
+            'firstname' => $validated['firstname'] ?? $user->firstname,
+            'phone' => $validated['phone'] ?? $user->phone,
+            'genre' => $validated['genre'],
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'data' => $user->fresh(),
+            'message' => 'Profil Admin mis à jour avec succès.',
+        ], 200);
+    }
+
+    /**
      * Update instructor profile.
      */
     public function updateInstructorProfile(Request $request)
