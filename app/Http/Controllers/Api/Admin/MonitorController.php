@@ -11,6 +11,7 @@ use App\Models\Appointment;
 use App\Models\Availability;
 use App\Models\UserDoc;
 use App\Models\AvailabilityRepeated;
+use App\Http\Resources\AppointmentLearnerResource;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
