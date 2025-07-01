@@ -68,7 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
            // Learners
             Route::get('/learners', [AdminLearnerController::class, 'index'])->name('admin.learners');
             Route::put('/learners/{user}/action', [AdminLearnerController::class, 'action'])->name('admin.learners.action');
-            Route::put('/learners/{user}/show', [AdminLearnerController::class, 'show'])->name('admin.learners.show');
+            Route::get('/learners/{user}/show', [AdminLearnerController::class, 'show'])->name('admin.learners.show');
             Route::get('/learners/{user}/userBadges', [AdminLearnerController::class, 'userBadges'])->name('admin.learners.userBadges');
             Route::get('/learners/{user}/userProgress', [AdminLearnerController::class, 'userProgress'])->name('admin.learners.userProgress');
             Route::get('/learners/{user}/lessonLearner', [AdminLearnerController::class, 'lessonLearner'])->name('admin.learners.lessonLearner');
@@ -80,7 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
             // Monitors
             Route::get('/monitors', [MonitorController::class, 'index'])->name('admin.monitors');
             Route::put('/monitors/{user}/action', [MonitorController::class, 'action'])->name('admin.monitors.action');
-            Route::put('/monitors/{user}/show', [MonitorController::class, 'show'])->name('admin.monitors.show');
+            Route::get('/monitors/{user}/show', [MonitorController::class, 'show'])->name('admin.monitors.show');
             Route::get('/monitors/{user}/listVehicules', [MonitorController::class, 'listVehicules'])->name('admin.monitors.listVehicules');
             Route::get('/monitors/{user}/listMeetingPoint', [MonitorController::class, 'listMeetingPoint'])->name('admin.monitors.listMeetingPoint');
             Route::get('/monitors/{user}/listAvailabilities', [MonitorController::class, 'listAvailabilities'])->name('admin.monitors.listAvailabilities');
