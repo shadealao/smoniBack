@@ -79,6 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
             // Monitors
             Route::get('/monitors', [MonitorController::class, 'index'])->name('admin.monitors');
             Route::put('/monitors/{user}/action', [MonitorController::class, 'action'])->name('admin.monitors.action');
+            Route::put('/monitors/{user}/show', [MonitorController::class, 'show'])->name('admin.monitors.show');
             Route::get('/monitors/{user}/listVehicules', [MonitorController::class, 'listVehicules'])->name('admin.monitors.listVehicules');
             Route::get('/monitors/{user}/listMeetingPoint', [MonitorController::class, 'listMeetingPoint'])->name('admin.monitors.listMeetingPoint');
             Route::get('/monitors/{user}/listAvailabilities', [MonitorController::class, 'listAvailabilities'])->name('admin.monitors.listAvailabilities');

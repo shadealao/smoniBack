@@ -36,7 +36,36 @@ class MonitorController extends Controller
             'success' => true,
             'data' => $users,
         ], 200);
-    } 
+    }
+    
+    /**
+     * Show Instructor
+     */
+    public function show(User $user)
+    {
+        $vehicles = Vehicle::where('instructor_id', $user->id)->get();
+        $meetingPoints = MeetingPoint::where('instructor_id', $user->id)->where('is_active',true)->paginate(10);
+        $repeateds = array();
+        $days = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+        foreach ($days as $day) {
+            $repeated = AvailabilityRepeated::where('monitor_id', $user->id)->where('day_of_week', $day)->get();
+            $info = [
+                $day => $repeated
+            ];
+            array_push($repeateds,$info);
+        }
+        return response()->json(['success' => true, 'data' => $repeateds]);
+
+
+        return response()->json([
+            'success' => true,
+            'user' => $user,
+            'vehicles' => $vehicles,
+            'meetingPoints' => $meetingPoints,
+            'repeateds' => $repeateds,
+            'message' => 'Liste des véhicules récupérée avec succès.',
+        ], 200);
+    }
 
     /**
      * Action (Active/Lock) 
@@ -58,7 +87,7 @@ class MonitorController extends Controller
      */
     public function listVehicules(User $user)
     {
-        $vehicles = Vehicle::where('instructor_id', $user->id)->paginate(10);
+        $vehicles = Vehicle::where('instructor_id', $user->id)->get();
 
         return response()->json([
             'success' => true,
