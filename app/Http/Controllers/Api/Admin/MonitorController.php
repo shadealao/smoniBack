@@ -130,8 +130,6 @@ class MonitorController extends Controller
         // Calculate the end date (7 days from the start date)
         $endDate = $startDate->copy()->addDays(6);
 
-        Log::info('Fetching availabilities for instructor ID: ' . $user->id . ' from ' . $startDate . ' to ' . $endDate);
-
         // Force the date format to 'Y-m-d' before the whereBetween query
         $startDate = $startDate->format('Y-m-d');
         $endDate = $endDate->format('Y-m-d');
