@@ -33,7 +33,7 @@ class MeetingPointController extends Controller
             'is_active' => 'sometimes|boolean',
         ]);
 
-        $existing = MeetingPoint::where('user_id', $user->id)
+        $existing = MeetingPoint::where('instructor_id', $user->id)
         ->where('label', $validated['label'])
         ->first();
 

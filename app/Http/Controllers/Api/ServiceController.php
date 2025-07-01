@@ -76,7 +76,7 @@ class ServiceController extends Controller
         $service = Service::find($request->service_id);
 
         $start_date = Carbon::now();
-        $end_date = $start_date->addDays($service->time);
+        $end_date = $start_date->addDays((int)$service->time);
 
         $subscription = Subscription::create([
             'learner_id' => auth()->user()->id, 
