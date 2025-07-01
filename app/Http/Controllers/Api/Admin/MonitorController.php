@@ -9,6 +9,7 @@ use App\Models\Vehicle;
 use App\Models\MeetingPoint;
 use App\Models\Appointment;
 use App\Models\Availability;
+use App\Models\UserDoc;
 use App\Models\AvailabilityRepeated;
 use App\Models\User;
 use Carbon\Carbon;
@@ -57,11 +58,12 @@ class MonitorController extends Controller
         }
 
         $perso = User::where('id',$user->id)->with('instructorProfile')->first();
-
+        $userDocs = UserDoc::where('user_id', $user->id)->get();
 
         return response()->json([
             'success' => true,
             'user' => $perso,
+            'doc' => $userDocs,
             'vehicles' => $vehicles,
             'meetingPoints' => $meetingPoints,
             'repeateds' => $repeateds,

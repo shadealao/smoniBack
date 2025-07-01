@@ -88,7 +88,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/monitors/{user}/listLearner', [MonitorController::class, 'listLearner'])->name('admin.monitors.listLearner');
             Route::get('/monitors/{user}/listAppointment', [MonitorController::class, 'listAppointment'])->name('admin.monitors.listAppointment');
 
-    
         });
     });
 

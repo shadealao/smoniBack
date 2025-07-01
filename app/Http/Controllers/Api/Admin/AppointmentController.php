@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Service\MailService;
 
 class AppointmentController extends Controller
 {
@@ -144,7 +145,10 @@ class AppointmentController extends Controller
         ], 200);
     }
 
-    public function sendmail(Request $request, Appointment $appointment){
+    public function sendmail(Request $request, Appointment $appointment, MailService $mailer){
         
+        if($appointment->learner_id){
+
+        }
     }
 }
