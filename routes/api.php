@@ -29,6 +29,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\LearnerController as AdminLearnerController;
 use App\Http\Controllers\Api\Admin\MonitorController;
 use App\Http\Controllers\Api\Admin\AdminController;
+use App\Http\Controllers\Api\Admin\AppointmentController as AdminAppointmentController;
+
 
 
 
@@ -87,6 +89,12 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/monitors/{user}/listAvailabilitiesRepeat', [MonitorController::class, 'listAvailabilitiesRepeat'])->name('admin.monitors.listAvailabilitiesRepeat');
             Route::get('/monitors/{user}/listLearner', [MonitorController::class, 'listLearner'])->name('admin.monitors.listLearner');
             Route::get('/monitors/{user}/listAppointment', [MonitorController::class, 'listAppointment'])->name('admin.monitors.listAppointment');
+
+            // Appointment
+            Route::get('/appointment', [AdminAppointmentController::class, 'index'])->name('admin.appointment');
+            Route::post('/appointment/create', [AdminAppointmentController::class, 'createAppointment'])->name('admin.appointment.create');
+            Route::put('/appointment/{appointment}/cancel', [AdminAppointmentController::class, 'cancel'])->name('admin.appointment.cancel');
+            Route::post('/appointment/{appointment}/sendmail', [AdminAppointmentController::class, 'sendmail'])->name('admin.appointment.sendmail');
 
         });
     });

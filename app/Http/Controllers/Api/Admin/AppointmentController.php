@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Service\MailService;
 
+/**
+ * @tags Zone Appointment (Admin)
+ */
 class AppointmentController extends Controller
 {
     /**
@@ -147,8 +150,24 @@ class AppointmentController extends Controller
 
     public function sendmail(Request $request, Appointment $appointment, MailService $mailer){
         
+        $header = "Rappel sur Smoni";
+        $subject = "Smoni vous rappel votr réservation";
+
         if($appointment->learner_id){
 
+            $content = $appointment->learner;
+            $mailer->roseCroixMail( null,$appointment->learner->email, $header, $content, $subject,);
         }
+
+        if($appointment->instructor){
+
+            $content = $appointment->instructor;
+            $mailer->roseCroixMail( null,$appointment->instructor->email, $header, $content, $subject,);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email envoyé',
+        ], 200);
     }
 }

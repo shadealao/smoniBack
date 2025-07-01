@@ -120,7 +120,7 @@
 
         <h1 class="email-title">Rappel pour de rendez-vous</h1>
 
-        <p class="content-paragraph">Hello 👋</p>
+        <p class="content-paragraph">Hello 👋 {{ $data->firstname }}</p>
         <p class="content-paragraph">Nous vous rappellons que vous aviez un rendez-vous pour dans les prochain jours. Veuillez vous connecter afin de prendre plus d'informations sur ce rendez-vous</p>
         <p class="content-paragraph">Si ce n'était pas vous, ignorez simplement cet email.</p>
 

@@ -27,6 +27,22 @@ class MailService{
         });
     }
 
+    public function reminderMail(String $sender = null, String $receiver = null, String $header, String $message, String $object)
+    {
+        if ($sender == null && $receiver) {
+            $sender = $this->adminMail;
+        }elseif ($sender && $receiver == null) {
+            $receiver = $this->adminMail;
+        }elseif($sender == null && $receiver == null) {
+            throw new \Exception("Must have a sender or a receiver", 1);
+        }
+        
+        $this->mailer::send('emails.reminder', [ 'data' => $message ], function($mail) use($sender, $receiver, $header, $object) {
+            $mail->from($sender, $header);
+            $mail->to($receiver)->subject($object);
+        });
+    }
+
     public function contactMail(String $sender = null, String $receiver = null, String $header, String $message, String $object)
     {
         if ($sender == null && $receiver) {
