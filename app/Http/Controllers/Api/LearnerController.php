@@ -165,7 +165,7 @@ class LearnerController extends Controller
         }
 
         // Annulation possible
-        $appointment->status = 'canceled';
+        $appointment->status = 'cancelled';
         $appointment->cancellation_reason = $validated['cancellation_reason'];
         $appointment->save();
 
@@ -193,9 +193,10 @@ class LearnerController extends Controller
         })
         ->whereDoesntHave('appointment');
 
+       
         if (!empty($validated['meeting_point'])) {
             $query->whereHas('meetingPoint', function($q) use ($validated) {
-                $q->where('label', 'ilike', '%' . $validated['meeting_point'] . '%');
+                $q->where('label', 'like', '%' . $validated['meeting_point'] . '%');
             });
         }
 

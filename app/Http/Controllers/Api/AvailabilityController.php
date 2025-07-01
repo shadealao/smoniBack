@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Availability;
 use App\Models\MeetingPoint;
+use App\Models\AvailabilityRepeated;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -229,11 +230,11 @@ class AvailabilityController extends Controller
         $endDateObj = Carbon::parse($endDate);
         while ($currentDate->lte($endDateObj)) {
             $dayOfWeek = strtolower($currentDate->locale('fr')->dayName);
-            $repeateds = \App\Models\AvailabilityRepeated::where('monitor_id', $user->id)
+            $repeateds = AvailabilityRepeated::where('monitor_id', $user->id)
                 ->where('day_of_week', $dayOfWeek)
                 ->get();
             foreach ($repeateds as $repeated) {
-                $times = $repeated->time;
+                $times = !is_array($repeated->time) ? json_decode($repeated->time, true) : $repeated->time;
                 // $times = json_decode($repeated->time, true);
                 foreach ($times as $time) {
                     $exists = Availability::where('instructor_id', $user->id)

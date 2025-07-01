@@ -26,6 +26,13 @@ use App\Http\Controllers\Api\StripeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\Admin\LearnerController as AdminLearnerController;
+use App\Http\Controllers\Api\Admin\MonitorController;
+use App\Http\Controllers\Api\Admin\AdminController;
+use App\Http\Controllers\Api\Admin\AppointmentController as AdminAppointmentController;
+
+
+
 
 //Verification Email
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])->name('verification.verify');
@@ -50,6 +57,47 @@ Route::get('/services/categories', [ServiceController::class, 'listCategory']);
 Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meeting_points']);
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::middleware(['admin'])->group(function () {
+        Route::prefix('admin')->group(function () {
+            
+            // Admin
+            Route::get('/', [AdminController::class, 'index'])->name('admin');
+            Route::put('/{user}/action', [AdminController::class, 'action'])->name('admin.action');
+            Route::post('/addAdmin', [AdminController::class, 'addAdmin'])->name('admin.addAdmin');
+            Route::delete('/{user}/deleteAdmin', [AdminController::class, 'deleteAdmin'])->name('admin.deleteAdmin');
+
+           // Learners
+            Route::get('/learners', [AdminLearnerController::class, 'index'])->name('admin.learners');
+            Route::put('/learners/{user}/action', [AdminLearnerController::class, 'action'])->name('admin.learners.action');
+            Route::get('/learners/{user}/show', [AdminLearnerController::class, 'show'])->name('admin.learners.show');
+            Route::get('/learners/{user}/userBadges', [AdminLearnerController::class, 'userBadges'])->name('admin.learners.userBadges');
+            Route::get('/learners/{user}/userProgress', [AdminLearnerController::class, 'userProgress'])->name('admin.learners.userProgress');
+            Route::get('/learners/{user}/lessonLearner', [AdminLearnerController::class, 'lessonLearner'])->name('admin.learners.lessonLearner');
+            Route::get('/learners/{user}/mySubscribe', [AdminLearnerController::class, 'mySubscribe'])->name('admin.learners.mySubscribe');
+            Route::get('/learners/{user}/listContrat', [AdminLearnerController::class, 'listContrat'])->name('admin.learners.listContrat');
+            Route::post('/learners/{user}/addContrat', [AdminLearnerController::class, 'addContrat'])->name('admin.learners.addContrat');
+            Route::post('/learners/{contrat}/updateContrat', [AdminLearnerController::class, 'updateContrat'])->name('admin.learners.updateContrat');
+
+            // Monitors
+            Route::get('/monitors', [MonitorController::class, 'index'])->name('admin.monitors');
+            Route::put('/monitors/{user}/action', [MonitorController::class, 'action'])->name('admin.monitors.action');
+            Route::get('/monitors/{user}/show', [MonitorController::class, 'show'])->name('admin.monitors.show');
+            Route::get('/monitors/{user}/listVehicules', [MonitorController::class, 'listVehicules'])->name('admin.monitors.listVehicules');
+            Route::get('/monitors/{user}/listMeetingPoint', [MonitorController::class, 'listMeetingPoint'])->name('admin.monitors.listMeetingPoint');
+            Route::get('/monitors/{user}/listAvailabilities', [MonitorController::class, 'listAvailabilities'])->name('admin.monitors.listAvailabilities');
+            Route::get('/monitors/{user}/listAvailabilitiesRepeat', [MonitorController::class, 'listAvailabilitiesRepeat'])->name('admin.monitors.listAvailabilitiesRepeat');
+            Route::get('/monitors/{user}/listLearner', [MonitorController::class, 'listLearner'])->name('admin.monitors.listLearner');
+            Route::get('/monitors/{user}/listAppointment', [MonitorController::class, 'listAppointment'])->name('admin.monitors.listAppointment');
+
+            // Appointment
+            Route::get('/appointment', [AdminAppointmentController::class, 'index'])->name('admin.appointment');
+            Route::post('/appointment/create', [AdminAppointmentController::class, 'createAppointment'])->name('admin.appointment.create');
+            Route::put('/appointment/{appointment}/cancel', [AdminAppointmentController::class, 'cancel'])->name('admin.appointment.cancel');
+            Route::post('/appointment/{appointment}/sendmail', [AdminAppointmentController::class, 'sendmail'])->name('admin.appointment.sendmail');
+
+        });
+    });
 
     // Learner Routes
     Route::get('/userBadges', [LearnerController::class, 'userBadges']);
@@ -77,6 +125,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Update profile routes
     Route::put('/profile/update/learner', [UserController::class, 'updateLearnerProfile']);
     Route::put('/profile/update/instructor', [UserController::class, 'updateInstructorProfile']);
+    Route::put('/profile/update/admin', [UserController::class, 'updateAdminProfile']);
     Route::put('/profile/update/password', [UserController::class, 'changePassword']);
     Route::post('/profile/update/photo', [UserController::class, 'updateImage']);
     Route::put('/profile/update/dropPhoto', [UserController::class, 'dropImage']);
@@ -187,7 +236,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/learners/{learner}/exam-registrations', [ExamNoteController::class, 'listExamRegistrations']);
     Route::get('/learners/{student}/notes', [ExamNoteController::class, 'listNotes']);
 
-// SupportTicket Routes
+    // SupportTicket Routes
     Route::post('/support-tickets', [SupportTicketController::class, 'store']);
     Route::get('/support-tickets', [SupportTicketController::class, 'index']);
     Route::post('/support-tickets/{supportTicket}/assign', [SupportTicketController::class, 'assign']);
@@ -212,4 +261,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Paiement
     Route::post('/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
+    Route::post('/create-payment-intents', [StripeController::class, 'createPaymentIntent']);
 });
+
+
