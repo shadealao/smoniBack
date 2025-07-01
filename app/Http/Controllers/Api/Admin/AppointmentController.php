@@ -114,6 +114,37 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Delete Appointment
+     * Cancel an appointment.
      */
+    public function cancel(Request $request, Appointment $appointment)
+    {
+
+        $validated = $request->validate([
+            'cancellation_reason' => 'required|string|max:500',
+        ]);
+
+
+        // Prevent canceling already canceled or completed appointments
+        if ($appointment->status === 'cancelled' || $appointment->status === 'completed' || $appointment->status === 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce rendez-vous ne peut être annulé.',
+            ], 422);
+        }
+
+        $appointment->update([
+            'status' => 'cancelled',
+            'availability_id' => null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $appointment->fresh(),
+            'message' => 'Rendez-vous annulé avec succès.',
+        ], 200);
+    }
+
+    public function sendmail(Request $request, Appointment $appointment){
+        
+    }
 }
