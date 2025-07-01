@@ -42,6 +42,18 @@ class LearnerController extends Controller
     }
 
     /**
+     * show
+     */
+    public function show(User $user){
+        $perso = User::where('id',$user->id)->with('learnerProfile')->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => $perso,
+        ], 200);
+    }
+
+    /**
      * Action (Active/Lock) 
      */
     public function action(Request $request, User $user){

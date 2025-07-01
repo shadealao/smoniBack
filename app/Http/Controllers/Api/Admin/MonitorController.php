@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Vehicule;
+use App\Models\InstructorProfile;
+use App\Models\Vehicle;
 use App\Models\MeetingPoint;
 use App\Models\Appointment;
 use App\Models\Availability;
@@ -44,7 +45,7 @@ class MonitorController extends Controller
     public function show(User $user)
     {
         $vehicles = Vehicle::where('instructor_id', $user->id)->get();
-        $meetingPoints = MeetingPoint::where('instructor_id', $user->id)->where('is_active',true)->paginate(10);
+        $meetingPoints = MeetingPoint::where('instructor_id', $user->id)->where('is_active',true)->get();
         $repeateds = array();
         $days = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
         foreach ($days as $day) {
@@ -54,12 +55,13 @@ class MonitorController extends Controller
             ];
             array_push($repeateds,$info);
         }
-        return response()->json(['success' => true, 'data' => $repeateds]);
+
+        $perso = User::where('id',$user->id)->with('instructorProfile')->first();
 
 
         return response()->json([
             'success' => true,
-            'user' => $user,
+            'user' => $perso,
             'vehicles' => $vehicles,
             'meetingPoints' => $meetingPoints,
             'repeateds' => $repeateds,
@@ -85,7 +87,7 @@ class MonitorController extends Controller
     /**
      * List all vehicles by the instructor.
      */
-    public function listVehicules(User $user)
+    public function listVehicles(User $user)
     {
         $vehicles = Vehicle::where('instructor_id', $user->id)->get();
 

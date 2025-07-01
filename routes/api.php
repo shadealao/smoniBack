@@ -68,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
            // Learners
             Route::get('/learners', [AdminLearnerController::class, 'index'])->name('admin.learners');
             Route::put('/learners/{user}/action', [AdminLearnerController::class, 'action'])->name('admin.learners.action');
+            Route::put('/learners/{user}/show', [AdminLearnerController::class, 'show'])->name('admin.learners.show');
             Route::get('/learners/{user}/userBadges', [AdminLearnerController::class, 'userBadges'])->name('admin.learners.userBadges');
             Route::get('/learners/{user}/userProgress', [AdminLearnerController::class, 'userProgress'])->name('admin.learners.userProgress');
             Route::get('/learners/{user}/lessonLearner', [AdminLearnerController::class, 'lessonLearner'])->name('admin.learners.lessonLearner');
