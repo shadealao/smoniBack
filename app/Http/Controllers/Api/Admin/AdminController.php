@@ -19,7 +19,7 @@ class AdminController extends Controller
      */
     public function index(Request $request){
         $q = $request->q ? : '';
-        $users = User::where('role','admin')      
+        $users = User::where('role','admin')->whereNot('id',auth()->user()->id)      
             ->where(function ($query) use ($q) {
                 $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
                     ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
@@ -96,5 +96,18 @@ class AdminController extends Controller
                 'error' => 'There was an error creating the user.'
             ], 500);
         } 
+    }
+
+    /**
+     * Delete Admin
+     */
+    public function deleteAdmin(Request $request, User $user){
+        
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Compte bien supprimé',
+        ], 200);
     }
 }

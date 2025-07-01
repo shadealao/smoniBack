@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\Admin\LearnerController as AdminLearnerController;
 use App\Http\Controllers\Api\Admin\MonitorController;
+use App\Http\Controllers\Api\Admin\AdminController;
 
 
 
@@ -57,6 +58,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware(['admin'])->group(function () {
         Route::prefix('admin')->group(function () {
+            
+            // Admin
+            Route::get('/', [AdminController::class, 'index'])->name('admin');
+            Route::put('/{user}/action', [AdminController::class, 'action'])->name('admin.action');
+            Route::post('/addAdmin', [AdminController::class, 'addAdmin'])->name('admin.addAdmin');
+            Route::delete('/{user}/deleteAdmin', [AdminController::class, 'deleteAdmin'])->name('admin.deleteAdmin');
+
            // Learners
             Route::get('/learners', [AdminLearnerController::class, 'index'])->name('admin.learners');
             Route::put('/learners/{user}/action', [AdminLearnerController::class, 'action'])->name('admin.learners.action');
@@ -69,14 +77,15 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/learners/{contrat}/updateContrat', [AdminLearnerController::class, 'updateContrat'])->name('admin.learners.updateContrat');
 
             // Monitors
-            Route::get('/monitors', [AdminLearnerController::class, 'index'])->name('admin.monitors');
-            Route::put('/monitors/{user}/action', [AdminLearnerController::class, 'action'])->name('admin.monitors.action');
-            Route::get('/monitors/{user}/listVehicules', [AdminLearnerController::class, 'listVehicules'])->name('admin.monitors.listVehicules');
-            Route::get('/monitors/{user}/listMeetingPoint', [AdminLearnerController::class, 'listMeetingPoint'])->name('admin.monitors.listMeetingPoint');
-            Route::get('/monitors/{user}/listAvailabilities', [AdminLearnerController::class, 'listAvailabilities'])->name('admin.monitors.listAvailabilities');
-            Route::get('/monitors/{user}/listAvailabilitiesRepeat', [AdminLearnerController::class, 'listAvailabilitiesRepeat'])->name('admin.monitors.listAvailabilitiesRepeat');
-            Route::get('/monitors/{user}/listLearner', [AdminLearnerController::class, 'listLearner'])->name('admin.monitors.listLearner');
-            Route::get('/monitors/{user}/listAppointment', [AdminLearnerController::class, 'listAppointment'])->name('admin.monitors.listAppointment');
+            Route::get('/monitors', [MonitorController::class, 'index'])->name('admin.monitors');
+            Route::put('/monitors/{user}/action', [MonitorController::class, 'action'])->name('admin.monitors.action');
+            Route::get('/monitors/{user}/listVehicules', [MonitorController::class, 'listVehicules'])->name('admin.monitors.listVehicules');
+            Route::get('/monitors/{user}/listMeetingPoint', [MonitorController::class, 'listMeetingPoint'])->name('admin.monitors.listMeetingPoint');
+            Route::get('/monitors/{user}/listAvailabilities', [MonitorController::class, 'listAvailabilities'])->name('admin.monitors.listAvailabilities');
+            Route::get('/monitors/{user}/listAvailabilitiesRepeat', [MonitorController::class, 'listAvailabilitiesRepeat'])->name('admin.monitors.listAvailabilitiesRepeat');
+            Route::get('/monitors/{user}/listLearner', [MonitorController::class, 'listLearner'])->name('admin.monitors.listLearner');
+            Route::get('/monitors/{user}/listAppointment', [MonitorController::class, 'listAppointment'])->name('admin.monitors.listAppointment');
+
     
         });
     });
