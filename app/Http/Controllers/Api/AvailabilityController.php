@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Availability;
 use App\Models\MeetingPoint;
+use App\Models\AvailabilityRepeated;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -229,31 +230,33 @@ class AvailabilityController extends Controller
         $endDateObj = Carbon::parse($endDate);
         while ($currentDate->lte($endDateObj)) {
             $dayOfWeek = strtolower($currentDate->locale('fr')->dayName);
-            $repeateds = \App\Models\AvailabilityRepeated::where('monitor_id', $user->id)
+            $repeateds = AvailabilityRepeated::where('monitor_id', $user->id)
                 ->where('day_of_week', $dayOfWeek)
                 ->get();
-            foreach ($repeateds as $repeated) {
-                $times = $repeated->time;
-                // $times = json_decode($repeated->time, true);
-                foreach ($times as $time) {
-                    $exists = Availability::where('instructor_id', $user->id)
-                        ->where('date', $currentDate->format('Y-m-d'))
-                        ->where('start_time', $time['start'])
-                        ->where('end_time', $time['end'])
-                        ->where('meeting_point_id', $repeated->meeting_point_id)
-                        ->where('vehicle_id', $repeated->vehicle_id)
-                        ->exists();
-                    if (!$exists) {
-                        Availability::create([
-                            'instructor_id' => $user->id,
-                            'meeting_point_id' => $repeated->meeting_point_id,
-                            'vehicle_id' => $repeated->vehicle_id,
-                            'day_of_week' => $dayOfWeek,
-                            'date' => $currentDate->format('Y-m-d'),
-                            'start_time' => $time['start'],
-                            'end_time' => $time['end'],
-                            'status' => $repeated->status,
-                        ]);
+            if(count($repeateds) > 0 ){
+                foreach ($repeateds as $repeated) {
+                    $times = $repeated->time;
+                    // $times = json_decode($repeated->time, true);
+                    foreach ($times as $time) {
+                        $exists = Availability::where('instructor_id', $user->id)
+                            ->where('date', $currentDate->format('Y-m-d'))
+                            ->where('start_time', $time['start'])
+                            ->where('end_time', $time['end'])
+                            ->where('meeting_point_id', $repeated->meeting_point_id)
+                            ->where('vehicle_id', $repeated->vehicle_id)
+                            ->exists();
+                        if (!$exists) {
+                            Availability::create([
+                                'instructor_id' => $user->id,
+                                'meeting_point_id' => $repeated->meeting_point_id,
+                                'vehicle_id' => $repeated->vehicle_id,
+                                'day_of_week' => $dayOfWeek,
+                                'date' => $currentDate->format('Y-m-d'),
+                                'start_time' => $time['start'],
+                                'end_time' => $time['end'],
+                                'status' => $repeated->status,
+                            ]);
+                        }
                     }
                 }
             }
