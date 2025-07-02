@@ -182,11 +182,11 @@ class LearnerController extends Controller
     }
 
     /**
-     * Add Contrat for Subcription
+     * Add contract for Subcription
      * 
      * @requestMediaType multipart/form-data
      */
-    public function addContrat(Request $request, User $user){
+    public function addcontract(Request $request, User $user){
 
         $validated = $request->validate([
             'subscription_id' => 'required|integer',
@@ -197,7 +197,7 @@ class LearnerController extends Controller
         if($exist)
             return response()->json([
                 'success' => false,
-                'message' => 'un contrat a déjà été etabli pour cette abonnement',
+                'message' => 'un contract a déjà été etabli pour cette abonnement',
             ], 405);
 
         $file = $request->file('file');
@@ -205,7 +205,7 @@ class LearnerController extends Controller
         $filePath = $file->storeAs('contracts', $fileName, 'public');
         $fileType = $file->getClientMimeType();
 
-        $contrat = Contract::create([
+        $contract = Contract::create([
             'student_id' => $user->id,
             'subscription_id' => $request->subscription_id,
             'file_original' => $filePath,
@@ -216,15 +216,15 @@ class LearnerController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $contrat,
+            'data' => $contract,
         ], 200);
     }
 
     /**
-     * Update Contrat for Subcription
+     * Update contract for Subcription
      * @requestMediaType multipart/form-data
      */
-    public function updateContrat(Request $request, Contrat $contrat){
+    public function updatecontract(Request $request, Contract $contract){
 
         $validated = $request->validate([
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // 2MB max
@@ -235,7 +235,7 @@ class LearnerController extends Controller
         $filePath = $file->storeAs('contracts', $fileName, 'public');
         $fileType = $file->getClientMimeType();
 
-        $contrat->update([
+        $contract->update([
             'file_original' => $filePath,
             'file_signed' => auth()->user()->firstname.' '.auth()->user()->lastname,
             'tag' => 'initial',
@@ -248,16 +248,16 @@ class LearnerController extends Controller
     }
 
     /**
-     * List Contrat services.
+     * List contract services.
      * 
      */
-    public function listContrat(User $user)
+    public function listcontract(User $user)
     {
-        $contrats = Contract::where('student_id',$user->id)->with(['subscription.service'])->paginate(10);
+        $contracts = Contract::where('student_id',$user->id)->with(['subscription.service'])->paginate(10);
 
         return response()->json([
             'success' => true,
-            'data' => $contrats,
+            'data' => $contracts,
         ], 200);
     }
 }
