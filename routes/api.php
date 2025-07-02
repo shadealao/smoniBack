@@ -63,8 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('admin')->group(function () {
 
             // Dashboard
-            Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.stat');
-            Route::get('/graph', [AdminController::class, 'graph'])->name('admin.graph');
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.stat');
+            Route::get('/graph', [DashboardController::class, 'graph'])->name('admin.graph');
             
             // Admin
             Route::get('/', [AdminController::class, 'index'])->name('admin');
