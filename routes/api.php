@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\LearnerController as AdminLearnerController;
 use App\Http\Controllers\Api\Admin\MonitorController;
 use App\Http\Controllers\Api\Admin\AdminController;
+use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\AppointmentController as AdminAppointmentController;
 
 
@@ -60,6 +61,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware(['admin'])->group(function () {
         Route::prefix('admin')->group(function () {
+
+            // Dashboard
+            Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.stat');
+            Route::get('/graph', [AdminController::class, 'graph'])->name('admin.graph');
             
             // Admin
             Route::get('/', [AdminController::class, 'index'])->name('admin');

@@ -4,6 +4,18 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\InstructorProfile;
+use App\Models\Vehicle;
+use App\Models\MeetingPoint;
+use App\Models\Appointment;
+use App\Models\Availability;
+use App\Models\UserDoc;
+use App\Models\AvailabilityRepeated;
+use App\Http\Resources\AppointmentLearnerResource;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Service\MailService;
 
 /**
