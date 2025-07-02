@@ -83,7 +83,8 @@ class UserController extends Controller
      */
     public function updateAdminProfile(Request $request)
     {
-        
+        $user = Auth::user();
+
         $validated = $request->validate([
             'lastname' => 'sometimes|string|max:255',
             'firstname' => 'sometimes|string|max:255',
