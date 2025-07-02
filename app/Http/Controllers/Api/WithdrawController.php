@@ -28,8 +28,8 @@ class WithdrawController extends Controller
             'cash' => $hour_no_billable * auth()->user()->instructorProfile->hourPrice,
         ];
 
-        $admin_cash = $hour_billable * auth()->user()->instructorProfile->hourDiscount;
-        $tva_cash = $hour_billable * auth()->user()->instructorProfile->tva;
+        $admin_cash = auth()->user()->instructorProfile->hourDiscount;
+        $tva_cash = auth()->user()->instructorProfile->tva;
         $my_cash = $billable['cash'] - ($admin_cash + $tva_cash);
 
         return response()->json([

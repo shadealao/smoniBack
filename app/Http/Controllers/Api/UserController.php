@@ -92,12 +92,12 @@ class UserController extends Controller
         ]);
 
         // Update user fields
-        $user->update(array_filter([
+        $user->update([
             'lastname' => $validated['lastname'] ?? $user->lastname,
             'firstname' => $validated['firstname'] ?? $user->firstname,
             'phone' => $validated['phone'] ?? $user->phone,
             'genre' => $validated['genre'],
-        ]));
+        ]);
 
         return response()->json([
             'success' => true,
