@@ -14,6 +14,7 @@ use App\Models\AvailabilityRepeated;
 use App\Http\Resources\AppointmentLearnerResource;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -125,20 +126,19 @@ class MonitorController extends Controller
             'date' => 'required|date',
         ]);
 
-        $startDate = Carbon::createFromFormat('Y-m-d', $request->date);
+        $startDate = Carbon::createFromFormat('Y-m-d', $request->date)->toDateString();
 
         // Calculate the end date (7 days from the start date)
-        $endDate = $startDate->addDays(6);
+        $endDate = Carbon::createFromFormat('Y-m-d', $request->date)->addDays(6)->toDateString();
 
         // Force the date format to 'Y-m-d' before the whereBetween query
-        $startDate = $startDate->format('Y-m-d');
-        $endDate = $endDate->format('Y-m-d');
+        // $startDate = $startDate->format('Y-m-d');
+        // $endDate = $endDate->format('Y-m-d');
 
         $availabilities = Availability::whereBetween('date', [$startDate, $endDate])
             ->where('instructor_id', $user->id)
             ->with(['meetingPoint', 'vehicle', 'appointment.learner'])
             ->get();
-
 
         return response()->json([
             'success' => true,
