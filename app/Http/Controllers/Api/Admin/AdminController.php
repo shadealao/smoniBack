@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Withdraw;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -119,14 +120,16 @@ class AdminController extends Controller
     public function withdraws(Request $request)
     {
         $validated = $request->validate([
-            'status' => 'nullable|string',
+            'status' => [Rule::in(['success', 'pending']),'nullable'],
             'per_page' => 'integer'
         ]);
 
         $per_page = $request->per_page ?? 10;
 
-        if($request->status)
-            $withdraws = Withdraw::where('payed',$request->status)->with('monitor')->paginate($per_page);
+        if($request->status){
+            $status = $request->status == 'success' ? true : false;
+            $withdraws = Withdraw::where('payed',$status)->with('monitor')->paginate($per_page);
+        }
         else
             $withdraws = Withdraw::with('monitor')->paginate($per_page);
 
