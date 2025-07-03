@@ -169,8 +169,6 @@ class AdminController extends Controller
      */
     public function approve(Request $request, Withdraw $withdraw)
     {
-        $user = Auth::user();
-
         if ($withdraw->payed) {
             return response()->json([
                 'success' => false,
@@ -194,7 +192,6 @@ class AdminController extends Controller
      */
     public function decline(Request $request, Withdraw $withdraw)
     {
-        $user = Auth::user();
 
         if ($withdraw->payed) {
             return response()->json([
