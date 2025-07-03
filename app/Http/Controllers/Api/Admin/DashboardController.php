@@ -66,32 +66,35 @@ class DashboardController extends Controller
     /**
      * Withdraws history
      */
-    public function withdrawalYear(){
-        // Récupérer l'année en cours
+    public function withdrawalYear()
+    {
         $currentYear = Carbon::now()->year;
 
-        // Récupérer les retraits pour l'année en cours
-        // et les grouper par mois, en sommant les montants
-        $monthlyWithdrawals = Withdraw::selectRaw('EXTRACT(MONTH FROM created_at) as month, SUM(ammount) as total_ammount')
-            ->whereYear('created_at', $currentYear)
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
+        $monthlyData = [];
+        for ($monthNumber = 1; $monthNumber <= 12; $monthNumber++) {
+            $monthName = Carbon::create(null, $monthNumber, 1)->monthName;
 
-        // Optionnel : Formater les résultats pour avoir le nom du mois
-        $formattedWithdrawals = $monthlyWithdrawals->map(function ($item) {
-            $monthName = Carbon::create(null, $item->month, 1)->monthName; // Nom du mois en français
-            return [
-                'month_number' => $item->month,
-                'month_name' => ucfirst($monthName), // Mettre la première lettre en majuscule
-                'total_ammount' => $item->total_ammount,
+            $monthlyData[$monthNumber] = [
+                'month_number' => $monthNumber,
+                'month_name' => ucfirst($monthName),
+                'total_ammount' => 0, 
             ];
-        });
+        }
+
+        $withdrawals = Withdraw::whereYear('created_at', $currentYear)->get();
+        foreach ($withdrawals as $withdraw) {
+            $month = Carbon::parse($withdraw->created_at)->month;
+
+            if ($month >= 1 && $month <= 12) {
+                $monthlyData[$month]['total_ammount'] += $withdraw->ammount;
+            }
+        }
+        $formattedWithdrawals = array_values($monthlyData);
 
         return response()->json([
             'success' => true,
             'data' => $formattedWithdrawals,
-            'message' => 'Succès.',
+            'message' => 'Historique des retraits par mois récupéré avec succès.',
         ], 200);
     }
 }
