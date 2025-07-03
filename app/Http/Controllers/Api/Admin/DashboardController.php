@@ -66,9 +66,14 @@ class DashboardController extends Controller
     /**
      * Withdraws history
      */
-    public function withdrawalYear()
+    public function withdrawalYear(Request $request)
     {
-        $currentYear = Carbon::now()->year;
+
+        $validated = $request->validate([
+            'year' => 'required',
+        ]);
+
+        $currentYear = $request->year;
 
         $monthlyData = [];
         for ($monthNumber = 1; $monthNumber <= 12; $monthNumber++) {
