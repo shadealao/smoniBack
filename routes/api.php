@@ -73,6 +73,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/addAdmin', [AdminController::class, 'addAdmin'])->name('admin.addAdmin');
             Route::delete('/{user}/deleteAdmin', [AdminController::class, 'deleteAdmin'])->name('admin.deleteAdmin');
             Route::get('/withdraws', [AdminController::class, 'withdraws'])->name('admin.withdraws');
+            Route::get('/withdraws/{withdraw}/show', [AdminController::class, 'showWthdraw']);
+            Route::post('/withdraws/{withdraw}/approve', [AdminController::class, 'approve']);
+            Route::post('/withdraws/{withdraw}/decline', [AdminController::class, 'decline']);
+
 
            // Learners
             Route::get('/learners', [AdminLearnerController::class, 'index'])->name('admin.learners');
@@ -210,7 +214,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/withdraws/no_billable', [WithdrawController::class, 'no_billable']);
     Route::post('/withdraws', [WithdrawController::class, 'store']);
     Route::get('/withdraws/list_monitor', [WithdrawController::class, 'list']);
-    Route::post('/withdraws/{withdraw}/approve', [WithdrawController::class, 'approve']);
 
     // TrainingModule Routes
     Route::post('/training-modules', [TrainingModuleController::class, 'store']);

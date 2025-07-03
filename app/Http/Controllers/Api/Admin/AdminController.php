@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Withdraw;
+use App\Models\BankAccount;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -128,7 +129,7 @@ class AdminController extends Controller
 
         if($request->status){
             $status = $request->status == 'success' ? true : false;
-            $withdraws = Withdraw::where('payed',$status)->with('monitor')->paginate($per_page);
+            $withdraws = Withdraw::where('payed',$status)->with('monitor.bank')->paginate($per_page);
         }
         else
             $withdraws = Withdraw::with('monitor')->paginate($per_page);
@@ -137,6 +138,76 @@ class AdminController extends Controller
             'success' => true,
             'data' => $withdraws,
             'message' => 'Liste des demandes de retrait récupérée avec succès.',
+        ], 200);
+    }
+
+    /**
+     * Show withdrawal.
+     */
+    public function showWthdraw(Request $request, Withdraw $withdraw)
+    {
+        $bank = BankAccount::where('monitor_id', $withdraw->monitor_id)->first();
+
+        $per_page = $request->per_page ?? 10;
+
+        if($request->status){
+            $status = $request->status == 'success' ? true : false;
+            $withdraws = Withdraw::where('payed',$status)->with('monitor')->paginate($per_page);
+        }
+        else
+            $withdraws = Withdraw::with('monitor')->paginate($per_page);
+
+        return response()->json([
+            'success' => true,
+            'withdraw' => $withdraw->load('monitor'),
+            'bank' => $bank,
+        ], 200);
+    }
+
+     /**
+     * Approve a withdrawal request (admin only).
+     */
+    public function approve(Request $request, Withdraw $withdraw)
+    {
+        $user = Auth::user();
+
+        if ($withdraw->payed) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette demande de retrait a déjà été payée.',
+            ], 422);
+        }
+
+        $withdraw->update([
+            'payed' => true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $withdraw->fresh(),
+            'message' => 'Demande de retrait approuvée avec succès.',
+        ], 200);
+    }
+
+     /**
+     * Delete a withdrawal request (admin only).
+     */
+    public function decline(Request $request, Withdraw $withdraw)
+    {
+        $user = Auth::user();
+
+        if ($withdraw->payed) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette demande de retrait a déjà été payée.',
+            ], 422);
+        }
+
+        $withdraw-delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Demande de retrait annnulé avec succès.',
         ], 200);
     }
 

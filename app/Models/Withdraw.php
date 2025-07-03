@@ -20,7 +20,7 @@ class Withdraw extends Model
         'duration' => 'integer',
     ];
 
-    public function monitor()
+    public function monitor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'monitor_id');
     }

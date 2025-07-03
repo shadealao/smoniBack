@@ -63,4 +63,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new VerifyEmailNotification());
     }
+
+    public function bank(): HasOne
+    {
+        return $this->hasOne(BankAccount::class);
+    }
 }
