@@ -80,7 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/learners/{user}/userProgress', [AdminLearnerController::class, 'userProgress'])->name('admin.learners.userProgress');
             Route::get('/learners/{user}/lessonLearner', [AdminLearnerController::class, 'lessonLearner'])->name('admin.learners.lessonLearner');
             Route::get('/learners/{user}/mySubscribe', [AdminLearnerController::class, 'mySubscribe'])->name('admin.learners.mySubscribe');
-            Route::get('/learners/{user}/listContrat', [AdminLearnerController::class, 'listContrat'])->name('admin.learners.listContrat');
+            Route::get('/learners/{user}/listContrat', [AdminLearnerController::class, 'listcontract'])->name('admin.learners.listContrat');
             Route::post('/learners/{user}/addContrat', [AdminLearnerController::class, 'addcontract'])->name('admin.learners.addContrat');
             Route::post('/learners/{contrat}/updateContact', [AdminLearnerController::class, 'updatecontract'])->name('admin.learners.updatecontract'); 
 
