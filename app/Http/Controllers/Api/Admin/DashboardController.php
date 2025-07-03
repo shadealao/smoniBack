@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Withdraw;
 use App\Models\User;
+use Carbon\Carbon;
 use App\Models\Appointment;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 
 /**
@@ -23,9 +25,7 @@ class DashboardController extends Controller
         $instructor = User::where('role','instructor')->count();
         $admin = User::where('role','admin')->count();
 
-        $hour_billable = Appointment::where('status', 'completed')->sum('duration') - Withdraw::sum('duration');
-        $hour_no_billable = Appointment::where('status', 'notation')->sum('duration');
-    
+        $cash = Subscription::sum('amount');
 
         return response()->json([
             'success' => true,
@@ -33,8 +33,7 @@ class DashboardController extends Controller
                 'learner' => $learner,
                 'instructor' => $instructor,
                 'admin' => $admin,
-                'hour_billable' => $hour_billable,
-                'hour_no_billable' => $hour_no_billable,
+                'cash' => $cash,
             ],
             'message' => 'Succès.',
         ], 200);
@@ -64,5 +63,35 @@ class DashboardController extends Controller
         
     }
 
-    
+    /**
+     * Withdraws history
+     */
+    public function withdrawalYear(){
+        // Récupérer l'année en cours
+        $currentYear = Carbon::now()->year;
+
+        // Récupérer les retraits pour l'année en cours
+        // et les grouper par mois, en sommant les montants
+        $monthlyWithdrawals = Withdraw::selectRaw('EXTRACT(MONTH FROM created_at) as month, SUM(ammount) as total_ammount')
+            ->whereYear('created_at', $currentYear)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // Optionnel : Formater les résultats pour avoir le nom du mois
+        $formattedWithdrawals = $monthlyWithdrawals->map(function ($item) {
+            $monthName = Carbon::create(null, $item->month, 1)->monthName; // Nom du mois en français
+            return [
+                'month_number' => $item->month,
+                'month_name' => ucfirst($monthName), // Mettre la première lettre en majuscule
+                'total_ammount' => $item->total_ammount,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $formattedWithdrawals,
+            'message' => 'Succès.',
+        ], 200);
+    }
 }

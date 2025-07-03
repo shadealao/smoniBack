@@ -65,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
             // Dashboard
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.stat');
             Route::get('/graph', [DashboardController::class, 'graph'])->name('admin.graph');
+            Route::get('/withdrawalYear', [DashboardController::class, 'withdrawalYear'])->name('admin.withdrawalYear');
             
             // Admin
             Route::get('/', [AdminController::class, 'index'])->name('admin');
