@@ -231,7 +231,7 @@ class LearnerController extends Controller
         ]);
 
         $file = $request->file('file');
-        $fileName = $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $fileName =  time() . '.' . $file->getClientOriginalExtension();
         $filePath = $file->storeAs('contracts', $fileName, 'public');
         $fileType = $file->getClientMimeType();
 
