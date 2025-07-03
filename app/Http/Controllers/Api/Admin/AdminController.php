@@ -111,4 +111,30 @@ class AdminController extends Controller
             'message' => 'Compte bien supprimé',
         ], 200);
     }
+
+    /**
+     * View all withdrawal requests.
+     */
+    public function withdraws(Request $request)
+    {
+        $validated = $request->validate([
+            'status' => 'nullable|string',
+            'per_page' => 'integer'
+        ]);
+
+        $user = Auth::user();
+        $per_page = $request->per_page ?? 10;
+
+        if($request->status)
+            $withdraws = Withdraw::where('payed',$request->status)->with('monitor')->paginate($per_page);
+        else
+            $withdraws = Withdraw::where('payed',$request->status)->with('monitor')->paginate($per_page);
+
+        return response()->json([
+            'success' => true,
+            'data' => $withdraws,
+            'message' => 'Liste des demandes de retrait récupérée avec succès.',
+        ], 200);
+    }
+
 }

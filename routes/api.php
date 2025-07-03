@@ -71,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{user}/action', [AdminController::class, 'action'])->name('admin.action');
             Route::post('/addAdmin', [AdminController::class, 'addAdmin'])->name('admin.addAdmin');
             Route::delete('/{user}/deleteAdmin', [AdminController::class, 'deleteAdmin'])->name('admin.deleteAdmin');
+            Route::get('/withdraws', [AdminController::class, 'withdraws'])->name('admin.withdraws');
 
            // Learners
             Route::get('/learners', [AdminLearnerController::class, 'index'])->name('admin.learners');
@@ -82,7 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/learners/{user}/mySubscribe', [AdminLearnerController::class, 'mySubscribe'])->name('admin.learners.mySubscribe');
             Route::get('/learners/{user}/listContrat', [AdminLearnerController::class, 'listcontract'])->name('admin.learners.listContrat');
             Route::post('/learners/{user}/addContrat', [AdminLearnerController::class, 'addcontract'])->name('admin.learners.addContrat');
-            Route::post('/learners/{contrat}/updateContact', [AdminLearnerController::class, 'updatecontract'])->name('admin.learners.updatecontract'); 
+            Route::post('/learners/{contract}/updateContact', [AdminLearnerController::class, 'updatecontract'])->name('admin.learners.updatecontract'); 
 
             // Monitors
             Route::get('/monitors', [MonitorController::class, 'index'])->name('admin.monitors');
@@ -206,7 +207,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/withdraws/stat', [WithdrawController::class, 'stat']);
     Route::get('/withdraws/no_billable', [WithdrawController::class, 'no_billable']);
     Route::post('/withdraws', [WithdrawController::class, 'store']);
-    Route::get('/withdraws', [WithdrawController::class, 'index']);
     Route::get('/withdraws/list_monitor', [WithdrawController::class, 'list']);
     Route::post('/withdraws/{withdraw}/approve', [WithdrawController::class, 'approve']);
 

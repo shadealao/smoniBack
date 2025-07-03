@@ -110,44 +110,12 @@ class WithdrawController extends Controller
     }
 
     /**
-     * View all withdrawal requests (admin only).
-     */
-    public function index(Request $request)
-    {
-        $validated = $request->validate([
-            'status' => 'nullable|string',
-            'per_page' => 'integer'
-        ]);
-
-        $user = Auth::user();
-        $per_page = $request->per_page ?? 10;
-
-        if ($user->role !== 'admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Seuls les administrateurs peuvent voir les demandes de retrait.',
-            ], 403);
-        }
-
-        if($request->status)
-            $withdraws = Withdraw::where('payed',$request->status)->with('monitor')->paginate($per_page);
-        else
-            $withdraws = Withdraw::where('payed',$request->status)->with('monitor')->paginate($per_page);
-
-        return response()->json([
-            'success' => true,
-            'data' => $withdraws,
-            'message' => 'Liste des demandes de retrait récupérée avec succès.',
-        ], 200);
-    }
-
-    /**
      * View all withdrawal requests (Instructor).
      */
     public function list(Request $request)
     {
         $validated = $request->validate([
-            'status' => 'nullable|string',
+            'status' => 'nullable|boolean',
             'per_page' => 'integer'
         ]);
         $user = Auth::user();

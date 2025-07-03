@@ -244,6 +244,7 @@ class LearnerController extends Controller
 
         return response()->json([
             'success' => true,
+            'data' => $contract->fresh()
         ], 200);
     }
 
