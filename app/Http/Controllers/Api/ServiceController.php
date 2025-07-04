@@ -93,7 +93,11 @@ class ServiceController extends Controller
                 $type_service = "Conduite";
                 $gearbox = $service->type;
            } else {
-                $type_service = "Autres";
+                if($services->title=='Pack code') $type_service = "Code";
+                else if($services->title=='Extension contrat') $type_service = "Extension contact";
+                else if($services->title=='Fabrication Permis') $type_service = "Fabrication Permis";
+                else if($services->title=='Examen code') $type_service = "Examen code";
+                else $type_service = "Autres";
                 $gearbox = "aucun";
            }
         }

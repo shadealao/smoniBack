@@ -85,6 +85,12 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/updateServiceItem/{serviceItem}', [AdminServiceController::class, 'updateServiceItem'])->name('admin.updateServiceItem');
             Route::delete('/deleteServiceItem/{serviceItem}', [AdminServiceController::class, 'deleteServiceItem'])->name('admin.deleteServiceItem');
 
+            // Code Access
+            Route::get('/learner/codeacess/list', [AdminServiceController::class, 'LearnCodeAccess'])->name('admin.LearnCodeAccess');
+            Route::get('/codeacess/list', [AdminServiceController::class, 'ListAccessCode'])->name('admin.listaccesscode');
+            Route::post('/codeaccess/add', [AdminServiceController::class, 'AddAccessCode'])->name('admin.addAccessCode');
+            Route::delete('/codeaccess/delete/{codeacess}', [AdminServiceController::class, 'DeleteAccessCode'])->name('admin.deleteAccessCode');
+
             // Admin
             Route::get('/', [AdminController::class, 'index'])->name('admin');
             Route::put('/{user}/action', [AdminController::class, 'action'])->name('admin.action');
@@ -143,7 +149,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/learner/cancel/rdv', [LearnerController::class, 'cancelrRdv']);
     Route::post('/learner/display/availabilities', [LearnerController::class, 'instructorsAvailable']);
     Route::get('/list/examen/learner/{learner_id}', [LearnerController::class, 'ListExamRdv']);
-
+    Route::get('/learners/code/access/{learner_id}', [LearnerController::class, 'learnercodeaccess'])->name('admin.examen.codeaccess');
     // Notifications Routes
     Route::get('/notif/allAsRead', [NotificationController::class, 'allAsRead']);
     Route::get('/userNotification', [NotificationController::class, 'userNotification']);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CategoryService;
 use App\Models\Service;
 use App\Models\ServiceItem;
+use App\Models\CodeAccess;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
@@ -268,6 +269,82 @@ class ServiceController extends Controller
             'message' => 'Service Item supprimé' ,
         ], 200);
     
+    }
+
+     /**
+     * List Code to Link.
+     * 
+     */
+    public function ListAccessCode(Request $request)
+    {
+        $access = CodeAccess::get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $access,
+            'message' => "Code Access"
+        ], 200);
+    }
+
+    /**
+     * Ajout Code Access Link.
+     * 
+     */
+    public function AddAccessCode(Request $request)
+    {
+        $validated = $request->validate([
+            'liens' => 'string|required',
+        ]);
+
+        $codeaccess = CodeAccess::create([
+            'liens' => $validated['liens']
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $codeaccess,
+            'message' => "Créer avec succès"
+        ], 200);
+    }
+
+    
+    /**
+     * Supprimer Code Access Link.
+     * 
+     */
+    public function DeleteAccessCode(Request $request, $codeacess)
+    {
+        $find = CodeAccess::find($codeacess);
+
+        if($find) {
+            $find->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Supprimer avec succès",
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => "Inexistant",
+            ], 404);
+        } 
+    }
+
+    /**
+     * Liste des utilisateurs ayant un abonnement de conduite
+     * 
+     */
+    public function LearnCodeAccess(Request $request)
+    {
+        $learners = Subscription::where('status','active')->where('type_service','Pack code')->with(['service.items','learner'])->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $learners,
+            'message' => "Liste des apprennat avec un abonnement de code",
+        ], 200);
+        
     }
 
 }

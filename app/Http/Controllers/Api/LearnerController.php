@@ -235,4 +235,38 @@ class LearnerController extends Controller
         ], 200);
     }
 
+    /**
+     * Accès au service de code.
+     * 
+     */
+    public function learnercodeaccess(Request $request, $learner_id) {
+        $learner = User::where('id', $learner_id)->first();
+
+        if(!$learner) {
+            return response()->json([
+                'success' => false,
+                'message' => "Apprenant inexistant",
+            ], 404);
+        }
+
+        $subscriptions = Subscription::where('learner_id', $learner_id)->where('status','active')->where('type_service','Pack code')->get();
+
+        if($subscriptions) {
+
+            $access = CodeAccess::get();
+
+            return response()->json([
+                'success' => false,
+                'data' => $access,
+                'message' => "Abonnement disponible",
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => "Pas d'abonnement de code pour cet utilisateur",
+            ], 404);
+        }
+
+    }
+
 }

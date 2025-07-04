@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Badge;
+use App\Models\CodeAccess;
 use App\Models\Contract;
 use App\Models\Subscription;
 use App\Models\ListBadge;
@@ -349,8 +350,6 @@ class LearnerController extends Controller
                 'success' => false,
                 'message' => "Inexistant",
             ], 404);
-        }
-
-        
+        } 
     }
 }
