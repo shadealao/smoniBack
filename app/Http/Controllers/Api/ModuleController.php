@@ -10,6 +10,7 @@ use App\Models\ModuleStep;
 use App\Models\Appointment;
 use App\Models\LearnerProgres;
 use App\Models\User;
+use App\Models\Badge;
 use Illuminate\Support\Facades\DB;
 
 class ModuleController extends Controller
@@ -40,7 +41,7 @@ class ModuleController extends Controller
                 
                 $progress = LearnerProgres::firstOrCreate([
                     'appointment_id' => $appointment->id, 
-                    'learner_id' => auth()->user()->id, 
+                    'learner_id' => $appointment->learner_id, 
                     'step_item_id' => $competence, 
                 ],
                 [
