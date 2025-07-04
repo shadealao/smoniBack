@@ -98,7 +98,7 @@ class ModuleController extends Controller
                     'id' => $moduleStep->id,
                     'code' => $moduleStep->code,
                     'name' => $moduleStep->name,
-                    'stat' => ($check * 100)/$moduleStep->competences->count(),
+                    'stat' => ($check * 100)/$competences->count(),
                     'competence' => $compet,
                 ];
                 if($detail_subModule['stat'] == 100){
@@ -120,7 +120,7 @@ class ModuleController extends Controller
 
                 array_push($subModule, $detail_subModule );
                 $total_check_comp = $total_check_comp + $check;
-                $total_comp = $total_comp + $moduleStep->competences->count();
+                $total_comp = $total_comp + $competences->count();
             }
 
             $detail_module = [
