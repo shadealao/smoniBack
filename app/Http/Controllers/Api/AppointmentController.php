@@ -34,7 +34,7 @@ class AppointmentController extends Controller
 
 
         // Vérifie si abonnement en cours et heure disponible
-        $subscriptions = Subscription::where('learner_id', $user->id)->where('status','active')->where('type_service','Conduite')->with(['service.items','learner']) ->get();
+        $subscriptions = Subscription::where('learner_id', $user->id)->where('status','active')->where('type_service','Conduite')->with(['service.items','learner'])->get();
 
         // Si pas d'abonnement
         if(!$subscriptions || !count($subscriptions)) {
@@ -105,7 +105,7 @@ class AppointmentController extends Controller
                 if (
                     isset($subscription->gearbox, $subscription->hour) &&
                     $subscription->gearbox === $availability->vehicle->gearbox_type &&
-                    $subscription->hours_left > 0
+                    $subscription->hours > 0
                 ) {
                     $validSubscription = $subscription;
                     break;
