@@ -13,6 +13,8 @@ use App\Models\LearnerProgres;
 use App\Models\Appointment;
 use App\Models\TrainingModule;
 use App\Models\Availability;
+use App\Models\Subscription;
+use App\Models\CodeAccess;
 use App\Models\Examen;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
