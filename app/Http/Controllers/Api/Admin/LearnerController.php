@@ -269,7 +269,7 @@ class LearnerController extends Controller
      */
     public function ListLearnerToExam(Request $request)
     {
-        $examens = Examen::with(['learner', 'monitor'])->get();
+        $examens = Examen::with(['learner', 'monitor'])->paginate(10);
 
         return response()->json([
             'success' => true,

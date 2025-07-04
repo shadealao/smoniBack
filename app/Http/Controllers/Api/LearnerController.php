@@ -226,7 +226,7 @@ class LearnerController extends Controller
     public function ListExamRdv(Request $request, $learner_id) {
         $examens = Examen::where('learner_id', $learner_id)
                             ->with(['learner', 'monitor'])
-                            ->get();
+                            ->paginate(10);
 
         return response()->json([
             'success' => true,
