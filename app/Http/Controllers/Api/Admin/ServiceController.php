@@ -130,7 +130,7 @@ class ServiceController extends Controller
             'type' => [Rule::in(['automatique', 'manual']),'required'],
             'time' => 'required|integer',
             'hour' => 'required|integer',
-            'items'=> 'required|array',
+            'items'=> 'array',
             'items.*.label' => 'required',
             'items.*.status' => 'boolean'
         ]);
