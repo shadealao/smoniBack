@@ -285,5 +285,69 @@ class MonitorController extends Controller
             'message' => 'Disponibilité créée avec succès.',
         ], 201);
     }
+
+    /** 
+     * Edit Heure payement moniteur
+     * 
+     */
+    public function updateHourAmmountMonitor(Request $request)
+    {
+
+        $validated = $request->validate([
+            'hour_ammount' => 'required|integer',
+            'instructor_id' => 'required|integer',
+        ]);
+        
+        $monitor = InstructorProfile::where('user_id',$validated['instructor_id'])->first();
+
+        if($monitor) {
+            $monitor->hourPrice=$validated['hour_ammount'];
+            $monitor->save();
+
+            return response()->json([
+                'success' => true,
+                'data' => $monitor,
+                'message' => "Mis-à-jour réussi",
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => true,
+                'message' => "Utilisateur introuvable",
+            ], 404);
+        }
+
+    }
+
+    /** 
+     * Edit Heure discount moniteur
+     * 
+     */
+    public function updateHourDiscountMonitor(Request $request)
+    {
+
+        $validated = $request->validate([
+            'hour_discount' => 'required|integer',
+            'instructor_id' => 'required|integer',
+        ]);
+        
+        $monitor = InstructorProfile::where('user_id',$validated['instructor_id'])->first();
+
+        if($monitor) {
+            $monitor->hourDiscount=$validated['hour_discount'];
+            $monitor->save();
+
+            return response()->json([
+                'success' => true,
+                'data' => $monitor,
+                'message' => "Mis-à-jour réussi",
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => true,
+                'message' => "Utilisteur introuvable",
+            ], 404);
+        }
+
+    }
     
 }
