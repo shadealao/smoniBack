@@ -33,4 +33,5 @@ class LearnerProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
 }
