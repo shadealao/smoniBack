@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\LearnerProfile;
 use App\Models\InstructorProfile;
 use App\Models\OtpCode;
+use App\Models\Examen;
 use App\Notifications\SendOtpCode;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -452,6 +453,52 @@ class UserController extends Controller
             'success' => true,
             'data' => auth()->user(),
         ], 200); 
+    }
+
+    /**
+     * Refuser/Accepter une date d'examen
+     * Enum ['refused', 'confirmed']
+     */
+    public function markExamRdv(Request $request) {
+        $validated = $request->validate([
+            'examen_id' => 'integer|required',
+            'status' => 'required',
+        ]);
+
+        $find = Examen::find($validated['examen_id']);
+
+        if($find) {
+
+            $find->status = $validated['status'];
+            $examen->save();
+
+            return response()->json([
+                'success' => true,
+                'data' => $find,
+                'message' => "Statut changer avec succès",
+            ], 200);
+
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => "Inexistant",
+            ], 404);
+        }
+
+    }
+
+    /**
+     * List examen to monitor
+     *
+     */
+    public function ListExamRdv(Request $request, $monitor_id) {
+        $examens = Examen::where('instructor_id', $monitor_id)->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $examens,
+            'message' => "List Examen"
+        ], 200);
     }
 
 }
