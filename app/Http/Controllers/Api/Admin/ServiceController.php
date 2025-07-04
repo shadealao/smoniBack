@@ -151,8 +151,8 @@ class ServiceController extends Controller
             foreach ($request->items as $item) {
                 $serviceItem = ServiceItem::create([
                     'service_id' => $service->id,
-                    'status' => $item->status,
-                    'label' => $item->label,
+                    'status' => $item['status'],
+                    'label' => $item['label'],
                 ]);
             }
 
@@ -224,8 +224,8 @@ class ServiceController extends Controller
         foreach ($request->items as $item) {
             $serviceItem = ServiceItem::create([
                 'service_id' => $service->id,
-                'status' => $item->status,
-                'label' => $item->label,
+                'status' => $item['status'],
+                'label' => $item['label'],
             ]);
         }
 
