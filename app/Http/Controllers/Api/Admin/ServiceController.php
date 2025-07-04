@@ -4,10 +4,17 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CategoryService;
+use App\Models\Service;
+use App\Models\ServiceItem;
 use App\Models\User;
+use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+/**
+ * @tags Zone Service (Admin)
+ */
 class ServiceController extends Controller
 {
     /**
@@ -90,11 +97,177 @@ class ServiceController extends Controller
      */
     public function listService(Request $request){
         
-        $categoryServices = CategoryService::all();
+        $services = Service::with('items')->paginate(10);
 
         return response()->json([
             'success' => true,
-            'data' => $categoryServices ,
+            'data' => $services ,
         ], 200);
     }
+
+    /**
+     * List Service By Category
+     */
+    public function listServiceByCategory(Request $request, CategoryService $categoryService){
+        
+        $services = Service::where('category_service_id',$categoryService->id)->with('items')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $services ,
+        ], 200);
+    }
+
+    /**
+     * Add Service
+     */
+    public function addService(Request $request){
+
+        $validated = $request->validate([
+            'category_service_id' => 'required|exist:category_services,id',
+            'title' => 'required',
+            'price' => 'required|integer',
+            'type' => [Rule::in(['automatique', 'manual']),'required'],
+            'time' => 'required|integer',
+            'hour' => 'required|integer',
+            'items'=> 'required|array',
+            'items.*.label' => 'required',
+            'items.*.status' => 'boolean'
+        ]);
+
+        DB::beginTransaction();
+
+            $service = Service::create([
+                'category_service_id' => $request->category_service_id,
+                'title' => $request->title,
+                'price' => $request->price,
+                'type' => $request->type,
+                'time' => $request->time,
+                'hour' => $request->hour,
+            ]);
+
+            foreach ($request->items as $item) {
+                $serviceItem = ServiceItem::create([
+                    'service_id' => $service->id,
+                    'status' => $item->status,
+                    'label' => $item->label,
+                ]);
+            }
+
+        DB::commit();
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Service ajouté' ,
+        ], 200);
+    
+    }
+
+    /**
+     * Update Service
+     */
+    public function updateService(Request $request, Service $service){
+
+        $validated = $request->validate([
+            'category_service_id' => 'required|exist:category_services,id',
+            'title' => 'required',
+            'price' => 'required|integer',
+            'type' => [Rule::in(['automatique', 'manual']),'required'],
+            'time' => 'required|integer',
+            'hour' => 'required|integer',
+        ]);
+
+
+        $service->update([
+            'category_service_id' => $request->category_service_id,
+            'title' => $request->title,
+            'price' => $request->price,
+            'type' => $request->type,
+            'time' => $request->time,
+            'hour' => $request->hour,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Service ajouté' ,
+        ], 200);
+    
+    }
+
+    /**
+     * List Service By Category
+     */
+    public function listServiceItem(Request $request, Service $service){
+        
+        $items = ServiceItem::where('service_id',$service->id)->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $items ,
+        ], 200);
+    }
+
+    /**
+     * Add Service Item
+     */
+    public function addServiceItem(Request $request, Service $service){
+
+        $validated = $request->validate([
+            'items'=> 'required|array',
+            'items.*.label' => 'required',
+            'items.*.status' => 'boolean'
+        ]);
+
+        foreach ($request->items as $item) {
+            $serviceItem = ServiceItem::create([
+                'service_id' => $service->id,
+                'status' => $item->status,
+                'label' => $item->label,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Service Item ajouté' ,
+        ], 200);
+    
+    }
+
+    /**
+     * Update Service Item
+     */
+    public function updateServiceItem(Request $request, ServiceItem $serviceItem){
+
+        $validated = $request->validate([
+            'label' => 'required',
+            'status' => 'boolean'
+        ]);
+
+            $serviceItem->update([
+                'status' => $request->status,
+                'label' => $request->label,
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Service Item modifié' ,
+        ], 200);
+    
+    }
+
+    /**
+     * Update Service Item
+     */
+    public function deleteServiceItem(Request $request, ServiceItem $serviceItem){
+
+            $serviceItem->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Service Item supprimé' ,
+        ], 200);
+    
+    }
+
 }

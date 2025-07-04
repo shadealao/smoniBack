@@ -31,6 +31,8 @@ use App\Http\Controllers\Api\Admin\MonitorController;
 use App\Http\Controllers\Api\Admin\AdminController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\AppointmentController as AdminAppointmentController;
+use App\Http\Controllers\Api\Admin\ServiceController as AdminServiceController;
+
 
 
 
@@ -66,7 +68,23 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.stat');
             Route::get('/graph', [DashboardController::class, 'graph'])->name('admin.graph');
             Route::get('/withdrawalYear', [DashboardController::class, 'withdrawalYear'])->name('admin.withdrawalYear');
-            
+
+            // Category Service
+            Route::get('/listCategoryService', [AdminServiceController::class, 'listCategoryService'])->name('admin.listCategoryService');
+            Route::post('/addCategoryService', [AdminServiceController::class, 'addCategoryService'])->name('admin.addCategoryService');
+            Route::put('/updateCategoryService/{categoryService}', [AdminServiceController::class, 'updateCategoryService'])->name('admin.updateCategoryService');
+            Route::delete('/deleteCategoryService/{categoryService}', [AdminServiceController::class, 'deleteCategoryService'])->name('admin.deleteCategoryService');
+            // Service
+            Route::get('/listService', [AdminServiceController::class, 'listService'])->name('admin.listService');
+            Route::get('/listServiceByCategory/{categoryService}', [AdminServiceController::class, 'listServiceByCategory'])->name('admin.listServiceByCategory');
+            Route::post('/addService', [AdminServiceController::class, 'addService'])->name('admin.addService');
+            Route::put('/updateService/{service}', [AdminServiceController::class, 'updateService'])->name('admin.updateService');
+            // ServiceItem
+            Route::get('/listserviceItem/{service}', [AdminServiceController::class, 'listserviceItem'])->name('admin.listserviceItem');
+            Route::post('/addServiceItem/{service}', [AdminServiceController::class, 'addServiceItem'])->name('admin.addServiceItem');
+            Route::put('/updateServiceItem/{serviceItem}', [AdminServiceController::class, 'updateServiceItem'])->name('admin.updateServiceItem');
+            Route::delete('/deleteServiceItem/{serviceItem}', [AdminServiceController::class, 'deleteServiceItem'])->name('admin.deleteServiceItem');
+
             // Admin
             Route::get('/', [AdminController::class, 'index'])->name('admin');
             Route::put('/{user}/action', [AdminController::class, 'action'])->name('admin.action');
