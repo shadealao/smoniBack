@@ -89,6 +89,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/learners/{user}/listContrat', [AdminLearnerController::class, 'listcontract'])->name('admin.learners.listContrat');
             Route::post('/learners/{user}/addContrat', [AdminLearnerController::class, 'addcontract'])->name('admin.learners.addContrat');
             Route::post('/learners/{contract}/updateContact', [AdminLearnerController::class, 'updatecontract'])->name('admin.learners.updatecontract'); 
+            Route::get('/learners/list/examen', [AdminLearnerController::class, 'ListLearnerToExam'])->name('admin.examen.list');
+            Route::post('/learners/add/examen', [AdminLearnerController::class, 'addLearnerToExam'])->name('admin.examen.addd');
+            Route::put('/learners/update/examen/{examen}', [AdminLearnerController::class, 'updateLearnerToExam'])->name('admin.examen.update');
+            Route::delete('/learners/delete/examen/{examen}', [AdminLearnerController::class, 'deleteLearnerToExam'])->name('admin.examen.delete');
 
             // Monitors
             Route::get('/monitors', [MonitorController::class, 'index'])->name('admin.monitors');
@@ -118,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/lessonLearner', [LearnerController::class, 'lessonLearner']);
     Route::post('/learner/cancel/rdv', [LearnerController::class, 'cancelrRdv']);
     Route::post('/learner/display/availabilities', [LearnerController::class, 'instructorsAvailable']);
+    Route::get('/list/examen/learner/{learner_id}', [LearnerController::class, 'ListExamRdv']);
 
     // Notifications Routes
     Route::get('/notif/allAsRead', [NotificationController::class, 'allAsRead']);
@@ -149,6 +154,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile/learner', [UserController::class, 'viewLearnerProfile']);
     Route::get('/profile/instructor', [UserController::class, 'viewInstructorProfile']);
     Route::get('/profile/admin', [UserController::class, 'viewAdminProfile']);
+    Route::get('/list/examen/monitor/{monitor_id}', [UserController::class, 'ListExamRdv']);
+    Route::put('/mark/examen/monitor', [UserController::class, 'markExamRdv']);
 
     // Meeting Point Routes
     Route::post('/meeting-points', [MeetingPointController::class, 'store']);
@@ -194,13 +201,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/appointments/addComment', [AppointmentController::class, 'addComment']);
     Route::put('/appointments/{note}/updateComment', [AppointmentController::class, 'updateComment']);
 
-
     // UserDoc Routes
     Route::post('/user-docs', [UserDocController::class, 'store']);
     Route::post('/info-docs', [UserDocController::class, 'save_doc']);
     Route::get('/user-docs', [UserDocController::class, 'index']);
     Route::delete('/user-docs/{userDoc}', [UserDocController::class, 'destroy']);
-
+    
 
     // BankAccount Routes
     Route::post('/bank-accounts', [BankAccountController::class, 'store']);

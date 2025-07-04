@@ -13,6 +13,7 @@ use App\Models\LearnerProgres;
 use App\Models\Appointment;
 use App\Models\TrainingModule;
 use App\Models\Availability;
+use App\Models\Examen;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
@@ -217,4 +218,19 @@ class LearnerController extends Controller
             'message' => 'Liste des moniteurs et disponibilités sans rendez-vous.',
         ], 200);
     }
+
+    /**
+     * List examen to learner
+     *
+     */
+    public function ListExamRdv(Request $request, $learner_id) {
+        $examens = Examen::where('learner_id', $learner_id)->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $examens,
+            'message' => "List Examen"
+        ], 200);
+    }
+
 }

@@ -16,6 +16,7 @@ use App\Models\Appointment;
 use App\Models\TrainingModule;
 use App\Models\Availability;
 use App\Models\User;
+use App\Models\Examen;
 use Illuminate\Support\Facades\DB;
 /**
  * @tags Zone Learner (Admin)
@@ -260,5 +261,95 @@ class LearnerController extends Controller
             'success' => true,
             'data' => $contracts,
         ], 200);
+    }
+
+    /**
+     * List Learner to an exam.
+     * 
+     */
+    public function ListLearnerToExam(Request $request)
+    {
+        $examens = Examen::get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $examens,
+            'message' => "List Exam"
+        ], 200);
+    }
+
+    /**
+     * Add Learner to an exam.
+     * 
+     */
+    public function addLearnerToExam(Request $request)
+    {
+        $validated = $request->validate([
+            'instructor_id' => 'integer|required',
+            'learner_id' => 'integer|required',
+            'date' => 'date',
+        ]);
+
+        $examens = Examen::create([
+            'instructor_id' => $validated['instructor_id'],
+            'learner_id' => $validated['learner_id'],
+            'date' => $validated['date'],
+            'status' => "pending",
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $examens,
+            'message' => "Créer avec succès"
+        ], 200);
+    }
+
+    /**
+     * Update exam.
+     * 
+     */
+    public function updateLearnerToExam(Request $request, Examen $examen)
+    {
+        $validated = $request->validate([
+            'instructor_id' => 'integer|required',
+            'learner_id' => 'integer|required',
+            'date' => 'date',
+        ]);
+
+        $examen->instructor_id = $validated['instructor_id'];
+        $examen->learner_id = $validated['learner_id'];
+        $examen->date = $validated['date'];
+        $examen->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => $examen,
+            'message' => "Mis-à-jour"
+        ], 200);
+    }
+
+    /**
+     * Delete exam.
+     * 
+     */
+    public function deleteLearnerToExam(Request $request, $examen)
+    {
+        $find = Examen::find($examen);
+
+        if($find) {
+            $find->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Supprimer avec succès",
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => "Inexistant",
+            ], 404);
+        }
+
+        
     }
 }
