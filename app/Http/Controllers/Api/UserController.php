@@ -492,7 +492,9 @@ class UserController extends Controller
      *
      */
     public function ListExamRdv(Request $request, $monitor_id) {
-        $examens = Examen::where('instructor_id', $monitor_id)->get();
+        $examens = Examen::where('instructor_id', $monitor_id)
+                            ->with(['learner', 'monitor'])
+                            ->get();
 
         return response()->json([
             'success' => true,
