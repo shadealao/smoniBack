@@ -78,6 +78,26 @@ class ServiceController extends Controller
         $start_date = Carbon::now();
         $end_date = $start_date->addDays((int)$service->time);
 
+        $hour = 0;
+        $type_service = 0;
+        $gearbox = 0;
+
+        if($service){
+           $hour = $service->time;
+           if(
+                $service->title!='Fabrication Permis' &&
+                $service->title!='Extension contrat' &&
+                $service->title!='Examen code' &&
+                $service->title!='Pack code'
+           ) {
+                $type_service = "Conduite";
+                $gearbox = $service->type;
+           } else {
+                $type_service = "Autres";
+                $gearbox = "aucun";
+           }
+        }
+
         $subscription = Subscription::create([
             'learner_id' => auth()->user()->id, 
             'service_id' => $service->id, 
@@ -85,6 +105,9 @@ class ServiceController extends Controller
             'end_date' => $end_date,
             'mode' => $request->mode,
             'status' => 'active',
+            'type_service' => $type_service,
+            'hour' => $hour,
+            'gearbox' => $gearbox,
             'transaction_id' => $request->transaction,
             'amount' => $service->price,
         ]);

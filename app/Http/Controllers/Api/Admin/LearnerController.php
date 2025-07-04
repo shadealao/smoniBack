@@ -287,13 +287,14 @@ class LearnerController extends Controller
         $validated = $request->validate([
             'instructor_id' => 'integer|required',
             'learner_id' => 'integer|required',
-            'date' => 'date_format:Y-m-d H:i:s|required',
+            'date' => 'date_format:Y-m-d H:i:s|required'
         ]);
 
         $examens = Examen::create([
             'instructor_id' => $validated['instructor_id'],
             'learner_id' => $validated['learner_id'],
-            'date' => $validated['date'],
+            'datetime' => $validated['date'],
+            'date' => now(),
             'status' => "pending",
         ]);
 

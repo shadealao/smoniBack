@@ -11,7 +11,7 @@ class Subscription extends Model
 
     protected $fillable = [
         'learner_id', 'service_id', 'start_date', 'end_date',
-        'status', 'mode','amount','transaction_id'
+        'status', 'mode','amount','transaction_id','type_service','hour','gearbox'
     ];
 
     public function learner()

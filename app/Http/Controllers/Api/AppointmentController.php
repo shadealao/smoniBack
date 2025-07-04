@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\Availability;
 use App\Models\Note;
 use App\Models\Vehicle;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 use App\Http\Resources\AppointmentLearnerResource;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,8 @@ class AppointmentController extends Controller
     {
         $user = Auth::user();
 
+        
+
         if ($user->role !== 'learner') {
             return response()->json([
                 'success' => false,
@@ -29,9 +32,39 @@ class AppointmentController extends Controller
             ], 403);
         }
 
+
+        // Vérifie si abonnement en cours et heure disponible
+        $subscriptions = Subscription::where('learner_id', $user->id)->where('status','active')->where('type_service','Conduite')->with(['service.items','learner']) ->get();
+
+        // Si pas d'abonnement
+        if(!$subscriptions || !count($subscriptions)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous n\'avez aucun abonnement de conduite disponible ou elles ont expiré',
+            ], 403);
+        }
+
+        // Si abonnement et pas d'heure
+        if($subscriptions) {
+            $hasAvailableHours = false;
+            foreach ($subscriptions as $subscription) {
+                if (isset($subscription->hour) && $subscription->hour > 1) {
+                    $hasAvailableHours = true;
+                    break;
+                }
+            }
+
+            if (!$hasAvailableHours) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous n\'avez aucune heure disponible pour vos abonnements de conduite',
+                ], 403);
+            }
+        }
+
         $validated = $request->validate([
             'availability_id' => 'required|exists:availabilities,id',
-            'price' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'tag' => 'nullable|string|max:100',
         ]);
 
@@ -64,6 +97,33 @@ class AppointmentController extends Controller
             ], 422);
         }
 
+        // Si la boite (gearbox) de l'abonnement ne corresponds pas aux véhicule de la disponibilité choisi ou si il n'a pas d'heure restant pour l'abonnement ayant cette boite
+        if ($subscriptions) {
+            $validSubscription = null;
+            foreach ($subscriptions as $subscription) {
+                // Supposons que l'abonnement a un champ 'gearbox' et 'hour'
+                if (
+                    isset($subscription->gearbox, $subscription->hour) &&
+                    $subscription->gearbox === $availability->vehicle->gearbox_type &&
+                    $subscription->hours_left > 0
+                ) {
+                    $validSubscription = $subscription;
+                    break;
+                }
+            }
+
+            if (!$validSubscription) {
+                // Aucun abonnement compatible (soit pas la bonne boîte, soit pas d'heure)
+                return response()->json([
+                    'success' => false,
+                    'message' => "Abonnement incompatible avec cette boîte ou heures restantes insuffisantes."
+                ], 403);
+            } else {
+                $validSubscription->hour-=1;
+                $validSubscription->save();
+            }
+        }
+
         $appointment = Appointment::create([
             'learner_id' => $user->id,
             'instructor_id' => $availability->instructor_id,
@@ -74,8 +134,8 @@ class AppointmentController extends Controller
             'end_time' => $availability->end_time,
             'duration' => Carbon::parse($availability->end_time)->diffInMinutes($availability->start_time),
             'status' => 'scheduled',
-            'price' => $validated['price'],
-            'tag' => $validated['tag'],
+            'price' => 0,
+            'tag' => "rdv",
             'lesson_notes' => null,
             'presence_student' => false,
             'presence_monitor' => false,
