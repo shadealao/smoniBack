@@ -321,6 +321,21 @@ class AppointmentController extends Controller
             'availability_id' => null,
         ]);
 
+        $availability = $appointment->availability;
+        $vehicle = $availability->vehicle;
+
+        // Vérifier la souscription de l'apprenant avec le même gearbox
+        $subscriptions = Subscription::where('learner_id', $appointment->learner_id)
+            ->where('gearbox', $vehicle->gearbox_type)
+            ->where('status', 'active')
+            -orderBy('created_at','desc')
+            ->first();
+        
+        if($subscriptions) {
+            $subscriptions->hour+= 1;
+            $subscriptions->save();
+        }
+
         return response()->json([
             'success' => true,
             'data' => $appointment->fresh(),

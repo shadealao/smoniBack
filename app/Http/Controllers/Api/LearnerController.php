@@ -172,6 +172,22 @@ class LearnerController extends Controller
         $appointment->cancellation_reason = $validated['cancellation_reason'];
         $appointment->save();
 
+        $availability = $appointment->availability;
+        $vehicle = $availability->vehicle;
+
+        // Vérifier la souscription de l'apprenant avec le même gearbox
+        $subscriptions = Subscription::where('learner_id', $validated['learner_id'])
+            ->where('gearbox', $vehicle->gearbox_type)
+            ->where('status', 'active')
+            -orderBy('created_at','desc')
+            ->first();
+        
+        if($subscriptions) {
+            $subscriptions->hour+= 1;
+            $subscriptions->save();
+        }
+        
+
         return response()->json([
             'success' => true,
             'message' => 'Rendez-vous annulé avec succès.'
