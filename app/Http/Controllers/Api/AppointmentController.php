@@ -105,7 +105,7 @@ class AppointmentController extends Controller
                 if (
                     isset($subscription->gearbox, $subscription->hour) &&
                     $subscription->gearbox === $availability->vehicle->gearbox_type &&
-                    $subscription->hours > 0
+                    $subscription->hour > 0
                 ) {
                     $validSubscription = $subscription;
                     break;
