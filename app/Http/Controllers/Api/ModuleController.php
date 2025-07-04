@@ -127,7 +127,7 @@ class ModuleController extends Controller
                 'id' => $trainingModule->id,
                 'code' => $trainingModule->code,
                 'name' => $trainingModule->name,
-                'stat' => ($total_check_comp * 100)/count($trainingModule),
+                'stat' => ($total_check_comp * 100)/($total_comp != 0 ? $total_comp : 1),
                 'subModule' => $subModule,
             ];
             array_push($module, $detail_module );
