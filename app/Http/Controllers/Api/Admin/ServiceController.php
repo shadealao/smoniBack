@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CategoryService;
 use App\Models\Service;
 use App\Models\ServiceItem;
+use App\Models\Subscription;
 use App\Models\CodeAccess;
 use App\Models\User;
 use Illuminate\Validation\Rule;
