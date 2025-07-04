@@ -46,7 +46,7 @@ class ModuleController extends Controller
                 ],
                 [
                     'appointment_id' => $appointment->id, 
-                    'learner_id' => auth()->user()->id, 
+                    'learner_id' => $appointment->learner_id, 
                     'step_item_id' => $competence, 
                 ]);
 
