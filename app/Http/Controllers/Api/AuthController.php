@@ -51,6 +51,7 @@ class AuthController extends Controller
             'permit_category' => 'nullable|string',
 
             // Champs spécifiques pour instructor
+            'tva' => 'nullable|boolean',
             'specialty' => 'nullable|string',
             'city' => 'nullable|string',
             'bio' => 'nullable|string',
@@ -125,6 +126,7 @@ class AuthController extends Controller
             if ($validated['role'] === 'instructor') {
                 InstructorProfile::create([
                     'user_id' => $user->id,
+                    'tva' => $validated['tva'] ? 20 : 0,
                     'address' => $validated['address'] ?? null,
                     'city' => $validated['city'] ?? null,
                     'postal_code' => $validated['postal_code'] ?? null,
