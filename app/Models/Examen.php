@@ -10,7 +10,7 @@ class Examen extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['instructor_id', 'learner_id', 'date', 'status'];
+    protected $fillable = ['instructor_id', 'learner_id', 'date', 'datetime', 'status'];
 
     public function monitor(): BelongsTo
     {
