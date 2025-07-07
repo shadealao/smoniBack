@@ -97,22 +97,6 @@ class LearnerController extends Controller
                     'competence' => $compet,
                 ];
                 
-                if($detail_subModule['stat'] == 100){
-                    Badge::firstOrCreate([
-                        'learner_id' => $user->id, 
-                        'module_id' => $moduleStep->id,
-                        'list_badge_id' => $moduleStep->id, 
-                        'awarded_at' => new \DateTime(), 
-                        'validation_instructor_id' => auth()->user()->id, 
-                    ],
-                    [
-                        'learner_id' => $user->id, 
-                        'module_id' => $moduleStep->id,
-                        'list_badge_id' => $moduleStep->id, 
-                        'awarded_at' => new \DateTime(), 
-                        'validation_instructor_id' => auth()->user()->id, 
-                    ]);
-                }
                 array_push($subModule, $detail_subModule );
                 $total_check_comp = $total_check_comp + $check;
                 $total_comp = $total_comp + $competences->count();
