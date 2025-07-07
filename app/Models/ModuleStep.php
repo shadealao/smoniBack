@@ -12,7 +12,7 @@ class ModuleStep extends Model
 
     protected $fillable = [
         'module_id', 'name', 'code', 'description', 'duration_minutes',
-        'step_type', 'display_order', 'required_for_completion', 'validation_criteria', 'status'
+        'step_type', 'display_order', 'required_for_completion', 'validation_criteria', 'status','pdf'
     ];
 
     protected $casts = [
