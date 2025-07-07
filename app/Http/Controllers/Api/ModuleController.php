@@ -99,7 +99,7 @@ class ModuleController extends Controller
                     'code' => $moduleStep->code,
                     'name' => $moduleStep->name,
                     'stat' => ($check * 100)/$competences->count(),
-                    'pdf' => $moduleStep->pdf,
+                    'pdf' => asset($moduleStep->pdf),
                     'competence' => $compet,
                 ];
                 if($detail_subModule['stat'] == 100){
