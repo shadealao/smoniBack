@@ -105,7 +105,7 @@ class ModuleController extends Controller
                 if($detail_subModule['stat'] == 100){
                     Badge::firstOrCreate([
                         'learner_id' => $user->id, 
-                        'module_id' => $moduleStep->id,
+                        'module_id' => $competence->id,
                         'list_badge_id' => $moduleStep->id, 
                         'awarded_at' => new \DateTime(), 
                         'validation_instructor_id' => auth()->user()->id, 
