@@ -99,8 +99,8 @@ class ModuleController extends Controller
                     'code' => $moduleStep->code,
                     'name' => $moduleStep->name,
                     'stat' => ($check * 100)/$competences->count(),
-                    'competence' => $compet,
                     'pdf' => $moduleStep->pdf,
+                    'competence' => $compet,
                 ];
                 if($detail_subModule['stat'] == 100){
                     Badge::firstOrCreate([
