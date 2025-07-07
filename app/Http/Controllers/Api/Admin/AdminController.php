@@ -22,14 +22,19 @@ class AdminController extends Controller
      * List
      */
     public function index(Request $request){
+        $validated = $request->validate([
+            'q' => '',
+            'per_page' => 'integer',
+        ]);
         $q = $request->q ? : '';
+        $per_page = $request->per_page ? : 10;
         $users = User::where('role','admin')->whereNot('id',auth()->user()->id)      
             ->where(function ($query) use ($q) {
                 $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
                     ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
                     ->orwhere(DB::raw('lower(email)'),'like','%'.strtolower($q).'%')
                     ->orwhere(DB::raw('lower(phone)'),'like','%'.strtolower($q).'%');
-            })->orderBy('created_at','desc')->paginate(10);
+            })->orderBy('created_at','desc')->paginate($per_page);
 
         return response()->json([
             'success' => true,
