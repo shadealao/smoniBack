@@ -126,7 +126,7 @@ class ServiceController extends Controller
     public function addService(Request $request){
 
         $validated = $request->validate([
-            'category_service_id' => 'required|exist:category_services,id',
+            'category_service_id' => 'required|exists:category_services,id',
             'title' => 'required',
             'price' => 'required|integer',
             'type' => [Rule::in(['automatique', 'manual']),'required'],
