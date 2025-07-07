@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('module_steps', function (Blueprint $table) {
-            $table->string('pdf')->nullable();
+            $table->string('pdf')->default('pdf/exemple.pdf');
         });
     }
 

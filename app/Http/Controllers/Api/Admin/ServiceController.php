@@ -147,14 +147,14 @@ class ServiceController extends Controller
                 'time' => $request->time,
                 'hour' => $request->hour,
             ]);
-
-            foreach ($request->items as $item) {
-                $serviceItem = ServiceItem::create([
-                    'service_id' => $service->id,
-                    'status' => $item['status'],
-                    'label' => $item['label'],
-                ]);
-            }
+            if(count($request->items) != 0)
+                foreach ($request->items as $item) {
+                    $serviceItem = ServiceItem::create([
+                        'service_id' => $service->id,
+                        'status' => $item['status'],
+                        'label' => $item['label'],
+                    ]);
+                }
 
         DB::commit();
 

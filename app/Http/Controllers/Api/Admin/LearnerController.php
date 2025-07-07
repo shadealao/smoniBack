@@ -129,9 +129,10 @@ class LearnerController extends Controller
                     'code' => $moduleStep->code,
                     'name' => $moduleStep->name,
                     'stat' => ($check * 100)/$competences->count(),
-                    'pdf' => $moduleStep->pdf,
+                    'pdf' => asset($moduleStep->pdf),
                     'competence' => $compet,
                 ];
+                
                 array_push($subModule, $detail_subModule );
                 $total_check_comp = $total_check_comp + $check;
                 $total_comp = $total_comp + $competences->count();

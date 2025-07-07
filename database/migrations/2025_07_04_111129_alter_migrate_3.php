@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            $table->string('type_service');
-            $table->string('gearbox');
+            $table->string('type_service')->nullable();
+            $table->string('gearbox')->nullable();
             $table->integer('hour')->nullable()->default(null);
         });
 
