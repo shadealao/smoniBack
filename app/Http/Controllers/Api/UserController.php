@@ -470,7 +470,7 @@ class UserController extends Controller
         if($find) {
 
             $find->status = $validated['status'];
-            $examen->save();
+            $find->save();
 
             return response()->json([
                 'success' => true,
