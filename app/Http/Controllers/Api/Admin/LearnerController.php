@@ -330,6 +330,7 @@ class LearnerController extends Controller
         $examen->instructor_id = $validated['instructor_id'];
         $examen->learner_id = $validated['learner_id'];
         $examen->date = $validated['date'];
+        $examen->status = "pending";
         $examen->save();
 
         return response()->json([
