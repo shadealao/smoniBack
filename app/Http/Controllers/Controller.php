@@ -2,28 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Mail;
+use App\Service\MailService;
+
+
 abstract class Controller
 {
-    public function sendmail(Request $request, Appointment $appointment, MailService $mailer){
+    public function sendmail($sender_id, $receiver_id, $header, $subject, $content, $type){
         
-        $header = "Rappel sur Smoni";
-        $subject = "Smoni vous rappel votr réservation";
+        $receiver = User::find($receiver_id);
 
-        if($appointment->learner_id){
+        Notification::create([
+            'sender_id' => $sender_id,
+            'receiver_id' => $receiver_id, 
+            'title' => $header,
+            'data' => $content, 
+            'type' => $type,
+        ]);
+        
+        $mail = new Mail;
+        $mailer = new MailService($mail);
 
-            $content = $appointment->learner;
-            $mailer->reminderMail( null,$appointment->learner->email, $header, $content, $subject,);
-        }
+        $mailer->messageMail( null,$receiver->email, $header, $content, $subject);
 
-        if($appointment->instructor){
+        return true;
+        // Utilisation
+        // $this->sendmail($sender_id, $receiver_id, $header, $subject, $content, $type);
 
-            $content = $appointment->instructor;
-            $mailer->reminderMail( null,$appointment->instructor->email, $header, $content, $subject,);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Email envoyé',
-        ], 200);
     }
 }

@@ -43,7 +43,7 @@ class MailService{
         });
     }
 
-    public function contactMail(String $sender = null, String $receiver = null, String $header, String $message, String $object)
+    public function messageMail(String $sender = null, String $receiver = null, String $header, String $message, String $object)
     {
         if ($sender == null && $receiver) {
             $sender = $this->adminMail;
@@ -53,7 +53,7 @@ class MailService{
             throw new \Exception("Must have a sender or a receiver", 1);
         }
         
-        $this->mailer::send('emails.contact', [ 'data' => $message ], function($mail) use($sender, $receiver, $header, $object) {
+        $this->mailer::send('emails.message', [ 'data' => $message, 'header' => $header ], function($mail) use($sender, $receiver, $header, $object) {
             $mail->from($sender, $header);
             $mail->to($receiver)->subject($object);
         });
