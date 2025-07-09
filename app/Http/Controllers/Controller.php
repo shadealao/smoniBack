@@ -30,6 +30,5 @@ abstract class Controller
         return true;
         // Utilisation
         // $this->sendmail($sender_id, $receiver_id, $header, $subject, $content, $type);
-
     }
 }
