@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use App\Models\Appointment;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
+use App\Service\MailService;
+
 
 /**
  * @tags Zone Dashboard (Admin)
@@ -100,6 +102,28 @@ class DashboardController extends Controller
             'success' => true,
             'data' => $formattedWithdrawals,
             'message' => 'Historique des retraits par mois récupéré avec succès.',
+        ], 200);
+    }
+
+    /**
+     * Test Email
+     */
+    public function testEmail(Request $request){
+
+        $validated = $request->validate([
+            'sender_id' => 'required',
+            'receiver_id' => 'required',
+            'header' => 'required',
+            'subject' => 'required',
+            'content' => 'required',
+            'type' => [Rule::in(['appointment','payment','progress','system'])],
+        ]);
+
+        $sendMessage = $this->sendmailer($request->sender_id, $request->receiver_id, $request->header, $request->subject, $request->content, $request->type);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email bien envoyé',
         ], 200);
     }
 }

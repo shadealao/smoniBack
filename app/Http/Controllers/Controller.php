@@ -10,7 +10,7 @@ use App\Service\MailService;
 
 abstract class Controller
 {
-    public function sendmail($sender_id, $receiver_id, $header, $subject, $content, $type){
+    public function sendmailer($sender_id, $receiver_id, $header, $subject, $content, $type){
         
         $receiver = User::find($receiver_id);
 
@@ -29,6 +29,6 @@ abstract class Controller
 
         return true;
         // Utilisation
-        // $this->sendmail($sender_id, $receiver_id, $header, $subject, $content, $type);
+        // $this->sendmailer($sender_id, $receiver_id, $header, $subject, $content, $type);
     }
 }

@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Withdraw;
+use App\Models\User;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+
+use PDF;
 
 class WithdrawController extends Controller
 {
@@ -88,25 +92,65 @@ class WithdrawController extends Controller
             'numero' => 'required|string',
         ]);
 
-        $hour = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration') - Withdraw::where('monitor_id', auth()->user()->id)->sum('duration');
-        $cash = $hour * auth()->user()->instructorProfile->hourPrice;
-
-        
-        
-        $withdraw = Withdraw::create([
-            'monitor_id' => $user->id,
-            'ammount' => $cash,
-            'duration' => $hour,
-            'currency' => 'EUR',
-            'payed' => false,
-            'invoice_code' => $request->numero,
-        ]);
+            $hour = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration') - Withdraw::where('monitor_id', auth()->user()->id)->sum('duration');
+            $cash = $hour * auth()->user()->instructorProfile->hourPrice;        
+            
+            $withdraw = Withdraw::create([
+                'monitor_id' => $user->id,
+                'ammount' => $cash,
+                'duration' => $hour,
+                'currency' => 'EUR',
+                'payed' => false,
+                'invoice_code' => $request->numero,
+                // 'invoice_file' => $pdf,
+            ]);
 
         return response()->json([
             'success' => true,
             'data' => $withdraw,
             'message' => 'Demande de retrait enregistrée avec succès.',
         ], 201);
+    }
+
+    
+    /**
+     * Generate facture.
+     */
+    public function generate()
+    {
+        
+        DB::beginTransaction();
+
+        $withdraws = Withdraw::where('invoice_file',null)->get();
+
+
+        foreach ($withdraws as $withdraw) {
+            DB::beginTransaction();
+
+                $pdf = 'pdf/facture/'.$withdraw->invoice_code.'_'.time().'.pdf';
+
+                $user = User::find($withdraw->monitor_id);
+
+                $amount = $user->instructorProfile->hourPrice * $withdraw->duration;
+
+                $tva = ($user->instructorProfile->hourPrice * $withdraw->duration) * ($user->instructorProfile->tva/100);
+
+                if (!file_exists(public_path('pdf/facture/'))) {
+                    mkdir(public_path('pdf/facture/'), 0755, true);
+                }
+                
+                PDF::loadView('pdf.facture', compact('withdraw','user','amount','tva'))
+                    ->setPaper('a4', 'portrait')
+                    ->setWarnings(false)
+                    ->save(public_path($pdf));
+            DB::commit();
+
+            $withdraw->update([
+              'invoice_file' => $pdf,
+            ]);
+        }
+
+        return true;
     }
 
     /**
