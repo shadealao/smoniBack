@@ -203,15 +203,14 @@ class ServiceController extends Controller
 
             $user = User::find($subscription->learner_id);
             $info = learnerProfile::where('user_id',$user->id)->first();
-
-            if (!file_exists(public_path('storage/pdf/contrat1/'))) {
-                mkdir(public_path('storage/pdf/contrat1/'), 0755, true);
-            }
             
             $service = Service::find($subscription->service_id);
             $categories = CategoryService::find($service->category_service_id);
 
-            if($categories->name == "Location Véhicule"){
+            if($categories->name != "Location Véhicule"){
+                if (!file_exists(public_path('storage/pdf/location/'))) {
+                    mkdir(public_path('storage/pdf/location/'), 0755, true);
+                }
                 $pdf = 'storage/pdf/location/'.$subscription->transaction_id.'.pdf';
 
                 PDF::loadView('pdf.location', compact('subscription','user','info','service'))
@@ -219,6 +218,9 @@ class ServiceController extends Controller
                 ->setWarnings(false)
                 ->save(public_path($pdf));
             }else{   
+                if (!file_exists(public_path('storage/pdf/contrat1/'))) {
+                    mkdir(public_path('storage/pdf/contrat1/'), 0755, true);
+                }
                 $pdf = 'storage/pdf/contrat1/'.$subscription->transaction_id.'.pdf';
 
                 PDF::loadView('pdf.contrat1', compact('subscription','user','info','service'))
