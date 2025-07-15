@@ -6,6 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contrat de Location Véhicule Auto-Ecole</title>
     <style>
+
+        /** Définition de la taille de la page **/
+        @page {
+            margin: 100px 50px 80px 50px;
+        }
+
+        /** En-tête fixe **/
+        header {
+            position: fixed;
+            top: -80px;
+            left: 0px;
+            right: 0px;
+        }
+
+        /** Pied de page fixe **/
+        footer {
+            position: fixed;
+            bottom: -50px;
+            left: 0px;
+            right: 0px;
+            height: 40px;
+
+            text-align: center;
+            font-size: 12px;
+            border-top: 1px solid #000;
+        }
+
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
@@ -46,6 +73,15 @@
 </head>
 
 <body>
+
+        <header>
+            <img src="{{ asset('images/header.png') }}" style="width: 100%" alt="">
+        </header>
+
+        <footer>
+            <p>SMONI Auto-école : 62 Rue de la JARRY, 94300 VINCENNES, SIREN 915387013 RCS CRETEIL, TVA FR65915387013 NDA : <strong>11941318194</strong></p>
+        </footer>
+
     <h1>CONTRAT DE LOCATION VEHICULE AUTO-ECOLE</h1>
 
     <p>Entre SMONI Auto Moto École, Société par Actions Simplifiée Unipersonnelle SASU au capital de 1.000 €</p>
