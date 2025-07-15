@@ -6,13 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\CategoryService;
 use App\Models\Service;
 use App\Models\ServiceItem;
-use App\Models\User;
 use App\Models\Contract;
+use App\Models\learnerProfile;
+use App\Models\User;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
+use PDF;
 use Carbon\Carbon;
 
 class ServiceController extends Controller
@@ -173,7 +177,7 @@ class ServiceController extends Controller
      * My info subscribe
      * 
     */
-public function infoSubscribe(){
+    public function infoSubscribe(){
 
         $subscriptions = Subscription::where('learner_id', auth()->user()->id)->with(['service.items']) ->orderBy('created_at','desc')->first();
 
@@ -184,4 +188,61 @@ public function infoSubscribe(){
     }
 
 
+
+    /**
+     * Generate Contrat.
+     */
+    public function contrat()
+    {
+        $ids = Contract::pluck('subscription_id')->toArray();
+        $subscriptions = Subscription::whereNotIn('id',$ids)->get();
+
+        foreach ($subscriptions as $subscription) {
+
+            $user = User::find($subscription->learner_id);
+            $info = learnerProfile::where('user_id',$user->id)->first();
+
+            if (!file_exists(public_path('storage/pdf/contrat1/'))) {
+                mkdir(public_path('storage/pdf/contrat1/'), 0755, true);
+            }
+            
+            $service = Service::find($subscription->service_id);
+            $categories = CategoryService::find($service->category_service_id);
+
+            if($categories->name == "Location Véhicule"){
+                $pdf = 'storage/pdf/location/'.$subscription->transaction_id.'.pdf';
+
+                PDF::loadView('pdf.location', compact('subscription','user','info','service'))
+                ->setPaper('a4', 'portrait')
+                ->setWarnings(false)
+                ->save(public_path($pdf));
+            }else{   
+                $pdf = 'storage/pdf/contrat1/'.$subscription->transaction_id.'.pdf';
+
+                PDF::loadView('pdf.contrat1', compact('subscription','user','info','service'))
+                ->setPaper('a4', 'portrait')
+                ->setWarnings(false)
+                ->save(public_path($pdf));
+            }
+
+            // $contrat = Contract::create([
+            //     'student_id' => $user->id,
+            //     'subscription_id' => $subscription->id,
+            //     'file_original' => $pdf,
+            //     'file_signed' => "By Super Admin",
+            //     'tag' => 'initial',
+            //     'date' => new \DateTime(),
+            // ]);
+            $contrat = new Contract();
+            $contrat->student_id = $user->id;
+            $contrat->subscription_id = $subscription->id;
+            $contrat->file_original = $pdf;
+            $contrat->file_signed = "By Super Admin";
+            $contrat->tag = 'initial';
+            $contrat->date = new \DateTime();
+             $contrat->save();
+
+        }
+        return true;
+    }
 }

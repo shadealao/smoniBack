@@ -10,7 +10,7 @@ class Service extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category_service_id', 'title', 'price', 'type', 'time', 'hour'
+        'category_service_id', 'title', 'price', 'type', 'time', 'hour', 'month'
     ];
 
     public function category()

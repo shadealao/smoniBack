@@ -127,7 +127,7 @@ class WithdrawController extends Controller
         foreach ($withdraws as $withdraw) {
             DB::beginTransaction();
 
-                $pdf = 'pdf/facture/'.$withdraw->invoice_code.'_'.time().'.pdf';
+                $pdf = 'storage/pdf/facture/'.$withdraw->invoice_code.'_'.time().'.pdf';
 
                 $user = User::find($withdraw->monitor_id);
 
@@ -135,19 +135,22 @@ class WithdrawController extends Controller
 
                 $tva = ($user->instructorProfile->hourPrice * $withdraw->duration) * ($user->instructorProfile->tva/100);
 
-                if (!file_exists(public_path('pdf/facture/'))) {
-                    mkdir(public_path('pdf/facture/'), 0755, true);
+                if (!file_exists(public_path('storage/pdf/facture/'))) {
+                    mkdir(public_path('storage/pdf/facture/'), 0755, true);
                 }
                 
                 PDF::loadView('pdf.facture', compact('withdraw','user','amount','tva'))
                     ->setPaper('a4', 'portrait')
                     ->setWarnings(false)
                     ->save(public_path($pdf));
+                    
             DB::commit();
 
             $withdraw->update([
               'invoice_file' => $pdf,
             ]);
+
+            $withdraw->save();
         }
 
         return true;

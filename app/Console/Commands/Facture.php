@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\Api\WithdrawController;
+use App\Http\Controllers\Api\ServiceController;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -31,6 +32,10 @@ class Facture extends Command
         
         $generate = new WithdrawController();
         $generate->generate();
+
+        // Contract1
+        $make = new ServiceController();
+        $make->contrat();
 
     }
 }

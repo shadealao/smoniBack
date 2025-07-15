@@ -146,6 +146,8 @@ class ServiceController extends Controller
                 'type' => $request->type,
                 'time' => $request->time,
                 'hour' => $request->hour,
+                'month' => $request->time/30,
+
             ]);
             if(count($request->items) != 0)
                 foreach ($request->items as $item) {
@@ -188,6 +190,7 @@ class ServiceController extends Controller
             'type' => $request->type,
             'time' => $request->time,
             'hour' => $request->hour,
+            'month' => $request->time/30,
         ]);
 
         return response()->json([

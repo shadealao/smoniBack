@@ -11,7 +11,8 @@ class LearnerProfile extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'birthdate',
+        'user_id', 
+        'birthdate',
         'city',
         'address',
         'postal_code',
