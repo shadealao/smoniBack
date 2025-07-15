@@ -194,9 +194,11 @@ class ServiceController extends Controller
      */
     public function contrat()
     {
+        try {
+            
         $ids = Contract::pluck('subscription_id')->toArray();
         $subscriptions = Subscription::whereNotIn('id',$ids)->get();
-
+        DB::beginTransaction();
         foreach ($subscriptions as $subscription) {
 
             $user = User::find($subscription->learner_id);
@@ -236,6 +238,12 @@ class ServiceController extends Controller
             ]);
 
         }
+        DB::commit();
         return true;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error('Database insertion failed: ' . $th->getMessage());
+            $this->error('Error: ' . $th->getMessage());
+        }
     }
 }
