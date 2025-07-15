@@ -224,23 +224,16 @@ class ServiceController extends Controller
                 ->setWarnings(false)
                 ->save(public_path($pdf));
             }
+            
 
-            // $contrat = Contract::create([
-            //     'student_id' => $user->id,
-            //     'subscription_id' => $subscription->id,
-            //     'file_original' => $pdf,
-            //     'file_signed' => "By Super Admin",
-            //     'tag' => 'initial',
-            //     'date' => new \DateTime(),
-            // ]);
-            $contrat = new Contract();
-            $contrat->student_id = $user->id;
-            $contrat->subscription_id = $subscription->id;
-            $contrat->file_original = $pdf;
-            $contrat->file_signed = "By Super Admin";
-            $contrat->tag = 'initial';
-            $contrat->date = new \DateTime();
-             $contrat->save();
+            $contrat = Contract::create([
+                'student_id' => $user->id,
+                'subscription_id' => $subscription->id,
+                'file_original' => $pdf,
+                'file_signed' => "By Super Admin",
+                'tag' => 'initial',
+                'date' => new \DateTime(),
+            ]);
 
         }
         return true;
