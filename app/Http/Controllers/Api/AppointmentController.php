@@ -23,8 +23,6 @@ class AppointmentController extends Controller
     {
         $user = Auth::user();
 
-        
-
         if ($user->role !== 'learner') {
             return response()->json([
                 'success' => false,
@@ -142,6 +140,8 @@ class AppointmentController extends Controller
             'finished' => false,
         ]);
 
+        $this->sendmailer(null, $user->email, 'Reservation pour Rendez-vous', "Rendez-vous pour cours de conduite", 'Vous venez de faire une résevation pour un cours qui aura lieu '.$availability->date.' de '.$availability->start_time.' à '.$availability->end_time, 'appointment');
+
         return response()->json([
             'success' => true,
             'data' => $appointment->load(['availability', 'vehicle', 'instructor']),
@@ -231,6 +231,8 @@ class AppointmentController extends Controller
         }
 
         $appointment->save();
+        
+        $this->sendmailer(null, $user->email, 'Reservation pour Rendez-vous', "Rendez-vous pour cours de conduite", 'Vous venez de faire une résevation pour un cours qui aura lieu '.$newAvailability->date.' de '.$newAvailability->start_time.' à '.$newAvailability->end_time, 'appointment');
 
         return response()->json([
             'success' => true,
@@ -263,6 +265,11 @@ class AppointmentController extends Controller
         $appointment->update([
             'status' => 'confirmed',
         ]);
+
+        
+        $this->sendmailer(null, $user->email, 'Confirmation Rendez-vous', 'Confirmation Rendez-vous', 'Vous venez de confirmer une résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
+
+        $this->sendmailer(null, $appointment->learner->email, 'Confirmation Rendez-vous', 'Confirmation Rendez-vous', 'Votre moniteur vient de confirmer votre résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
 
         return response()->json([
             'success' => true,
@@ -335,6 +342,10 @@ class AppointmentController extends Controller
             $subscriptions->save();
         }
 
+        $this->sendmailer(null, $user->email, 'Annullation Rendez-vous', 'Annullation Rendez-vous', 'Vous venez d\'annuler une résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
+
+        $this->sendmailer(null, $appointment->learner->email, 'Annullation Rendez-vous', 'Annullation Rendez-vous', 'Votre moniteur vient d\'annuler votre résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time.'<br> <b>Raison</b>: '.$validated['cancellation_reason'], 'appointment');
+
         return response()->json([
             'success' => true,
             'data' => $appointment->fresh(),
@@ -373,6 +384,11 @@ class AppointmentController extends Controller
         $appointment->presence_monitor = true;
         $appointment->status = 'pending';
         $appointment->save();
+
+        
+        $this->sendmailer(null, $user->email, 'Comfirmation de présence au rendez-vous', 'Comfirmation de présence au rendez-vous', 'Vous venez de confirmer la présence de l\'apprenant '.$appointment->learner->lastname.' au rendez-vous '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
+
+        $this->sendmailer(null, $appointment->learner->email, 'Comfirmation de présence au rendez-vous', 'Comfirmation de présence au rendez-vous', 'Votre moniteur vient de confirmer votre présence au cours', 'appointment');
 
         return response()->json([
             'success' => true,
@@ -416,6 +432,10 @@ class AppointmentController extends Controller
         $appointment->reason = $request->reason;
 
         $appointment->save();
+
+        $this->sendmailer(null, $user->email, 'Absence au rendez-vous', 'Absence au rendez-vous', 'Vous venez de marquer l\'absence de l\'apprenant '.$appointment->learner->lastname.' au rendez-vous '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
+
+        $this->sendmailer(null, $appointment->learner->email, 'Absence au rendez-vous', 'Absence au rendez-vous', 'Votre moniteur vient de marquer votre présence au cours', 'appointment');
 
         return response()->json([
             'success' => true,
@@ -462,6 +482,9 @@ class AppointmentController extends Controller
         $appointment->finished = true;
         $appointment->status = 'notation';
         $appointment->save();
+
+        $this->sendmailer(null, $appointment->learner->email, 'Fin du cours', 'FIn du cours', 'Votre moniteur vient de marquer la fin de votre cours. Merci', 'appointment');
+
 
         return response()->json([
             'success' => true,

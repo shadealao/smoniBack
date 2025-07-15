@@ -51,6 +51,10 @@ class AdminController extends Controller
             'is_active' => $user->is_active ? false : true,
         ]);
 
+        $this->sendmailer(null, auth()->user()->email, $user->is_active ? "Blocage du compte" : "Béblocage du compte",$user->is_active ? "Blocage du compte" : "Béblocage du compte", 'Vous venez de '.$user->is_active ? 'bloquer' : 'débloquer'.' l\utilisateur '.$user->lastname, 'UserAction');
+
+        $this->sendmailer(null, $user->email, $user->is_active ? "Blocage du compte" : "Béblocage du compte",$user->is_active ? "Blocage du compte" : "Béblocage du compte", 'Votre compte aété '.$user->is_active ? 'bloqué' : 'débloqué', 'UserAction');
+
         return response()->json([
             'success' => true,
             'data' => $user->is_active ? 'Compte Activé' : 'Compte Bloqué',
@@ -184,6 +188,9 @@ class AdminController extends Controller
         $withdraw->update([
             'payed' => true,
         ]);
+        
+        $this->sendmailer(null, auth()->user()->email, 'Validation de la Demande de Retrait', 'Validation de la Demande de Retrait', 'Vous venez de valider un retrait de '.$hour.' heure soit un montant de '.$cash.' EUR pour le moniteur '.$withdraw->monitor->lastname.' '.$withdraw->monitor->firstname, 'withdraw');
+        $this->sendmailer(null, $withdraw->monitor->email, 'Validation de la Demande de Retrait', 'Validation de la Demande de Retrait', 'Vous venez de recevoir un retrait de '.$hour.' heure soit un montant de '.$cash.' EUR. Merci et à bientôt', 'withdraw');
 
         return response()->json([
             'success' => true,
@@ -206,6 +213,10 @@ class AdminController extends Controller
         }
 
         $withdraw-delete();
+
+        $this->sendmailer(null, auth()->user()->email, 'Annnulation de la Demande de Retrait', 'Annnulation de la Demande de Retrait', 'Vous venez d\'annuler le retrait de '.$hour.' heure soit un montant de '.$cash.' EUR pour le moniteur '.$withdraw->monitor->lastname.' '.$withdraw->monitor->firstname, 'withdraw');
+        $this->sendmailer(null, $withdraw->monitor->email, 'Annnulation de la Demande de Retrait', 'Annnulation de la Demande de Retrait', 'Votre retrait de '.$hour.' heure soit un montant de '.$cash.' EUR a été annulé. Veuillez joindre l\'equipe', 'withdraw');
+
 
         return response()->json([
             'success' => true,
