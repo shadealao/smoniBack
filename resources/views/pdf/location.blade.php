@@ -9,7 +9,7 @@
 
         /** Définition de la taille de la page **/
         @page {
-            margin: 100px 50px 80px 50px;
+            margin: 100px 0px 80px 0px;
         }
 
         /** En-tête fixe **/
@@ -35,7 +35,7 @@
 
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
+            line-height: 1.3;
             margin: 20px;
         }
 
@@ -75,7 +75,7 @@
 <body>
 
         <header>
-            <img src="{{ asset('images/header.png') }}" style="width: 100%" alt="">
+            <img src="{{ asset('images/header.png') }}" style="width: 100%; height: 70px" alt="">
         </header>
 
         <footer>
