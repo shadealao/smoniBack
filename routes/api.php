@@ -66,6 +66,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware(['admin'])->group(function () {
         Route::prefix('admin')->group(function () {
+            //Auth
+            Route::post('/passTest', [AuthController::class, 'checkAsk']);
 
             // Dashboard
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.stat');

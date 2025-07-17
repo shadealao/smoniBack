@@ -105,7 +105,7 @@ class WithdrawController extends Controller
                 // 'invoice_file' => $pdf,
             ]);
 
-            $this->sendmailer(null, $user->email, 'Demande de Retrait', 'Demande de Retrait', 'Vous venez de lancer un retrait de '.$hour.' heure soit un montant de '.$cash.' EUR. Veillez patienter que l\'administrateurs valide ce dernier', 'withdraw');
+            $this->sendmailer( $user->id, 'Demande de Retrait', 'Demande de Retrait', 'Vous venez de lancer un retrait de '.$hour.' heure soit un montant de '.$cash.' EUR. Veillez patienter que l\'administrateurs valide ce dernier', 'withdraw');
 
         return response()->json([
             'success' => true,
@@ -121,8 +121,6 @@ class WithdrawController extends Controller
     public function generate()
     {
         
-        DB::beginTransaction();
-
         $withdraws = Withdraw::where('invoice_file',null)->get();
 
 
@@ -152,7 +150,6 @@ class WithdrawController extends Controller
               'invoice_file' => $pdf,
             ]);
 
-            $withdraw->save();
         }
 
         return true;
@@ -219,8 +216,8 @@ class WithdrawController extends Controller
 
         
         
-        $this->sendmailer(null, auth()->user()->email, 'Validation de la Demande de Retrait', 'Validation de la Demande de Retrait', 'Vous venez de valider un retrait de '.$hour.' heure soit un montant de '.$cash.' EUR pour le moniteur '.$withdraw->monitor->lastname.' '.$withdraw->monitor->firstname, 'withdraw');
-        $this->sendmailer(null, $withdraw->monitor->email, 'Validation de la Demande de Retrait', 'Validation de la Demande de Retrait', 'Vous venez de recevoir un retrait de '.$hour.' heure soit un montant de '.$cash.' EUR. Merci et à bientôt', 'withdraw');
+        $this->sendmailer( auth()->user()->id, 'Validation de la Demande de Retrait', 'Validation de la Demande de Retrait', 'Vous venez de valider un retrait de '.$hour.' heure soit un montant de '.$cash.' EUR pour le moniteur '.$withdraw->monitor->lastname.' '.$withdraw->monitor->firstname, 'withdraw');
+        $this->sendmailer( $withdraw->monitor_id, 'Validation de la Demande de Retrait', 'Validation de la Demande de Retrait', 'Vous venez de recevoir un retrait de '.$hour.' heure soit un montant de '.$cash.' EUR. Merci et à bientôt', 'withdraw');
 
         return response()->json([
             'success' => true,

@@ -21,7 +21,9 @@ class LearnerProfile extends Model
         'cin_issue_place',
         'permit_number',
         'permit_issue_date',
-        'permit_category'
+        'permit_category',
+        'test_passed',
+        'hour',
     ];
 
     protected $casts = [
