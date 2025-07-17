@@ -7,12 +7,12 @@
     <title>Contrat d'Enseignement à la Conduite - SMONI</title>
     <style>
 
-        @font-face {
+        /* @font-face {
             font-family: 'Montserrat';
-            src: url("{{ public_path('fonts/montserrat/Montserrat-Regular.ttf') }}") format("truetype");
+            src: url(env('APP_URL').'fonts/montserrat/Montserrat-Regular.ttf');
             font-weight: normal;
             font-style: normal;
-        }
+        } */
 
          /** Définition de la taille de la page **/
         @page {

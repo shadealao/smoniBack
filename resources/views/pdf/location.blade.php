@@ -9,7 +9,7 @@
 
         @font-face {
             font-family: 'Montserrat';
-            src: url("{{ public_path('fonts/montserrat/Montserrat-Regular.ttf') }}") format("truetype");
+            src: url("{{ asset('fonts/montserrat/Montserrat-Regular.ttf') }}") format("truetype");
             font-weight: normal;
             font-style: normal;
         }
