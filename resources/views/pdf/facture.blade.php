@@ -126,39 +126,45 @@
     <div class="line-yellow"></div>
 
     </div>
-  <div class="invoice">
-
-    <div class="header">
-      <h1>Facture</h1>
-      <img src="{{asset('image.png')}}" alt="Logo de SMONI AUTO-MOTO ÉCOLE" class="logo">
-    </div>
-
-    <div class="top-info">
-      <div>
-        <p><strong>Numéro de facture</strong>{{$withdraw->invoice_code}}</p>
-        <p><strong>Date d’émission</strong>{{date('d M Y',strtotime($withdraw->created_at))}}</p>
-        <p><strong>Date d’échéance</strong>{{date('d M Y',strtotime($withdraw->created_at))}}</p>
-      </div>
-
-      <div class="company-info">
-          <div>
-            <p><strong>SMONI AUTO-MOTO ÉCOLE</strong><br>
-            62 Rue De La Jarry<br>
-            94300 Vincennes<br>
-            France<br>
-            +33 7 49 46 49 78</p>
+    <table style="width: 100%; border:1px solid transparent">
+        <td style="width: 25%;border:1px solid transparent">
+          <div class="header">
+            <h1>Facture</h1>
           </div>
-      
-            <div>
-                <p><strong>Facturer à</strong><br>
-                {{$user->lastname.' '.$user->firstname}}<br>
-                {{$user->instructorProfile->adress}}<br>
-                {{$user->instructorProfile->city}}<br>
-                {{$user->instructorProfile->postal_code}}<br>
+        </td>
+        <td style="width: 25%;border:1px solid transparent">
+          <div style="text-align:right">
+            <img src="{{asset('image.png')}}" alt="Logo de SMONI AUTO-MOTO ÉCOLE" class="logo">
+          </div>
+        </td>
+    </table>
+    <div class="invoice">
+        <div class="top-info">
+          <div>
+            <p><strong>Numéro de facture</strong>{{$withdraw->invoice_code}}</p>
+            <p><strong>Date d’émission</strong>{{date('d M Y',strtotime($withdraw->created_at))}}</p>
+            <p><strong>Date d’échéance</strong>{{date('d M Y',strtotime($withdraw->created_at))}}</p>
+          </div>
+
+          <div class="company-info">
+              <div>
+                <p><strong>SMONI AUTO-MOTO ÉCOLE</strong><br>
+                62 Rue De La Jarry<br>
+                94300 Vincennes<br>
                 France<br>
-                {{$user->email}}</p>
-            </div>
-    </div>
+                +33 7 49 46 49 78</p>
+              </div>
+          
+                <div>
+                    <p><strong>Facturer à</strong><br>
+                    {{$user->lastname.' '.$user->firstname}}<br>
+                    {{$user->instructorProfile->adress}}<br>
+                    {{$user->instructorProfile->city}}<br>
+                    {{$user->instructorProfile->postal_code}}<br>
+                    France<br>
+                    {{$user->email}}</p>
+                </div>
+        </div>
     </div>
 
     <h2 class="amount-due">{{number_format($withdraw->ammount)}} € dus le {{date('d M Y',strtotime($withdraw->created_at))}}</h2>

@@ -10,12 +10,12 @@ use App\Service\MailService;
 
 abstract class Controller
 {
-    public function sendmailer($sender_id, $receiver_id, $header, $subject, $content, $type){
+    public function sendmailer($receiver_id, $header, $subject, $content, $type){
         
         $receiver = User::find($receiver_id);
-
+        $sender = User::where('role','admin')->first();
         Notification::create([
-            'sender_id' => $sender_id,
+            'sender_id' => $sender->id,
             'receiver_id' => $receiver_id, 
             'title' => $header,
             'data' => $content, 

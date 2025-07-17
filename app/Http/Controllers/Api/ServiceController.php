@@ -120,7 +120,7 @@ class ServiceController extends Controller
             'amount' => $service->price,
         ]);
 
-        $this->sendmailer(null, auth()->user()->email, 'Souscription à un service', 'Souscription à un service', 'Vous venez de souscrire au service '.$service->title, 'subscribe');
+        $this->sendmailer( auth()->user()->id, 'Souscription à un service', 'Souscription à un service', 'Vous venez de souscrire au service '.$service->title, 'subscribe');
 
         return response()->json([
             'success' => true,
@@ -195,41 +195,42 @@ class ServiceController extends Controller
      * Generate Contrat.
      */
     public function contrat()
-    {
-        try {
-            
+    { 
         $ids = Contract::pluck('subscription_id')->toArray();
         $subscriptions = Subscription::whereNotIn('id',$ids)->get();
-        DB::beginTransaction();
         foreach ($subscriptions as $subscription) {
+            DB::beginTransaction();
+                $user = User::find($subscription->learner_id);
+                $info = learnerProfile::where('user_id',$user->id)->first();
+                
+                $service = Service::find($subscription->service_id);
+                $categories = CategoryService::find($service->category_service_id);
 
-            $user = User::find($subscription->learner_id);
-            $info = learnerProfile::where('user_id',$user->id)->first();
-            
-            $service = Service::find($subscription->service_id);
-            $categories = CategoryService::find($service->category_service_id);
+                if($categories->name == "Location Véhicule"){
+                    if (!file_exists(public_path('storage/pdf/location/'))) {
+                        mkdir(public_path('storage/pdf/location/'), 0755, true);
+                    }
+                    $pdf = 'storage/pdf/location/'.$subscription->transaction_id.'.pdf';
 
-            if($categories->name != "Location Véhicule"){
-                if (!file_exists(public_path('storage/pdf/location/'))) {
-                    mkdir(public_path('storage/pdf/location/'), 0755, true);
+                    PDF::loadView('pdf.location', compact('subscription','user','info','service'))
+                    ->setPaper('a4', 'portrait')
+                    ->setWarnings(false)
+                    ->save(public_path($pdf));
+                }else{   
+                    if (!file_exists(public_path('storage/pdf/contrat1/'))) {
+                        mkdir(public_path('storage/pdf/contrat1/'), 0755, true);
+                    }
+                    $pdf = 'storage/pdf/contrat1/'.$subscription->transaction_id.'.pdf';
+
+                    PDF::loadView('pdf.contrat1', compact('subscription','user','info','service'))
+                    ->setPaper('a4', 'portrait')
+                    ->setWarnings(false)
+                    ->save(public_path($pdf));
                 }
-                $pdf = 'storage/pdf/location/'.$subscription->transaction_id.'.pdf';
-
-                PDF::loadView('pdf.location', compact('subscription','user','info','service'))
-                ->setPaper('a4', 'portrait')
-                ->setWarnings(false)
-                ->save(public_path($pdf));
-            }else{   
-                if (!file_exists(public_path('storage/pdf/contrat1/'))) {
-                    mkdir(public_path('storage/pdf/contrat1/'), 0755, true);
-                }
-                $pdf = 'storage/pdf/contrat1/'.$subscription->transaction_id.'.pdf';
-
-                PDF::loadView('pdf.contrat1', compact('subscription','user','info','service'))
-                ->setPaper('a4', 'portrait')
-                ->setWarnings(false)
-                ->save(public_path($pdf));
-            }
+                
+                $this->sendmailer( $user->id, 'Contrat lié au Service', 'Contrat lié au Service', 'Vous avez recu votre contrat. Veuillez vous connecter afin de disposer de ce dernier', 'subscribe');
+                
+            DB::commit();
             
 
             $contrat = Contract::create([
@@ -240,16 +241,8 @@ class ServiceController extends Controller
                 'tag' => 'initial',
                 'date' => new \DateTime(),
             ]);
-
-            $this->sendmailer(null, $user->email, 'Contrat lié au Service', 'Contrat lié au Service', 'Vous avez recu votre contrat. Veuillez vous connecter afin de disposer de ce dernier', 'subscribe');
-
         }
-        DB::commit();
         return true;
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error('Database insertion failed: ' . $th->getMessage());
-            $this->error('Error: ' . $th->getMessage());
-        }
+        
     }
 }
