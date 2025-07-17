@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contrat d'Enseignement à la Conduite - SMONI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
 
          /** Définition de la taille de la page **/
@@ -36,7 +39,7 @@
         body {
             font-family: Arial, sans-serif;
             line-height: 1.3;
-            margin: 20px;
+            margin: 0 10px;
         }
 
         h1,
@@ -58,7 +61,7 @@
 <body>
 
         <header>
-            <img src="{{ asset('images/header.png') }}" style="width: 100%; height: 70px" alt="">
+            <img src="{{ asset('images/header.png') }}" style="width: 100%; height: 100px" alt="">
         </header>
 
         <footer>
