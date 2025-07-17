@@ -5,10 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contrat d'Enseignement à la Conduite - SMONI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url("{{ public_path('fonts/montserrat/Montserrat-Regular.ttf') }}") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
 
          /** Définition de la taille de la page **/
         @page {
@@ -37,7 +41,7 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             line-height: 1.3;
             margin: 0 10px;
         }
