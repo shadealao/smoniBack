@@ -223,12 +223,47 @@ class AuthController extends Controller
 
         // Générer un jeton
         $token = $user->createToken('auth-token')->plainTextToken;
+        
+        if($user->role == "learner"){
+            $learner = LearnerProfile::where('user_id',$user->id)->first();
+            return response()->json([
+                'success' => true,
+                'token' => $token,
+                'test_passed' => $learner->test_passed,
+                'data' => $user,
+                'message' => 'Connexion réussie',
+            ], 200);
+        }
+        else
+            return response()->json([
+                'success' => true,
+                'token' => $token,
+                'data' => $user,
+                'message' => 'Connexion réussie',
+            ], 200);
+    }
+
+    /**
+     * Check Asking Question
+     */
+    public function checkAsk(Request $request){
+
+        $validated = $request->validate([
+            'point' => 'required',
+        ]);
+
+        $hour = $this->checkPoint($request->point);
+
+        $learner = LearnerProfile::where('user_id',auth()->user()->id)->first();
+
+        $learner->update([
+            'test_passed' => true,
+            'hour' => $hour,
+        ]);
 
         return response()->json([
             'success' => true,
-            'token' => $token,
-            'data' => $user,
-            'message' => 'Connexion réussie',
+            'message' => 'Félicitation',
         ], 200);
     }
 
