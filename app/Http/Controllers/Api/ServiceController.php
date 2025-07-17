@@ -120,6 +120,8 @@ class ServiceController extends Controller
             'amount' => $service->price,
         ]);
 
+        $this->sendmailer(null, auth()->user()->email, 'Souscription à un service', 'Souscription à un service', 'Vous venez de souscrire au service '.$service->title, 'subscribe');
+
         return response()->json([
             'success' => true,
             'data' => $subscription,
@@ -238,6 +240,8 @@ class ServiceController extends Controller
                 'tag' => 'initial',
                 'date' => new \DateTime(),
             ]);
+
+            $this->sendmailer(null, $user->email, 'Contrat lié au Service', 'Contrat lié au Service', 'Vous avez recu votre contrat. Veuillez vous connecter afin de disposer de ce dernier', 'subscribe');
 
         }
         DB::commit();
