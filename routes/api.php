@@ -64,10 +64,10 @@ Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meetin
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::middleware(['admin'])->group(function () {
-        Route::prefix('admin')->group(function () {
             //Auth
             Route::post('/passTest', [AuthController::class, 'checkAsk']);
+    Route::middleware(['admin'])->group(function () {
+        Route::prefix('admin')->group(function () {
 
             // Dashboard
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.stat');

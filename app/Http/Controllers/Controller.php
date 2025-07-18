@@ -32,7 +32,7 @@ abstract class Controller
         // $this->sendmailer($sender_id, $receiver_id, $header, $subject, $content, $type);
     }
 
-    public function checkPoint($point){
+    public function checkPoint($points){
         if ($points > 12) {
             return 20; // "> 12 points" -> 20 heures
         } elseif ($points >= 11 && $points <= 12) {
