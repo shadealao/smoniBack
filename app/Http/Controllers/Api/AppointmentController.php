@@ -129,7 +129,7 @@ class AppointmentController extends Controller
             'date' => $availability->date,
             'start_time' => $availability->start_time,
             'end_time' => $availability->end_time,
-            'duration' => Carbon::parse($availability->end_time)->diffInMinutes($availability->start_time),
+            'duration' => Carbon::parse($availability->start_time)->diffInMinutes($availability->end_time),
             'status' => 'scheduled',
             'price' => 0,
             'tag' => "rdv",
