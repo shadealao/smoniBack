@@ -19,8 +19,7 @@ class AppointmentController extends Controller
     /**
      * Book an appointment (learner only).
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $user = Auth::user();
 
         if ($user->role !== 'learner') {
@@ -141,6 +140,8 @@ class AppointmentController extends Controller
         ]);
 
         $this->sendmailer( $user->id, 'Reservation pour Rendez-vous', "Rendez-vous pour cours de conduite", 'Vous venez de faire une résevation pour un cours qui aura lieu '.$availability->date.' de '.$availability->start_time.' à '.$availability->end_time, 'appointment');
+
+        $this->sendmailer( $availability->instructor_id, 'Reservation pour Rendez-vous', "Rendez-vous pour cours de conduite", 'Une résevation pour un cours qui aura lieu '.$availability->date.' de '.$availability->start_time.' à '.$availability->end_time.' par '.$user->lastname, 'appointment');
 
         return response()->json([
             'success' => true,

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->float('price');
             $table->integer('time')->default(60);
-            $table->enum('type', ['automatique', 'manual']);
+            $table->enum('type', ['automatic', 'manual']);
             $table->timestamps();
         });
     }

@@ -23,7 +23,7 @@ class ServiceSeeder extends Seeder
                     [
                         "title" => "Leçon de Conduite",
                         "price" => 62,
-                        "type" => "automatique",
+                        "type" => "automatic",
                         "list" => [
                             [
                                 "text" => "1H de cours de conduite",
@@ -46,7 +46,7 @@ class ServiceSeeder extends Seeder
                     [
                         "title" => "Perfectionnement",
                         "price" => 490,
-                        "type" => "automatique",
+                        "type" => "automatic",
                         "list" => [
                             [
                                 "text" => "10H de cours de conduite",
@@ -69,7 +69,7 @@ class ServiceSeeder extends Seeder
                     [
                         "title" => "Formule Classique",
                         "price" => 890,
-                        "type" => "automatique",
+                        "type" => "automatic",
                         "list" => [
                             [
                                 "text" => "13H de cours de conduite",
@@ -100,7 +100,7 @@ class ServiceSeeder extends Seeder
                     [
                         "title" => "Formule Classique PLUS",
                         "price" => 1750,
-                        "type" => "automatique",
+                        "type" => "automatic",
                         "list" => [
                             [
                                 "text" => "26H de cours de conduite",
@@ -131,7 +131,7 @@ class ServiceSeeder extends Seeder
                     [
                         "title" => "Formule Accéléré",
                         "price" => 998,
-                        "type" => "automatique",
+                        "type" => "automatic",
                         "list" => [
                             [
                                 "text" => "13H de cours de conduite",
@@ -162,7 +162,7 @@ class ServiceSeeder extends Seeder
                     [
                         "title" => "Formule Accéléré PLUS",
                         "price" => 1990,
-                        "type" => "automatique",
+                        "type" => "automatic",
                         "list" => [
                             [
                                 "text" => "26H de cours de conduite",
@@ -527,8 +527,8 @@ class ServiceSeeder extends Seeder
                         ],
                     ],
                     [
-                        "title" => "Location voiture automatique - sans moniteur SMONI",
-                        "type" => "automatique",
+                        "title" => "Location voiture automatic - sans moniteur SMONI",
+                        "type" => "automatic",
                         "price" => 99,
                         "list" => [
                             [
@@ -608,7 +608,7 @@ class ServiceSeeder extends Seeder
                                 "valide" => true,
                             ],
                             [
-                                "text" => "Formation boite automatique vers boite automatique",
+                                "text" => "Formation boite automatic vers boite automatic",
                                 "valide" => true,
                             ],
                             [

@@ -59,7 +59,7 @@ class NotificationController extends Controller
      */
     public function OneAsRead(Notification $notification){
 
-        $notifications->update([
+        $notification->update([
             "read_at" => new \DateTime()
         ]);
 

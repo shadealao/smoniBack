@@ -31,7 +31,7 @@ class ServiceController extends Controller
     {
         $validated = $request->validate([
             'category_id' => 'integer|nullable',
-            'type' => [Rule::in(['manual', 'automatique']),'nullable'],
+            'type' => [Rule::in(['manual', 'automatic']),'nullable'],
         ]);
 
         $type = $request->type ?? 'manual';
