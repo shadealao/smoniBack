@@ -469,6 +469,11 @@ class UserController extends Controller
 
         if($find) {
 
+            if($validated['status'] == 'confirmed'){
+                $this->sendmailer( $find->instructor_id, 'Rendez-vous pour Examen', "Rendez-vous pour Examen", 'Un Rendez-vous  pour un examen qui aura lieu '.$find->date, 'examen');
+                $this->sendmailer( $find->learner_id, 'Rendez-vous pour Examen', "Rendez-vous pour Examen", 'Un Rendez-vous  pour un examen qui aura lieu '.$find->date, 'examen');
+            }
+
             $find->status = $validated['status'];
             $find->save();
 
