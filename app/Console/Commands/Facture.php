@@ -32,6 +32,7 @@ class Facture extends Command
         
         $generate = new WithdrawController();
         $generate->generate();
+        Log::info("Cron Generate");
 
         // Contract1
         $make = new ServiceController();

@@ -37,6 +37,7 @@ class AppointmentController extends Controller
         if(!$subscriptions || !count($subscriptions)) {
             return response()->json([
                 'success' => false,
+                'etat' => 'notSubscription',
                 'message' => 'Vous n\'avez aucun abonnement de conduite disponible ou elles ont expiré',
             ], 403);
         }
@@ -54,6 +55,7 @@ class AppointmentController extends Controller
             if (!$hasAvailableHours) {
                 return response()->json([
                     'success' => false,
+                    'etat' => 'notSubscription',
                     'message' => 'Vous n\'avez aucune heure disponible pour vos abonnements de conduite',
                 ], 403);
             }
@@ -71,6 +73,7 @@ class AppointmentController extends Controller
         if (!$availability->status || Carbon::parse($availability->date)->isPast()) {
             return response()->json([
                 'success' => false,
+                'etat' => 'notAvailble',
                 'message' => 'Cette disponibilité n\'est pas disponible.',
             ], 422);
         }
@@ -79,6 +82,7 @@ class AppointmentController extends Controller
         if (Appointment::where('availability_id', $availability->id)->exists()) {
             return response()->json([
                 'success' => false,
+                'etat' => 'notAvailble',
                 'message' => 'Cette disponibilité est déjà réservée.',
             ], 422);
         }
@@ -90,6 +94,7 @@ class AppointmentController extends Controller
         if (!$vehicle) {
             return response()->json([
                 'success' => false,
+                'etat' => 'notAvailble',
                 'message' => 'Le véhicule spécifié n\'appartient pas à ce moniteur.',
             ], 422);
         }
@@ -113,6 +118,7 @@ class AppointmentController extends Controller
                 // Aucun abonnement compatible (soit pas la bonne boîte, soit pas d'heure)
                 return response()->json([
                     'success' => false,
+                    'etat' => 'notSubscription',
                     'message' => "Abonnement incompatible avec cette boîte ou heures restantes insuffisantes."
                 ], 403);
             } else {
