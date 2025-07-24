@@ -7,12 +7,12 @@
     <title>Contrat de Location Véhicule Auto-Ecole</title>
     <style>
 
-        @font-face {
+        /* @font-face {
             font-family: 'Montserrat';
             src: url("{{ asset('fonts/montserrat/Montserrat-Regular.ttf') }}") format("truetype");
             font-weight: normal;
             font-style: normal;
-        }
+        } */
 
         /** Définition de la taille de la page **/
         @page {
