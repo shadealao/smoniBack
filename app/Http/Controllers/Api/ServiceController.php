@@ -87,7 +87,7 @@ class ServiceController extends Controller
         $gearbox = 0;
 
         if($service){
-           $hour = $service->time;
+           $hour = $service->hour;
            if(
                 $service->title!='Fabrication Permis' &&
                 $service->title!='Extension contrat' &&
