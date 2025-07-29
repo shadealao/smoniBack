@@ -14,5 +14,5 @@ Schedule::command('app:facture')
     ->timezone('Europe/Paris') // votre fuseau horaire
     ->withoutOverlapping(); // empêche les chevauchements
 
-Schedule::command('app:fetch-subscribe')->daily()
+Schedule::command('app:fetch-subscribe')->daily();
 
