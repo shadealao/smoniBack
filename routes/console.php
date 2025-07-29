@@ -13,3 +13,6 @@ Schedule::command('app:facture')
     ->onOneServer() // pour éviter les exécutions multiples en cluster
     ->timezone('Europe/Paris') // votre fuseau horaire
     ->withoutOverlapping(); // empêche les chevauchements
+
+Schedule::command('app:fetch-subscribe')->daily()
+

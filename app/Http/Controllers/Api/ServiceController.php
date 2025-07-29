@@ -180,11 +180,11 @@ class ServiceController extends Controller
     */
     public function infoSubscribe(){
 
-        $subscriptions = Subscription::where('learner_id', auth()->user()->id)->with(['service.items']) ->orderBy('created_at','desc')->first();
+        $hours = Subscription::where('learner_id', auth()->user()->id)->sum('hour');
 
         return response()->json([
             'success' => true,
-            'data' => $subscriptions,
+            'data' => $hours,
         ], 200);
     }
 
