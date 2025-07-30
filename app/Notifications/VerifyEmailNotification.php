@@ -26,7 +26,7 @@ class VerifyEmailNotification extends Notification
         );
 
         return (new MailMessage)
-            ->subject('Finalisez votre inscription sur SMSNI')
+            ->subject('Finalisez votre inscription sur SMONI')
             ->markdown('emails.verify-email', [
                 'verificationUrl' => $verificationUrl,
                 'user' => $notifiable
