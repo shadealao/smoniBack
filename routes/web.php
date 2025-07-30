@@ -21,14 +21,14 @@ Route::put('/update_pass/{id}', [AuthController::class, 'update_pass'])->name('a
 
 Route::middleware(['admin'])->group(function () {
         
-    Route:: get('/profil', [DashboardController::class, 'profil'])->name('admin.profil');
-    Route:: put('/profil/update_info/{id}', [DashboardController::class, 'update_info'])->name('admin.update_info');
-    Route:: put('/profil/update_pass/{id}', [DashboardController::class, 'update_pass'])->name('admin.update_pass');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    // Route:: get('/profil', [DashboardController::class, 'profil'])->name('admin.profil');
+    // Route:: put('/profil/update_info/{id}', [DashboardController::class, 'update_info'])->name('admin.update_info');
+    // Route:: put('/profil/update_pass/{id}', [DashboardController::class, 'update_pass'])->name('admin.update_pass');
+    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // Learners
-    Route::get('/learners', [LearnerController::class, 'index'])->name('admin.learners');
-    Route::put('/learners/{user}/action', [LearnerController::class, 'action'])->name('admin.learners.action');
+    // // Learners
+    // Route::get('/learners', [LearnerController::class, 'index'])->name('admin.learners');
+    // Route::put('/learners/{user}/action', [LearnerController::class, 'action'])->name('admin.learners.action');
 
     // // Admins
     // Route::get('/admins', [AdminController::class, 'index'])->name('admin.admins');

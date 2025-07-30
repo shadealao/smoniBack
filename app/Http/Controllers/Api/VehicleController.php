@@ -41,7 +41,7 @@ class VehicleController extends Controller
             'status' => 'sometimes|in:available,maintenance,out_of_service',
         ]);
 
-        if($request->hasFile('photo'))
+        if($request->hasFile('photo_url'))
             $photoUrl = $request->file('photo_url')->store('vehicule', 'public');
         else 
         $photoUrl = null;
@@ -122,7 +122,7 @@ class VehicleController extends Controller
         ]);
 
         
-        if($request->hasFile('photo'))
+        if($request->hasFile('photo_url'))
             $photoUrl = $request->file('photo_url')->store('vehicule', 'public');
         else 
             $photoUrl = $vehicle->photo_url;

@@ -82,12 +82,11 @@ class ServiceController extends Controller
         $start_date = Carbon::now();
         $end_date = $start_date->addDays((int)$service->time);
 
-        $hour = 0;
         $type_service = 0;
         $gearbox = 0;
-
+        $hour = $service->hour;
         if($service){
-           $hour = $service->hour;
+           
            if(
                 $service->title!='Fabrication Permis' &&
                 $service->title!='Extension contrat' &&
@@ -181,11 +180,11 @@ class ServiceController extends Controller
     */
     public function infoSubscribe(){
 
-        $subscriptions = Subscription::where('learner_id', auth()->user()->id)->with(['service.items']) ->orderBy('created_at','desc')->first();
+        $hours = Subscription::where('learner_id', auth()->user()->id)->sum('hour');
 
         return response()->json([
             'success' => true,
-            'data' => $subscriptions,
+            'data' => $hours,
         ], 200);
     }
 
