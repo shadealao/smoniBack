@@ -221,7 +221,7 @@ class LearnerController extends Controller
             });
         }
 
-        $availabilities = $query->with(['vehicle', 'meetingPoint'])->get();
+        $availabilities = $query->with(['vehicle', 'meetingPoint'])->orderBy('date','desc')->orderBy('start_time','asc')->get();
 
         // Grouper par moniteur
         $result = $availabilities->groupBy('instructor_id')->map(function($items) {
