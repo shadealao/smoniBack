@@ -129,7 +129,7 @@ class ServiceController extends Controller
             'category_service_id' => 'required|exists:category_services,id',
             'title' => 'required',
             'price' => 'required|integer',
-            'type' => [Rule::in(['automatique', 'manual']),'required'],
+            'type' => [Rule::in(['automatic', 'manual']),'required'],
             'time' => 'required|integer',
             'hour' => 'required|integer',
             'items'=> 'array|nullable',
@@ -177,7 +177,7 @@ class ServiceController extends Controller
             'category_service_id' => 'required|exists:category_services,id',
             'title' => 'required',
             'price' => 'required|integer',
-            'type' => [Rule::in(['automatique', 'manual']),'required'],
+            'type' => [Rule::in(['automatic', 'manual']),'required'],
             'time' => 'required|integer',
             'hour' => 'required|integer',
         ]);
