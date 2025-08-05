@@ -59,7 +59,6 @@ class AuthController extends Controller
             'certification_number' => 'nullable|numeric|min:0',
 
             'workZones' => 'sometimes|array',
-            // 'vehicles' => 'sometimes|array',
 
             'workZones.*.label' => 'required_if:role,instructor|string|max:255',
             'workZones.*.address' => 'nullable|string|max:255',
@@ -68,11 +67,19 @@ class AuthController extends Controller
             'workZones.*.latitude' => 'nullable|numeric|between:-90,90',
             'workZones.*.longitude' => 'nullable|numeric|between:-180,180',
 
-            // 'vehicles.*.brand' => 'required_if:role,instructor|string|max:100',
-            // 'vehicles.*.plate_number' => 'required_if:role,instructor|string|max:20|unique:vehicles,plate_number',
-            // 'vehicles.*.registrationDocument' => 'file',
-            // 'vehicles.*.gearbox_type' => 'required_if:role,instructor|in:manual,automatic',
-            // 'vehicles.*.status' => 'sometimes|in:available,maintenance,out_of_service',
+            'vehicles' => 'sometimes|array',
+            
+            'vehicles.*.brand' => 'required_if:role,instructor|string|max:100',
+            'vehicles.*.model' => 'required_if:role,instructor|string|max:100',
+            'vehicles.*.year' => 'required_if:role,instructor|integer|min:1900|max:' . date('Y'),
+            'vehicles.*.plate_number' => 'required_if:role,instructor|string|max:20|unique:vehicles,plate_number',
+            'vehicles.*.fuel_type' => 'required_if:role,instructor|in:essence,diesel,électrique,hybride',
+            'vehicles.*.insurance_expiry' => 'nullable|date|after:today',
+            'vehicles.*.technical_inspection_date' => 'nullable|date|after:today',
+            'vehicles.*.photo_url' => 'nullable|file',
+            'vehicles.*.color' => 'nullable|string|max:50',
+            'vehicles.*.gearbox_type' => 'required_if:role,instructor|in:manual,automatic',
+            'vehicles.*.status' => 'sometimes|in:available,maintenance,out_of_service',
         ]);
 
         // Hachage du mot de passe
@@ -93,6 +100,7 @@ class AuthController extends Controller
                 'phone' => $validated['phone'],
                 'genre' => $validated['genre'],
                 'role' => $validated['role'],
+                'is_active' => $validated['role'] == "instructor" ? false : true,
                 'photo' => $request->photo ? $photoPath : null,
             ]);
 
@@ -152,21 +160,28 @@ class AuthController extends Controller
                         'is_active' => $zone['is_active'] ?? true,
                     ]);
                 }
-                // foreach($request->vehicles as $vehicle){
-                //     if ($vehicle['registrationDocument']) {
-                //         $vehicleFile = $vehicle['registrationDocument'];
-                //         $vehiclePhotoPath = $vehicleFile->store('vehicles', 'public');
-                //     }
+                foreach($request->vehicles as $vehicle){
+                    if($vehicle['photo_url'])
+                        $photoUrl = $vehicle['photo_url']->store('vehicule', 'public');
+                    else 
+                    $photoUrl = null;
 
-                //     Vehicle::create([
-                //         'instructor_id' => $user->id,
-                //         'brand' => $vehicle['brand'],
-                //         'plate_number' => $vehicle['plate_number'],
-                //         'photo_url' => $vehiclePhotoPath ?? null,
-                //         'gearbox_type' => $vehicle['gearbox_type'],
-                //         'status' => $vehicle['status'] ?? 'available',
-                //     ]);
-                // }
+                    $vehicle = Vehicle::create([
+                        'instructor_id' => $user->id,
+                        'brand' => $vehicle['brand'],
+                        'model' => $vehicle['model'],
+                        'year' => $vehicle['year'],
+                        'plate_number' => $vehicle['plate_number'],
+                        'fuel_type' => $vehicle['fuel_type'],
+                        'insurance_expiry' => isset($vehicle['insurance_expiry']) ? $vehicle['insurance_expiry'] : null,
+                        'technical_inspection_date' => isset($vehicle['technical_inspection_date']) ? $vehicle['technical_inspection_date'] : null,
+                        'photo_url' => $photoUrl,
+                        'color' => isset($vehicle['color']) ? $vehicle['color'] : null,
+                        'gearbox_type' => $vehicle['gearbox_type'],
+                        'status' => isset($vehicle['status']) ? $vehicle['color'] : 'available',
+                    ]);
+
+                }
             }
             // Pour le rôle 'admin', aucun profil supplémentaire n'est créé (ou ajoutez un modèle AdminProfile si nécessaire)
             DB::commit();

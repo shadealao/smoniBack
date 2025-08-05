@@ -341,7 +341,11 @@ class ServiceController extends Controller
      */
     public function LearnCodeAccess(Request $request)
     {
-        $learners = Subscription::where('status','active')->where('type_service','Pack code')->with(['service.items','learner'])->paginate(10);
+        // $learners = Subscription::where('status','active')->where('type_service','Pack code')->with(['service.items','learner'])->paginate(10);
+        $learners = Subscription::where('status', 'active')
+                       ->whereRaw('LOWER(type_service) = ?', [strtolower('Pack code')])
+                       ->with(['service.items','learner'])
+                       ->paginate(10);
 
         return response()->json([
             'success' => true,
