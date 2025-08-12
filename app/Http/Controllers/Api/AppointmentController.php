@@ -328,12 +328,6 @@ class AppointmentController extends Controller
             ], 422);
         }
 
-        $appointment->update([
-            'status' => 'cancelled',
-            'cancellation_reason' => $validated['cancellation_reason'],
-            'canceled_by_monitor' => $user->role === 'learner' ? false : true
-        ]);
-
         $availability = $appointment->availability;
         $vehicle = $availability->vehicle;
 
@@ -341,7 +335,7 @@ class AppointmentController extends Controller
         $subscriptions = Subscription::where('learner_id', $appointment->learner_id)
             ->where('gearbox', $vehicle->gearbox_type)
             ->where('status', 'active')
-            -orderBy('created_at','desc')
+            ->orderBy('created_at','desc')
             ->first();
         
         if($subscriptions) {
@@ -353,6 +347,13 @@ class AppointmentController extends Controller
 
         $this->sendmailer( $appointment->learner_id, 'Annullation Rendez-vous', 'Annullation Rendez-vous', 'Votre moniteur vient d\'annuler votre résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time.'<br> <b>Raison</b>: '.$validated['cancellation_reason'], 'appointment');
 
+        $appointment->update([
+            'availability_id' => null,
+            'status' => 'cancelled',
+            'cancellation_reason' => $validated['cancellation_reason'],
+            'canceled_by_monitor' => $user->role === 'learner' ? false : true
+        ]);
+        
         return response()->json([
             'success' => true,
             'data' => $appointment->fresh(),
@@ -545,7 +546,7 @@ class AppointmentController extends Controller
                 'message' => 'Cette utilisateur n\'est pas un instructeur',
             ], 403);
 
-        $appointments = Appointment::where('instructor_id', auth()->user()->id)->with('learner')->orderBy('created_at','desc')->paginate($per_page);
+        $appointments = Appointment::where('instructor_id', auth()->user()->id)->with('learner')->orderBy('date','desc')->paginate($per_page);
 
         return response()->json([
             'success' => true,

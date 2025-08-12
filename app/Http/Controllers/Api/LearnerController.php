@@ -228,6 +228,7 @@ class LearnerController extends Controller
             $instructor = $items->first()->instructor;
             return [
                 'instructor' => $instructor,
+                'instructor_profile' => $instructor->instructorProfile,
                 'availabilities' => $items->values(),
             ];
         })->values();

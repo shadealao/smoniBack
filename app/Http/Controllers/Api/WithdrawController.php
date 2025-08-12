@@ -20,13 +20,13 @@ class WithdrawController extends Controller
      * Wallet Info.
      */
     public function stat(){
-        $hour_billable = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration') - Withdraw::where('monitor_id', auth()->user()->id)->sum('duration');
+        $hour_billable = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration')/60 - Withdraw::where('monitor_id', auth()->user()->id)->sum('duration');
         $billable = [
             'hour' => $hour_billable,
             'cash' => $hour_billable * auth()->user()->instructorProfile->hourPrice,
         ];
 
-        $hour_no_billable = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'notation')->sum('duration');
+        $hour_no_billable = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'notation')->sum('duration')/60;;
         $no_billable = [
             'hour' => $hour_no_billable,
             'cash' => $hour_no_billable * auth()->user()->instructorProfile->hourPrice,
@@ -92,7 +92,7 @@ class WithdrawController extends Controller
             'numero' => 'required|string',
         ]);
 
-            $hour = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration') - Withdraw::where('monitor_id', auth()->user()->id)->sum('duration');
+            $hour = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration')/60 - Withdraw::where('monitor_id', auth()->user()->id)->sum('duration');
             $cash = $hour * auth()->user()->instructorProfile->hourPrice;        
             
             $withdraw = Withdraw::create([
