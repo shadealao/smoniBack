@@ -19,8 +19,8 @@ class DashboardMonitorController extends Controller
         $learners_count = Appointment::query()
         ->select('learner_id')
         ->where('instructor_id', auth()->user()->id)
-        ->groupBy('learner_id')
-        ->count('learner_id');
+        ->distinct('learner_id')
+        ->count();
 
         $hour = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration');
 
