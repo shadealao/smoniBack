@@ -15,4 +15,5 @@ Schedule::command('app:facture')
     ->withoutOverlapping(); // empêche les chevauchements
 
 Schedule::command('app:fetch-subscribe')->daily();
+Schedule::command('app:cancel-old-appointment')->daily();
 
