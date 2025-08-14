@@ -181,7 +181,7 @@ class LearnerController extends Controller
         $subscriptions = Subscription::where('learner_id', $validated['learner_id'])
             ->where('gearbox', $vehicle->gearbox_type)
             ->where('status', 'active')
-            -orderBy('created_at','desc')
+            ->orderBy('created_at','desc')
             ->first();
         
         if($subscriptions) {
@@ -204,13 +204,14 @@ class LearnerController extends Controller
     {
         $validated = $request->validate([
             'datesearch' => 'required|date',
-            'gearbox' => 'required|string',
+            // 'gearbox' => 'required|string',
             'meeting_point' => 'nullable|string',
         ]);
 
+        // Automatic
         $query = Availability::where('date', $validated['datesearch'])
         ->whereHas('vehicle', function($q) use ($validated) {
-            $q->where('gearbox_type', $validated['gearbox']);
+            $q->where('gearbox_type', 'automatic');
         })
         ->whereDoesntHave('appointment');
 
@@ -233,9 +234,36 @@ class LearnerController extends Controller
             ];
         })->values();
 
+        // Manual
+        $query1 = Availability::where('date', $validated['datesearch'])
+        ->whereHas('vehicle', function($q) use ($validated) {
+            $q->where('gearbox_type', 'manual');
+        })
+        ->whereDoesntHave('appointment');
+
+       
+        if (!empty($validated['meeting_point'])) {
+            $query1->whereHas('meetingPoint', function($q) use ($validated) {
+                $q->where('label', 'like', '%' . $validated['meeting_point'] . '%');
+            });
+        }
+
+        $availabilities1 = $query1->with(['vehicle', 'meetingPoint'])->orderBy('date','desc')->orderBy('start_time','asc')->get();
+
+        // Grouper par moniteur
+        $result1 = $availabilities1->groupBy('instructor_id')->map(function($items) {
+            $instructor = $items->first()->instructor;
+            return [
+                'instructor' => $instructor,
+                'instructor_profile' => $instructor->instructorProfile,
+                'availabilities' => $items->values(),
+            ];
+        })->values();
+
         return response()->json([
             'success' => true,
-            'data' => $result,
+            'manual' => $result,
+            'automatic' => $result1,
             'message' => 'Liste des moniteurs et disponibilités sans rendez-vous.',
         ], 200);
     }

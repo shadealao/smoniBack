@@ -348,7 +348,6 @@ class AppointmentController extends Controller
         $this->sendmailer( $appointment->learner_id, 'Annullation Rendez-vous', 'Annullation Rendez-vous', 'Votre moniteur vient d\'annuler votre résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time.'<br> <b>Raison</b>: '.$validated['cancellation_reason'], 'appointment');
 
         $appointment->update([
-            'availability_id' => null,
             'status' => 'cancelled',
             'cancellation_reason' => $validated['cancellation_reason'],
             'canceled_by_monitor' => $user->role === 'learner' ? false : true

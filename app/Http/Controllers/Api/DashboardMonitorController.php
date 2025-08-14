@@ -98,7 +98,7 @@ class DashboardMonitorController extends Controller
         $monthlyDurations = Appointment::query()
             ->select(
                 DB::raw('EXTRACT(MONTH FROM updated_at) as month'), // Extrait le numéro du mois de la colonne 'date'
-                DB::raw('SUM(duration) as total_duration') // Calcule la somme des durées
+                DB::raw('SUM(duration)/60 as total_duration') // Calcule la somme des durées
             )
             ->where('status','completed')
             ->where('instructor_id', $instructorId) // Filtre pour l'instructeur spécifique

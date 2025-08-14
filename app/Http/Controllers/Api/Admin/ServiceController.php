@@ -300,6 +300,13 @@ class ServiceController extends Controller
             'liens' => 'string|required',
         ]);
 
+        $exist = CodeAccess::first();
+        if($exist)
+            return response()->json([
+                'success' => false,
+                'message' => "Liens Existe déjà",
+            ], 404);
+            
         $codeaccess = CodeAccess::create([
             'liens' => $validated['liens']
         ]);

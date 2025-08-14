@@ -10,6 +10,7 @@ use App\Models\Contract;
 use App\Models\learnerProfile;
 use App\Models\User;
 use App\Models\Subscription;
+use App\Models\CodeAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -80,7 +81,7 @@ class ServiceController extends Controller
         $service = Service::find($request->service_id);
 
         $start_date = Carbon::now();
-        $end_date = $start_date->addDays((int)$service->time);
+        $end_date = Carbon::now()->addDays((int)$service->time);
 
         $type_service = 0;
         $gearbox = 0;
@@ -154,9 +155,12 @@ class ServiceController extends Controller
             'service_id' => $service->id,
             ])->first();
 
+        $link = CodeAccess::orderBy('created_at','desc')->limit(1)->get();
+
         return response()->json([
             'success' => true,
             'data' => $exist ? true : false,
+            'link' => $exist ? $link : null,
         ], 200);
     }
 
