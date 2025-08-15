@@ -55,7 +55,7 @@ class CancelOldAppointment extends Command
                 $sender->sendmailer( $appointment->learner_id, 'Annullation Rendez-vous', 'Annullation Rendez-vous', 'La résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time.' a été annulé à cause du delais passer', 'appointment');
 
                 $appointment->update([
-                    'availability_id' => null,
+                    // 'availability_id' => null,
                     'status' => 'cancelled',
                     'cancellation_reason' => "Délai d'attente passé",
                     'canceled_by_monitor' => true
