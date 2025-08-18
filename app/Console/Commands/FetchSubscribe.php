@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\ServiceController;
 use App\Models\Service;
 use App\Models\Subscription;
 use Illuminate\Console\Command;
@@ -32,23 +32,9 @@ class FetchSubscribe extends Command
     {
         Log::info("Strat Action");
 
-        $today = Carbon::today();
-        $fifteenDaysFromNow = $today->copy()->addDays(15);
-
-        $expiringSubscriptions = Subscription::whereDate('end_date', $fifteenDaysFromNow)
-            ->with('learner','service')
-            ->get();
-        foreach ($expiringSubscriptions as $subscribe) {
-            $sender = new Controller();
-            $content = 'Votre abonnement '.$subscribe->service->title.' expirera dans environ 15 jours.';
-            $sender->sendmailer($subscribe->learner_id, 'Expiration prochaine de votre abonnement', "Expiration prochaine de votre abonnement", $content, 'subcribe');
-        }
-
-        $expiringSubscriptions = Subscription::whereDate('end_date','<', $today)
-            ->update([
-                "status" => "expired",
-            ]);
-
+        $make = new ServiceController();
+        $make->fetchSubscribe();
+        
         Log::info("End Action");
 
     }

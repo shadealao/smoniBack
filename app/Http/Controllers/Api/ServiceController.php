@@ -248,4 +248,25 @@ class ServiceController extends Controller
         return true;
         
     }
+
+
+    public function fetchSubscribe(){
+
+        $today = Carbon::today();
+        $fifteenDaysFromNow = $today->copy()->addDays(15);
+
+        $expiringSubscriptions = Subscription::whereDate('end_date', $fifteenDaysFromNow)
+            ->with('learner','service')
+            ->get();
+        foreach ($expiringSubscriptions as $subscribe) {
+            $content = 'Votre abonnement '.$subscribe->service->title.' expirera dans environ 15 jours.';
+            $this->sendmailer($subscribe->learner_id, 'Expiration prochaine de votre abonnement', "Expiration prochaine de votre abonnement", $content, 'subcribe');
+        }
+
+        $expiringSubscriptions = Subscription::whereDate('end_date','<', $today)
+            ->update([
+                "status" => "expired",
+            ]);
+
+    }
 }

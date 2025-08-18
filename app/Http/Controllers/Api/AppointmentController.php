@@ -651,4 +651,39 @@ class AppointmentController extends Controller
             'message' => 'Commentaire Pédagogique bien modifié.',
         ], 201);
     }
+
+    public function cancelOldAppointment(){
+        $appointments = Appointment::where('status','scheduled')->with('learner','instructor')->orderBy('date','desc')->get();
+
+        foreach ($appointments as $appointment) {
+            $now = new \DateTime();
+            $date = new \DateTime($appointment->date);
+
+            if($date < $now){
+                $availability = $appointment->availability;
+                $vehicle = $availability->vehicle;
+
+                $subscriptions = Subscription::where('learner_id', $appointment->learner_id)
+                    ->where('gearbox', $vehicle->gearbox_type)
+                    ->where('status', 'active')
+                    ->orderBy('created_at','desc')
+                    ->first();
+                
+                if($subscriptions) {
+                    $subscriptions->hour+= 1;
+                    $subscriptions->save();
+                }
+                $this->sendmailer( $appointment->instructor_id, 'Annullation Rendez-vous', 'Annullation Rendez-vous', 'La résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time.' a été annulé à cause du delais passer', 'appointment');
+
+                $this->sendmailer( $appointment->learner_id, 'Annullation Rendez-vous', 'Annullation Rendez-vous', 'La résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time.' a été annulé à cause du delais passer', 'appointment');
+
+                $appointment->update([
+                    // 'availability_id' => null,
+                    'status' => 'cancelled',
+                    'cancellation_reason' => "Délai d'attente passé",
+                    'canceled_by_monitor' => true
+                ]);
+            }
+        }
+    }
 }
