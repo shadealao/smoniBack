@@ -204,17 +204,24 @@ class LearnerController extends Controller
     {
         $validated = $request->validate([
             'datesearch' => 'required|date',
-            // 'gearbox' => 'required|string',
+            'gearbox' => 'required|in:all,automatic,manual',
             'meeting_point' => 'nullable|string',
         ]);
 
-        // Automatic
-        $query = Availability::where('date', $validated['datesearch'])
-        ->whereHas('vehicle', function($q) use ($validated) {
-            $q->where('gearbox_type', 'automatic');
-        })
-        ->whereDoesntHave('appointment');
-
+        // MySearch
+        if($request->gearbox == "all"){
+            
+            $query = Availability::where('date', $validated['datesearch'])
+            ->whereHas('vehicle', function($q) use ($validated) {
+            })
+            ->whereDoesntHave('appointment');
+        }else{
+            $query = Availability::where('date', $validated['datesearch'])
+            ->whereHas('vehicle', function($q) use ($validated) {
+                $q->where('gearbox_type', $validated['gearbox']);
+            })
+            ->whereDoesntHave('appointment');
+        }
        
         if (!empty($validated['meeting_point'])) {
             $query->whereHas('meetingPoint', function($q) use ($validated) {
@@ -234,24 +241,12 @@ class LearnerController extends Controller
             ];
         })->values();
 
-        // Manual
-        $query1 = Availability::where('date', $validated['datesearch'])
-        ->whereHas('vehicle', function($q) use ($validated) {
-            $q->where('gearbox_type', 'manual');
-        })
-        ->whereDoesntHave('appointment');
 
-       
-        if (!empty($validated['meeting_point'])) {
-            $query1->whereHas('meetingPoint', function($q) use ($validated) {
-                $q->where('label', 'like', '%' . $validated['meeting_point'] . '%');
-            });
-        }
 
-        $availabilities1 = $query1->with(['vehicle', 'meetingPoint'])->orderBy('date','desc')->orderBy('start_time','asc')->get();
+        $a = $query->with(['vehicle', 'meetingPoint'])->orderBy('date','desc')->orderBy('start_time','asc')->get();
 
         // Grouper par moniteur
-        $result1 = $availabilities1->groupBy('instructor_id')->map(function($items) {
+        $others = $a->groupBy('instructor_id')->map(function($items) {
             $instructor = $items->first()->instructor;
             return [
                 'instructor' => $instructor,
@@ -262,8 +257,8 @@ class LearnerController extends Controller
 
         return response()->json([
             'success' => true,
-            'manual' => $result,
-            'automatic' => $result1,
+            'data' => $result,
+            'others' => $others,
             'message' => 'Liste des moniteurs et disponibilités sans rendez-vous.',
         ], 200);
     }
