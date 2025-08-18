@@ -242,11 +242,29 @@ class LearnerController extends Controller
         })->values();
 
 
+        // Others
+        if($request->gearbox == "all"){
+            
+            $a = Availability::where('date', $validated['datesearch'])
+            ->whereHas('vehicle', function($q) use ($validated) {
+            })
+            ->whereDoesntHave('appointment');
+        }else{
+            $a = Availability::where('date', $validated['datesearch'])
+            ->whereHas('vehicle', function($q) use ($validated) {
+                $q->where('gearbox_type', $validated['gearbox']);
+            })
+            ->whereDoesntHave('appointment');
+        }
 
-        $a = $query->with(['vehicle', 'meetingPoint'])->orderBy('date','desc')->orderBy('start_time','asc')->get();
+        $a->whereHas('meetingPoint', function($q) use ($validated) {
+                $q->where('label', 'like', '%%');
+            });
+
+        $b = $a->with(['vehicle', 'meetingPoint'])->orderBy('date','desc')->orderBy('start_time','asc')->get();
 
         // Grouper par moniteur
-        $others = $a->groupBy('instructor_id')->map(function($items) {
+        $others = $b->groupBy('instructor_id')->map(function($items) {
             $instructor = $items->first()->instructor;
             return [
                 'instructor' => $instructor,

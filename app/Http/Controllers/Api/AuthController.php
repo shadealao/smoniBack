@@ -276,7 +276,7 @@ class AuthController extends Controller
             'hour' => $hour,
         ]);
 
-        $this->sendmailer( auth()->user()->id, 'Bilan du test', 'Bilan du test', 'Bonjour Mr/Mme, <br> Lors de ce test, vous avez accumulé un total de '.$request->point.' points, ce qui equivaut à un total de '.$hour.' heures','bilan');
+        $this->sendmailer( auth()->user()->id, 'Bilan du test', 'Bilan du test', 'Bonjour Mr/Mme, Lors de ce test, vous avez accumulé un total de '.$request->point.' points, ce qui equivaut à un total de '.$hour.' heures','bilan');
 
         return response()->json([
             'success' => true,
