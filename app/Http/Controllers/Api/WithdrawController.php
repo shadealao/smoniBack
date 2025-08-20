@@ -36,6 +36,8 @@ class WithdrawController extends Controller
         $tva_cash = auth()->user()->instructorProfile->tva;
         $my_cash = $billable['cash'] - ($admin_cash + $tva_cash);
 
+        $pendingWithdraw = Withdraw::where('monitor_id', auth()->user()->id)->where('payed',false)->count();
+
         return response()->json([
             'success' => true,
             'billable' => $billable ,
@@ -43,6 +45,7 @@ class WithdrawController extends Controller
             'admin_cash' => $admin_cash,
             'tva_cash' => $tva_cash,
             'my_cash' => $my_cash,
+            'pendingWithdraw' => $pendingWithdraw,
         ], 200);
 
     }
