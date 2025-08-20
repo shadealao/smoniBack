@@ -93,8 +93,13 @@ class WithdrawController extends Controller
         ]);
 
             $hour = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration')/60 - Withdraw::where('monitor_id', auth()->user()->id)->sum('duration');
-            $cash = $hour * auth()->user()->instructorProfile->hourPrice;        
+            $cash = $hour * auth()->user()->instructorProfile->hourPrice;   
             
+            if($cash == 0)
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Impossible',
+                ], 403);
             $withdraw = Withdraw::create([
                 'monitor_id' => $user->id,
                 'ammount' => $cash,
@@ -161,7 +166,7 @@ class WithdrawController extends Controller
     public function list(Request $request)
     {
         $validated = $request->validate([
-            'status' => 'nullable|boolean',
+            'status' => 'in:payed,nopayed',
             'per_page' => 'integer'
         ]);
         $user = Auth::user();
@@ -174,10 +179,10 @@ class WithdrawController extends Controller
             ], 403);
         }
 
-        if($request->status)
-            $withdraws = Withdraw::where('monitor_id',$user->id)->where('payed',$request->status)->with('monitor')->paginate($per_page);
+        if($request->status == "payed")
+            $withdraws = Withdraw::where('monitor_id',$user->id)->where('payed',true)->with('monitor')->paginate($per_page);
         else
-            $withdraws = Withdraw::where('monitor_id',$user->id)->with('monitor')->paginate($per_page);
+            $withdraws = Withdraw::where('monitor_id',$user->id)->where('payed',false)->with('monitor')->paginate($per_page);
 
         return response()->json([
             'success' => true,

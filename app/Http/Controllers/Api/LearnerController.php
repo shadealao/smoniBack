@@ -27,7 +27,7 @@ class LearnerController extends Controller
     public function userBadges()
     {
         $badges = Badge::where('learner_id',auth()->user()->id)->with('list_badge')->get();
-        $ids = Badge::where('learner_id',auth()->user()->id)->pluck('id')->toArray();
+        $ids = Badge::where('learner_id',auth()->user()->id)->pluck('list_badge_id')->toArray();
 
         $nobadges = ListBadge::whereNotIn('id',$ids)->get();
 
@@ -127,7 +127,7 @@ class LearnerController extends Controller
      */
     public function lessonLearner(Request $request)
     {
-        $lessons = Appointment::where('learner_id', auth()->user()->id)->with(['instructor', 'availability.meetingPoint', 'vehicle'])->orderBy('created_at','desc')->get();
+        $lessons = Appointment::where('learner_id', auth()->user()->id)->with(['instructor', 'availability.meetingPoint', 'vehicle'])->orderBy('date','desc')->get();
 
         return response()->json([
             'success' => true,

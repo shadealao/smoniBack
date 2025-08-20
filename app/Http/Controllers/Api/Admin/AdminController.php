@@ -212,10 +212,9 @@ class AdminController extends Controller
             ], 422);
         }
 
-        $withdraw-delete();
+        $withdraw->delete();
 
-        $this->sendmailer( auth()->user()->id, 'Annnulation de la Demande de Retrait', 'Annnulation de la Demande de Retrait', 'Vous venez d\'annuler le retrait de '.$hour.' heure soit un montant de '.$cash.' EUR pour le moniteur '.$withdraw->monitor->lastname.' '.$withdraw->monitor->firstname, 'withdraw');
-        $this->sendmailer( $withdraw->monitor_id, 'Annnulation de la Demande de Retrait', 'Annnulation de la Demande de Retrait', 'Votre retrait de '.$hour.' heure soit un montant de '.$cash.' EUR a été annulé. Veuillez joindre l\'equipe', 'withdraw');
+        $this->sendmailer( $withdraw->monitor_id, 'Annnulation de la Demande de Retrait', 'Annnulation de la Demande de Retrait', 'Votre retrait de '.$withdraw->duration.' heure soit un montant de '.$withdraw->ammount.' EUR a été annulé. Veuillez joindre l\'equipe', 'withdraw');
 
         return response()->json([
             'success' => true,
