@@ -536,8 +536,9 @@ class AppointmentController extends Controller
 
         $validated = $request->validate([
             'per_page' => 'nullable|integer',
+            'status' => 'in:all,scheduled,confirmed,completed,cancelled,pending,notation',
         ]);
-        $per_page = $request->per_page ?? 200;
+        $per_page = $request->per_page ?? 20;
 
         if(auth()->user()->role != 'instructor')
             return response()->json([
@@ -545,7 +546,18 @@ class AppointmentController extends Controller
                 'message' => 'Cette utilisateur n\'est pas un instructeur',
             ], 403);
 
-        $appointments = Appointment::where('instructor_id', auth()->user()->id)->with('learner')->orderBy('date','desc')->paginate($per_page);
+        if($request->status != 'all') {
+            $appointments = Appointment::where('instructor_id', auth()->user()->id)
+                ->where('status', $request->status)
+                ->with('learner')
+                ->orderBy('date','desc')
+                ->paginate($per_page);
+        } else {
+            $appointments = Appointment::where('instructor_id', auth()->user()->id)
+                ->with('learner')
+                ->orderBy('date','desc')
+                ->paginate($per_page);
+        }
 
         return response()->json([
             'success' => true,

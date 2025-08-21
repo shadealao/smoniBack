@@ -497,10 +497,23 @@ class UserController extends Controller
      *
      */
     public function ListExamRdv(Request $request, $monitor_id) {
-        $examens = Examen::where('instructor_id', $monitor_id)
+
+        $request->validate([
+            'status' => 'in:all,refused,confirmed,pending',
+        ]);
+
+        if($request->status && $request->status != 'all') {
+            $examens = Examen::where('instructor_id', $monitor_id)
+                            ->where('status', $request->status)
                             ->with(['learner', 'monitor'])
-                            ->orderBy('created_at', 'desc')
+                            ->orderBy('date', 'desc')
                             ->paginate(10);
+        } else {
+            $examens = Examen::where('instructor_id', $monitor_id)
+                            ->with(['learner', 'monitor'])
+                            ->orderBy('date', 'desc')
+                            ->paginate(10);
+        }
 
         return response()->json([
             'success' => true,

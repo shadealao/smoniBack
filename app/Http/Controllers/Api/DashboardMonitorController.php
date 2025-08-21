@@ -75,7 +75,9 @@ class DashboardMonitorController extends Controller
                 'message' => 'Cette utilisateur n\'est pas un instructeur',
             ], 403);
 
-        $appointments = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'confirmed')->with('learner')->with('availability.meetingPoint')->orderBy('date','desc')->paginate(10);
+            $now = new \DateTime();
+
+        $appointments = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'confirmed')->where('date', '>=', $now->format('Y-m-d'))->with('learner')->with('availability.meetingPoint')->orderBy('date','asc')->paginate(10);
 
         return response()->json([
             'success' => true,
