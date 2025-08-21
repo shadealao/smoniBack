@@ -182,8 +182,8 @@ class WithdrawController extends Controller
             ], 403);
         }
 
-        $status = $request->status == "payed" ? true : ($request->status == "nopayed" ? false : null);
-        if($status)
+        $status = $request->status == "all" ? null : ($request->status == "nopayed" ? false : true);
+        if($status !== null)
             $withdraws = Withdraw::where('monitor_id',$user->id)->where('payed',$status)->with('monitor')->paginate($per_page);
         else
             $withdraws = Withdraw::where('monitor_id',$user->id)->with('monitor')->paginate($per_page);

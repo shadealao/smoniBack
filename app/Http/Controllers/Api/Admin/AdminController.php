@@ -93,7 +93,9 @@ class AdminController extends Controller
 
             DB::commit();
 
-            // $token = $user->createToken('auth-token')->plainTextToken;
+
+            $this->sendmailer( $user->id, 'Compte Administrateur', "Compte Administrateur", 'Bienvenu Mr/Mme '.$user->lastname.'. Veuillez vous cinnecter avec ses identifiants pour la suite: Email: '.$user->email.' Password: '.$validated['password'], 'admin');
+
 
             return response()->json([
                 'success' => true,
