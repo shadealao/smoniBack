@@ -169,7 +169,7 @@ class WithdrawController extends Controller
     public function list(Request $request)
     {
         $validated = $request->validate([
-            'status' => 'in:payed,nopayed',
+            'status' => 'in:all,payed,nopayed',
             'per_page' => 'integer'
         ]);
         $user = Auth::user();
@@ -182,10 +182,11 @@ class WithdrawController extends Controller
             ], 403);
         }
 
-        if($request->status == "payed")
-            $withdraws = Withdraw::where('monitor_id',$user->id)->where('payed',true)->with('monitor')->paginate($per_page);
+        $status = $request->status == "payed" ? true : ($request->status == "nopayed" ? false : null);
+        if($status)
+            $withdraws = Withdraw::where('monitor_id',$user->id)->where('payed',$status)->with('monitor')->paginate($per_page);
         else
-            $withdraws = Withdraw::where('monitor_id',$user->id)->where('payed',false)->with('monitor')->paginate($per_page);
+            $withdraws = Withdraw::where('monitor_id',$user->id)->with('monitor')->paginate($per_page);
 
         return response()->json([
             'success' => true,
