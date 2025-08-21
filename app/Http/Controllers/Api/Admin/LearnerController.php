@@ -81,7 +81,7 @@ class LearnerController extends Controller
     public function userBadges(User $user)
     {
         $badges = Badge::where('learner_id',$user->id)->with('list_badge')->get();
-        $ids = Badge::where('learner_id',$user->id)->pluck('id')->toArray();
+        $ids = Badge::where('learner_id',$user->id)->pluck('list_badge_id')->toArray();
 
         $nobadges = ListBadge::whereNotIn('id',$ids)->get();
 
@@ -299,6 +299,38 @@ class LearnerController extends Controller
             'learner_id' => 'integer|required',
             'date' => 'date_format:Y-m-d H:i:s|required'
         ]);
+
+        $exist1 = Appointment::where('learner_id', $validated['learner_id'])
+            ->wherenot('status', 'canceled')
+            ->whereDate('date', date('Y-m-d', strtotime($validated['date'])))
+            ->exists();
+        if ($exist1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'L\'apprenant a déjà un rendez-vous confirmé pour cette date.',
+            ], 422);
+        }
+
+        $exist2 = Examen::where('instructor_id', $validated['instructor_id'])
+            ->where('date', date('Y-m-d', strtotime($validated['date'])))
+            ->exists();
+        if ($exist2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Le moniteur a déjà un examen prévu pour cette date.',
+            ], 422);
+        }
+
+        $exist3 = Appointment::where('instructor_id', $validated['instructor_id'])
+            ->wherenot('status', 'canceled')
+            ->whereDate('date', date('Y-m-d', strtotime($validated['date'])))
+            ->exists();
+        if ($exist3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Le moniteur a déjà un rendez-vous confirmé pour cette date.',
+            ], 422);
+        }
 
         $examens = Examen::create([
             'instructor_id' => $validated['instructor_id'],

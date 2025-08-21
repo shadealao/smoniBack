@@ -213,12 +213,16 @@ class LearnerController extends Controller
             
             $query = Availability::where('date', $validated['datesearch'])
             ->whereHas('vehicle', function($q) use ($validated) {
+            })->whereHas('instructor', function($q) {
+                $q->where('is_active', true);
             })
             ->whereDoesntHave('appointment');
         }else{
             $query = Availability::where('date', $validated['datesearch'])
             ->whereHas('vehicle', function($q) use ($validated) {
                 $q->where('gearbox_type', $validated['gearbox']);
+            })->whereHas('instructor', function($q) {
+                $q->where('is_active', true);
             })
             ->whereDoesntHave('appointment');
         }
@@ -234,11 +238,13 @@ class LearnerController extends Controller
         // Grouper par moniteur
         $result = $availabilities->groupBy('instructor_id')->map(function($items) {
             $instructor = $items->first()->instructor;
-            return [
-                'instructor' => $instructor,
-                'instructor_profile' => $instructor->instructorProfile,
-                'availabilities' => $items->values(),
-            ];
+            if($instructor->is_active == true) {
+               return [
+                    'instructor' => $instructor,
+                    'instructor_profile' => $instructor->instructorProfile,
+                    'availabilities' => $items->values(),
+                ];
+            }
         })->values();
 
 
@@ -259,6 +265,8 @@ class LearnerController extends Controller
 
         $a->whereHas('meetingPoint', function($q) use ($validated) {
                 $q->where('label', 'like', '%%');
+            })->whereHas('instructor', function($q) {
+                $q->where('is_active', true);
             });
 
         $b = $a->with(['vehicle', 'meetingPoint'])->orderBy('date','desc')->orderBy('start_time','asc')->get();
@@ -271,6 +279,7 @@ class LearnerController extends Controller
                 'instructor_profile' => $instructor->instructorProfile,
                 'availabilities' => $items->values(),
             ];
+            
         })->values();
 
         return response()->json([

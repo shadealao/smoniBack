@@ -32,8 +32,8 @@ class WithdrawController extends Controller
             'cash' => $hour_no_billable * auth()->user()->instructorProfile->hourPrice,
         ];
 
-        $admin_cash = auth()->user()->instructorProfile->hourDiscount;
-        $tva_cash = auth()->user()->instructorProfile->tva;
+        $admin_cash = $billable['cash'] == 0 ? 0 : auth()->user()->instructorProfile->hourDiscount;
+        $tva_cash = ($billable['cash'] * auth()->user()->instructorProfile->tva)/100;
         $my_cash = $billable['cash'] - ($admin_cash + $tva_cash);
 
         $pendingWithdraw = Withdraw::where('monitor_id', auth()->user()->id)->where('payed',false)->count();

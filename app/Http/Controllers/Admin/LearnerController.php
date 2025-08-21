@@ -43,7 +43,7 @@ class LearnerController extends Controller
     public function userBadges(User $user)
     {
         $badges = Badge::where('learner_id',$user->id)->with('list_badge')->get();
-        $ids = Badge::where('learner_id',$user->id)->pluck('id')->toArray();
+        $ids = Badge::where('learner_id',$user->id)->pluck('list_badge_id')->toArray();
 
         $nobadges = ListBadge::whereNotIn('id',$ids)->get();
 
