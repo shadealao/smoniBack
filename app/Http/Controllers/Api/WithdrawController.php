@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
+use App\Exports\WithdrawsExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 use PDF;
 
 class WithdrawController extends Controller
@@ -193,6 +196,14 @@ class WithdrawController extends Controller
             'data' => $withdraws,
             'message' => 'Liste des demandes de retrait récupérée avec succès.',
         ], 200);
+    }
+
+    /**
+     * Export
+     */
+    public function export(Request $request, User $user)
+    {
+        return Excel::download(new WithdrawsExport($user->id), 'retraits.xlsx');
     }
 
     /**
