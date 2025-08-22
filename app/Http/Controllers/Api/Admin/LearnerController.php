@@ -37,8 +37,8 @@ class LearnerController extends Controller
         $per_page = $request->per_page ? : 10;
         $status = $request->status == 'all' ? null : ($request->status == "active" ? true : false);
 
-        if($status == null)
-            $users = User::where('role','learner')->whereNot('id',auth()->user()->id)      
+        if($status !== null)
+            $users = User::where('role','learner')->whereNot('id',auth()->user()->id)->where('is_active',$status)      
                 ->where(function ($query) use ($q) {
                     $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
                         ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
@@ -46,7 +46,7 @@ class LearnerController extends Controller
                         ->orwhere(DB::raw('lower(phone)'),'like','%'.strtolower($q).'%');
                 })->orderBy('created_at','desc')->paginate($per_page);
         else 
-            $users = User::where('role','learner')->whereNot('id',auth()->user()->id)->where('is_active',$status)      
+            $users = User::where('role','learner')->whereNot('id',auth()->user()->id)      
                 ->where(function ($query) use ($q) {
                     $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
                         ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')

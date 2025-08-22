@@ -107,7 +107,7 @@ class ModuleController extends Controller
                         'learner_id' => $user->id, 
                         'module_id' => $trainingModule->id,
                         'list_badge_id' => $moduleStep->id, 
-                        'awarded_at' => new \DateTime(), 
+                        // 'awarded_at' => new \DateTime(), 
                         // 'validation_instructor_id' => auth()->user()->id, 
                     ])->first();
                     
