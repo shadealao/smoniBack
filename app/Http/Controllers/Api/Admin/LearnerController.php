@@ -31,16 +31,28 @@ class LearnerController extends Controller
         $validated = $request->validate([
             'q' => '',
             'per_page' => 'integer',
+            'status' => 'in:all,active,block'
         ]);
         $q = $request->q ? : '';
         $per_page = $request->per_page ? : 10;
-        $users = User::where('role','learner')      
-            ->where(function ($query) use ($q) {
-                $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
-                    ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
-                    ->orwhere(DB::raw('lower(email)'),'like','%'.strtolower($q).'%')
-                    ->orwhere(DB::raw('lower(phone)'),'like','%'.strtolower($q).'%');
-            })->with('learnerProfile')->orderBy('created_at','desc')->paginate($per_page);
+        $status = $request->status == 'all' ? null : ($request->status == "active" ? true : false);
+
+        if($status == null)
+            $users = User::where('role','learner')->whereNot('id',auth()->user()->id)      
+                ->where(function ($query) use ($q) {
+                    $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(email)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(phone)'),'like','%'.strtolower($q).'%');
+                })->orderBy('created_at','desc')->paginate($per_page);
+        else 
+            $users = User::where('role','learner')->whereNot('id',auth()->user()->id)->where('is_active',$status)      
+                ->where(function ($query) use ($q) {
+                    $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(email)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(phone)'),'like','%'.strtolower($q).'%');
+                })->orderBy('created_at','desc')->paginate($per_page);
 
         return response()->json([
             'success' => true,
@@ -277,9 +289,19 @@ class LearnerController extends Controller
      */
     public function ListLearnerToExam(Request $request)
     {
-        $examens = Examen::with(['learner', 'monitor'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $validated = $request->validate([
+            'status' => 'string|in:all,refused,confirmed,pending',
+        ]);
+        if($request->status == 'all') {
+            $examens = Examen::with(['learner', 'monitor'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        } else {
+            $examens = Examen::where('status', $request->status)
+                ->with(['learner', 'monitor'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        }
 
         return response()->json([
             'success' => true,

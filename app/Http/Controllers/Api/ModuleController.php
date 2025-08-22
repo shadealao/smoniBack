@@ -103,20 +103,22 @@ class ModuleController extends Controller
                     'competence' => $compet,
                 ];
                 if($detail_subModule['stat'] == 100){
-                    Badge::where([
+                    $exist = Badge::where([
                         'learner_id' => $user->id, 
                         'module_id' => $trainingModule->id,
                         'list_badge_id' => $moduleStep->id, 
                         'awarded_at' => new \DateTime(), 
                         // 'validation_instructor_id' => auth()->user()->id, 
-                    ],
-                    )->firstOrCreate([
+                    ])->first();
+                    
+                    if(!$exist)
+                        Badge::create([
                         'learner_id' => $user->id, 
                         'module_id' => $trainingModule->id,
                         'list_badge_id' => $moduleStep->id, 
                         'awarded_at' => new \DateTime(), 
                         'validation_instructor_id' => auth()->user()->id, 
-                    ]);
+                        ]);
                 }
 
                 array_push($subModule, $detail_subModule );

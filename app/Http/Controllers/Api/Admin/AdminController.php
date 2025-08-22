@@ -25,16 +25,27 @@ class AdminController extends Controller
         $validated = $request->validate([
             'q' => '',
             'per_page' => 'integer',
+            'status' => 'in:all,active,block'
         ]);
         $q = $request->q ? : '';
         $per_page = $request->per_page ? : 10;
-        $users = User::where('role','admin')->whereNot('id',auth()->user()->id)      
-            ->where(function ($query) use ($q) {
-                $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
-                    ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
-                    ->orwhere(DB::raw('lower(email)'),'like','%'.strtolower($q).'%')
-                    ->orwhere(DB::raw('lower(phone)'),'like','%'.strtolower($q).'%');
-            })->orderBy('created_at','desc')->paginate($per_page);
+        $status = $request->status == 'all' ? null : ($request->status == "active" ? true : false);
+        if($status == null)
+            $users = User::where('role','admin')->whereNot('id',auth()->user()->id)      
+                ->where(function ($query) use ($q) {
+                    $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(email)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(phone)'),'like','%'.strtolower($q).'%');
+                })->orderBy('created_at','desc')->paginate($per_page);
+        else 
+            $users = User::where('role','admin')->whereNot('id',auth()->user()->id)->where('is_active',$status)      
+                ->where(function ($query) use ($q) {
+                    $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(email)'),'like','%'.strtolower($q).'%')
+                        ->orwhere(DB::raw('lower(phone)'),'like','%'.strtolower($q).'%');
+                })->orderBy('created_at','desc')->paginate($per_page);
 
         return response()->json([
             'success' => true,
@@ -132,7 +143,7 @@ class AdminController extends Controller
     public function withdraws(Request $request)
     {
         $validated = $request->validate([
-            'status' => [Rule::in(['success', 'pending']),'nullable'],
+            'status' => 'in:success,pending',
             'per_page' => 'integer'
         ]);
 

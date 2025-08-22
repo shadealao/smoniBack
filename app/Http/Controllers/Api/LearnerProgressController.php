@@ -120,30 +120,30 @@ class LearnerProgressController extends Controller
         }
 
         // Check if badge already exists
-        if (Badge::where('learner_id', $learnerProgres->learner_id)
-            ->where('module_id', $learnerProgres->module_id)
-            ->exists()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Un badge a déjà été attribué pour ce module.',
-            ], 422);
-        }
+        // if (Badge::where('learner_id', $learnerProgres->learner_id)
+        //     ->where('module_id', $learnerProgres->module_id)
+        //     ->exists()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Un badge a déjà été attribué pour ce module.',
+        //     ], 422);
+        // }
 
-        $validated = $request->validate([
-            'certification_url' => 'nullable|url',
-        ]);
+        // $validated = $request->validate([
+        //     'certification_url' => 'nullable|url',
+        // ]);
 
-        $badge = Badge::create([
-            'learner_id' => $learnerProgres->learner_id,
-            'module_id' => $learnerProgres->module_id,
-            'awarded_at' => now(),
-            'validation_instructor_id' => $user->id,
-            'certification_url' => $validated['certification_url'] ?? null,
-        ]);
+        // $badge = Badge::create([
+        //     'learner_id' => $learnerProgres->learner_id,
+        //     'module_id' => $learnerProgres->module_id,
+        //     'awarded_at' => now(),
+        //     'validation_instructor_id' => $user->id,
+        //     'certification_url' => $validated['certification_url'] ?? null,
+        // ]);
 
         return response()->json([
             'success' => true,
-            'data' => $badge->load(['module', 'validationInstructor']),
+            // 'data' => $badge->load(['module', 'validationInstructor']),
             'message' => 'Badge attribué avec succès.',
         ], 201);
     }
