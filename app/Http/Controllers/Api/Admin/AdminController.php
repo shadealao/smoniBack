@@ -152,7 +152,7 @@ class AdminController extends Controller
 
         if($request->status){
             $status = $request->status == 'success' ? true : false;
-            $withdraws = Withdraw::where('payed',$status)->with('monitor.bank')->paginate($per_page);
+            $withdraws = Withdraw::where('payed',$status)->with('monitor')->paginate($per_page);
         }
         else
             $withdraws = Withdraw::with('monitor')->paginate($per_page);
