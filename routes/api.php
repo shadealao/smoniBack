@@ -38,7 +38,6 @@ use App\Http\Controllers\Api\Admin\ServiceController as AdminServiceController;
 Route::post('/testEmail', [DashboardController::class, 'testEmail'])->name('testEmail');
 Route::post('/generateFacture', [WithdrawController::class, 'generate'])->name('generate');
 Route::post('/contrat', [ServiceController::class, 'contrat'])->name('contrat');
-Route::get('/export/{user}', [WithdrawController::class, 'export'])->name('export');
 
 
 //Verification Email
@@ -67,6 +66,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
             //Auth
             Route::post('/passTest', [AuthController::class, 'checkAsk']);
+            Route::get('/export', [WithdrawController::class, 'export'])->name('export');
+
+
     Route::middleware(['admin'])->group(function () {
         Route::prefix('admin')->group(function () {
 

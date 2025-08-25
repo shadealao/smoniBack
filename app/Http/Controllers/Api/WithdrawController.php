@@ -202,9 +202,9 @@ class WithdrawController extends Controller
     /**
      * Export
      */
-    public function export(Request $request, User $user)
+    public function export(Request $request)
     {
-        return Excel::download(new WithdrawsExport($user->id), 'retraits.xlsx');
+        return Excel::download(new WithdrawsExport(auth()->user()->id), 'retraits.xlsx');
     }
 
     /**

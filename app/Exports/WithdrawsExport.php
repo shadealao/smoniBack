@@ -3,10 +3,14 @@
 namespace App\Exports;
 
 use App\Models\Withdraw;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class WithdrawsExport implements FromCollection, WithHeadings
+use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Illuminate\Contracts\View\View;
+
+class WithdrawsExport implements FromView
 {
     public function __construct($id)
     {
@@ -16,19 +20,39 @@ class WithdrawsExport implements FromCollection, WithHeadings
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function collection()
+    // public function collection()
+    // {
+    //     return Withdraw::select('invoice_code','created_at','ammount', 'payed')->where('monitor_id',$this->id)->orderBy('created_at','desc') ->get();
+    // }
+
+    // public function headings(): array
+    // {
+    //     // Les en-têtes de vos colonnes dans le fichier Excel
+    //     return [
+    //         'Transaction ID',
+    //         'Créé le',
+    //         'Montant',
+    //         'Statut',
+    //     ];
+    // }
+
+     public function view(): View
     {
-        return Withdraw::select('invoice_code','created_at','ammount', 'payed')->where('monitor_id',$this->id)->orderBy('created_at','desc') ->get();
+        $withdraws = Withdraw::select('invoice_code','created_at','ammount', 'payed')->where('monitor_id',$this->id)->orderBy('created_at','desc') ->get();
+
+        return view('export.transaction',compact('withdraws'));
     }
 
-    public function headings(): array
+    
+     /**
+     * @return array
+     */
+    public function registerEvents(): array
     {
-        // Les en-têtes de vos colonnes dans le fichier Excel
         return [
-            'Transaction ID',
-            'Créé le',
-            'Montant',
-            'Statut',
+            AfterSheet::class => function(AfterSheet $event) {
+                $event->sheet->getDelegate()->setRightToLeft(true);
+            },
         ];
     }
 }
