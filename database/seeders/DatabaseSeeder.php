@@ -15,18 +15,15 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             ServiceSeeder::class,
-            // UserSeeder::class,
+            UserSeeder::class,
+            VehicleSeeder::class,
+            ModuleSeeder::class,
+            BadgeSeeder::class,
+            
+            // AvailabilityRepeatedSeeder::class,
             // MeetingPointSeeder::class,
-            // VehicleSeeder::class,
             // AvailabilitySeeder::class,
             // AppointmentSeeder::class,
-            // ModuleSeeder::class,
-            // BadgeSeeder::class,
-            // AvailabilityRepeatedSeeder::class,
-            
-            // TrainingModuleSeeder::class,
-            // ModuleStepSeeder::class,
-            // LearnerProgressSeeder::class,
         ]);
     }
 }

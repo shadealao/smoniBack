@@ -131,13 +131,13 @@ class LearnerController extends Controller
             'status' => ['required', Rule::in(['all','scheduled', 'confirmed', 'completed', 'cancelled','pending','notation'])],
         ]);
         if($validated['status'] == 'all') {
-            $lessons = Appointment::where('learner_id', auth()->user()->id)->with(['instructor', 'availability.meetingPoint', 'vehicle'])->orderBy('date','asc')->get();
+            $lessons = Appointment::where('learner_id', auth()->user()->id)->with(['instructor', 'availability.meetingPoint', 'vehicle'])->orderBy('date','asc')->paginate(10);
         } else {
             $lessons = Appointment::where('learner_id', auth()->user()->id)
                 ->where('status', $validated['status'])
                 ->with(['instructor', 'availability.meetingPoint', 'vehicle'])
                 ->orderBy('date','asc')
-                ->get();
+                ->paginate(10);
         }
 
         return response()->json([

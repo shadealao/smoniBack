@@ -196,23 +196,28 @@
       <tr>
         
         <td>Sous-total</td>
-        <td>{{number_format($amount)}} €</td>
+        <td>{{number_format($amount,2)}} €</td>
       </tr>
       <tr>
         <td>Total hors taxes</td>
-        <td>{{number_format($amount - $tva)}} €</td>
+        <td>{{number_format($amount - ($tva+$admin),2)}} €</td>
       </tr>
       <tr>
-        <td>TVA - France ({{$user->instructorProfile->tva}} % de {{number_format($amount - $tva)}} € compris)</td>
-        <td>{{number_format($tva)}} €</td>
+        <td>TVA - France ({{$user->instructorProfile->tva}} % de {{number_format($amount - ($tva+$admin),2)}} € compris)</td>
+        <td>{{number_format($tva,2)}} €</td>
+      </tr>
+      
+      <tr>
+        <td>Frais de commission {{number_format($admin,2)}}€</td>
+        <td>{{number_format($admin,2)}} €</td>
       </tr>
       <tr class="bold">
         <td>Total</td>
-        <td>{{number_format($amount)}} €</td>
+        <td>{{number_format($amount,2)}} €</td>
       </tr>
       <tr class="bold">
         <td>Montant dû</td>
-        <td>{{number_format($amount)}} €</td>
+        <td>{{number_format($amount - ($tva+$admin),2)}} €</td>
       </tr>
     </table>
 </body>

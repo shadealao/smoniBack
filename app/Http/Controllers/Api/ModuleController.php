@@ -54,6 +54,76 @@ class ModuleController extends Controller
 
         DB::commit();
 
+        $user = User::find($appointment->learner_id);
+
+        $myCompetence = LearnerProgres::where('learner_id',$user->id)->pluck('step_item_id')->toArray();
+        
+        $trainingModules = TrainingModule::all();
+
+        $module = array();
+        foreach ($trainingModules as $trainingModule) {
+            
+            $subModule = array();
+            $total_check_comp = 0;
+            $total_comp = 0;
+            $moduleSteps = ModuleStep::where('module_id',$trainingModule->id)->get();
+            foreach ($moduleSteps as $moduleStep) {
+            
+                $compet = array();
+                $check=0;
+                
+                $competences = StepModuleItem::where('step_id',$moduleStep->id)->get();
+                foreach ($competences as $competence) {
+                    
+                    $detail_compet = [
+                        'id' => $competence->id,
+                        'name' => $competence->description,
+                        'is_check' => in_array($competence->id, $myCompetence) ? true : false,
+                    ];
+                    array_push($compet, $detail_compet );
+                    $check = in_array($competence->id, $myCompetence) ? $check+1 : $check;
+                }
+
+                $detail_subModule = [
+                    'id' => $moduleStep->id,
+                    'code' => $moduleStep->code,
+                    'name' => $moduleStep->name,
+                    'stat' => ($check * 100)/$competences->count(),
+                    'pdf' => asset($moduleStep->pdf),
+                    'competence' => $compet,
+                ];
+                if($detail_subModule['stat'] == 100){
+
+                    Badge::firstOrCreate([
+                        'learner_id' => $user->id, 
+                        'module_id' => $trainingModule->id,
+                        'list_badge_id' => $moduleStep->id, 
+                    ],
+                    [
+                        'learner_id' => $user->id, 
+                        'module_id' => $trainingModule->id,
+                        'list_badge_id' => $moduleStep->id, 
+                        'awarded_at' => new \DateTime(), 
+                        'validation_instructor_id' => auth()->user()->id, 
+                    ]);
+                }
+
+                array_push($subModule, $detail_subModule );
+                $total_check_comp = $total_check_comp + $check;
+                $total_comp = $total_comp + $competences->count();
+            }
+
+            $detail_module = [
+                'id' => $trainingModule->id,
+                'code' => $trainingModule->code,
+                'name' => $trainingModule->name,
+                'stat' => ($total_check_comp * 100)/($total_comp != 0 ? $total_comp : 1),
+                'subModule' => $subModule,
+            ];
+            array_push($module, $detail_module );
+
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Progression mise à jour avec succès.',
@@ -103,22 +173,19 @@ class ModuleController extends Controller
                     'competence' => $compet,
                 ];
                 if($detail_subModule['stat'] == 100){
-                    $exist = Badge::where([
+
+                    Badge::firstOrCreate([
                         'learner_id' => $user->id, 
                         'module_id' => $trainingModule->id,
                         'list_badge_id' => $moduleStep->id, 
-                        // 'awarded_at' => new \DateTime(), 
-                        // 'validation_instructor_id' => auth()->user()->id, 
-                    ])->first();
-                    
-                    if(!$exist)
-                        Badge::create([
+                    ],
+                    [
                         'learner_id' => $user->id, 
                         'module_id' => $trainingModule->id,
                         'list_badge_id' => $moduleStep->id, 
                         'awarded_at' => new \DateTime(), 
                         'validation_instructor_id' => auth()->user()->id, 
-                        ]);
+                    ]);
                 }
 
                 array_push($subModule, $detail_subModule );

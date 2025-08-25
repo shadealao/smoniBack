@@ -142,15 +142,16 @@ class WithdrawController extends Controller
 
                 $user = User::find($withdraw->monitor_id);
 
-                $amount = $user->instructorProfile->hourPrice * $withdraw->duration;
+                $amount = ($user->instructorProfile->hourPrice * $withdraw->duration );
+                $admin = $user->instructorProfile->hourDiscount;
 
-                $tva = ($user->instructorProfile->hourPrice * $withdraw->duration) * ($user->instructorProfile->tva/100);
+                $tva = ($amount-$admin) * ($user->instructorProfile->tva/100);
 
                 if (!file_exists(public_path('storage/pdf/facture/'))) {
                     mkdir(public_path('storage/pdf/facture/'), 0755, true);
                 }
                 
-                PDF::loadView('pdf.facture', compact('withdraw','user','amount','tva'))
+                PDF::loadView('pdf.facture', compact('withdraw','user','amount','tva','admin'))
                     ->setPaper('a4', 'portrait')
                     ->setWarnings(false)
                     ->save(public_path($pdf));
