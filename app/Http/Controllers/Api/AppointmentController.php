@@ -309,16 +309,7 @@ class AppointmentController extends Controller
             'cancellation_reason' => 'required|string|max:500',
         ]);
 
-        // Learners can only cancel 24 hours before
-        if ($user->role === 'learner') {
-            $appointmentDateTime = Carbon::parse($appointment->date . ' ' . $appointment->start_time);
-            if ($appointmentDateTime->diffInHours(Carbon::now(), false) < 24) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Les apprenants ne peuvent annuler que 24 heures avant le rendez-vous.',
-                ], 403);
-            }
-        }
+        $appointmentDateTime = Carbon::parse($appointment->date . ' ' . $appointment->start_time);
 
         // Prevent canceling already canceled or completed appointments
         if ($appointment->status === 'cancelled' || $appointment->status === 'completed') {
@@ -328,6 +319,16 @@ class AppointmentController extends Controller
             ], 422);
         }
 
+        // Learners can only cancel 48 hours before
+        if ($user->role === 'learner') {
+            if ($appointmentDateTime->diffInHours(Carbon::now(), false) < 48) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Les apprenants ne peuvent annuler que 24 heures avant le rendez-vous.',
+                ], 403);
+            }
+        }
+        
         $availability = $appointment->availability;
         $vehicle = $availability->vehicle;
 
@@ -342,20 +343,31 @@ class AppointmentController extends Controller
             $subscriptions->hour+= 1;
             $subscriptions->save();
         }
-
+        
         $this->sendmailer( $user->id, 'Annullation Rendez-vous', 'Annullation Rendez-vous', 'Vous venez d\'annuler une résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
 
         $this->sendmailer( $appointment->learner_id, 'Annullation Rendez-vous', 'Annullation Rendez-vous', 'Votre moniteur vient d\'annuler votre résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time.'<br> <b>Raison</b>: '.$validated['cancellation_reason'], 'appointment');
 
-        $appointment->update([
-            'status' => 'cancelled',
-            'cancellation_reason' => $validated['cancellation_reason'],
-            'canceled_by_monitor' => $user->role === 'learner' ? false : true
-        ]);
+
+        if ($user->role === 'instructor') {
+            if ($appointmentDateTime->diffInHours(Carbon::now(), false) < 48) {
+                $appointment->update([
+                    'status' => 'cancelled',
+                    'cancellation_reason' => $validated['cancellation_reason'],
+                    'canceled_by_monitor' => $user->role === 'learner' ? false : true
+                ]);
+            }else{
+                $appointment->delete();
+            }
+        }
+
+        if ($user->role === 'learner') {
+            $appointment->delete();
+        }
         
         return response()->json([
             'success' => true,
-            'data' => $appointment->fresh(),
+            'data' => 'ok',
             'message' => 'Rendez-vous annulé avec succès.',
         ], 200);
     }
