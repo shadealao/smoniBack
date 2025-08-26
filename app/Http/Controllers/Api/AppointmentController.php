@@ -309,7 +309,15 @@ class AppointmentController extends Controller
             'cancellation_reason' => 'required|string|max:500',
         ]);
 
-        $appointmentDateTime = Carbon::parse($appointment->date . ' ' . $appointment->start_time);
+
+        $date = new \DateTime($appointment->date);
+        $date->setTime(date('H', strtotime($appointment->start_time)),0,0);
+        $date->format('Y-m-d H:i:s');
+        $appointmentDateTime = Carbon::parse($date);
+        
+        // $date1 = new DateTime();
+        // $date2 = new DateTime($appointment->date . ' ' . $appointment->start_time);
+        // $interval = $date1->diff($date2);
 
         // Prevent canceling already canceled or completed appointments
         if ($appointment->status === 'cancelled' || $appointment->status === 'completed') {
@@ -321,10 +329,10 @@ class AppointmentController extends Controller
 
         // Learners can only cancel 48 hours before
         if ($user->role === 'learner') {
-            if ($appointmentDateTime->diffInHours(Carbon::now(), false) < 48) {
+            if (abs($appointmentDateTime->diffInHours(Carbon::now(), false)) < 48) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Les apprenants ne peuvent annuler que 24 heures avant le rendez-vous.',
+                    'message' => 'Les apprenants ne peuvent annuler que 48 heures avant le rendez-vous.',
                 ], 403);
             }
         }
@@ -350,7 +358,8 @@ class AppointmentController extends Controller
 
 
         if ($user->role === 'instructor') {
-            if ($appointmentDateTime->diffInHours(Carbon::now(), false) < 48) {
+            if (abs($appointmentDateTime->diffInHours(Carbon::now(), false)) < 48) {
+
                 $appointment->update([
                     'status' => 'cancelled',
                     'cancellation_reason' => $validated['cancellation_reason'],

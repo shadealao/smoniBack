@@ -180,11 +180,6 @@ class LearnerController extends Controller
             ], 403);
         }
 
-        // Annulation possible
-        $appointment->status = 'cancelled';
-        $appointment->cancellation_reason = $validated['cancellation_reason'];
-        $appointment->save();
-
         $availability = $appointment->availability;
         $vehicle = $availability->vehicle;
 
@@ -199,6 +194,7 @@ class LearnerController extends Controller
             $subscriptions->hour+= 1;
             $subscriptions->save();
         }
+        $appointment->delete();
         
 
         return response()->json([
