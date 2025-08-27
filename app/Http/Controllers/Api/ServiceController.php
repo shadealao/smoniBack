@@ -7,7 +7,7 @@ use App\Models\CategoryService;
 use App\Models\Service;
 use App\Models\ServiceItem;
 use App\Models\Contract;
-use App\Models\learnerProfile;
+use App\Models\LearnerProfile;
 use App\Models\User;
 use App\Models\Subscription;
 use App\Models\CodeAccess;
@@ -206,7 +206,7 @@ class ServiceController extends Controller
         foreach ($subscriptions as $subscription) {
             DB::beginTransaction();
                 $user = User::find($subscription->learner_id);
-                $info = learnerProfile::where('user_id',$user->id)->first();
+                $info = LearnerProfile::where('user_id',$user->id)->first();
                 
                 $service = Service::find($subscription->service_id);
                 $categories = CategoryService::find($service->category_service_id);
