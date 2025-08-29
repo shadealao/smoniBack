@@ -24,6 +24,16 @@ class LearnerProfile extends Model
         'permit_category',
         'test_passed',
         'hour',
+
+        'identity',
+        'accommodation',
+        'authorize',        
+        'identityPhoto',
+        'assr',
+        'cip',
+        'snu',
+        'medicalVisit',
+        'neph',
     ];
 
     protected $casts = [

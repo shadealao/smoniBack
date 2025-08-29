@@ -29,7 +29,11 @@ class InstructorProfile extends Model
         'num_tva',
         'num_teach_authorization',
         'date_teach_permit',
-        'date_medical_visit'
+        'date_medical_visit',
+
+        'grayCard',
+        'greenCard',
+        'assurance',
     ];
 
     protected $casts = [

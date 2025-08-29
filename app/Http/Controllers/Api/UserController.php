@@ -80,6 +80,61 @@ class UserController extends Controller
     }
 
     /**
+     * Update learner Doc.
+     */ 
+    public function updateDocLearnerProfile(Request $request)
+    {
+        $user = User::find(Auth::id());
+
+        if ($user->role !== 'learner') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous n\'êtes pas un apprenant.',
+            ], 403);
+        }
+        $validated = $request->validate([
+            'identity' => 'nullable|file',
+            'accommodation' => 'nullable|file',
+            'authorize' => 'nullable|file',            
+            'identityPhoto' => 'nullable|file',
+            'assr' => 'nullable|file',
+            'cip' => 'nullable|file',
+            'medicalVisit' => 'nullable|file',
+            'snu' => 'nullable|file',
+            'neph' => 'nullable|string',
+        ]);
+        $identity = $request->file('identity') ? $request->file('identity')->store('profil', 'public') : null;
+        $accommodation = $request->file('accommodation') ? $request->file('accommodation')->store('profil', 'public') : null;
+        $authorize = $request->file('authorize') ? $request->file('authorize')->store('profil', 'public') : null;        
+        $identityPhoto = $request->file('identityPhoto') ? $request->file('identityPhoto')->store('profil', 'public') : null;
+        $assr = $request->file('assr') ? $request->file('assr')->store('profil', 'public') : null;
+        $cip = $request->file('cip') ? $request->file('cip')->store('profil', 'public') : null;
+        $snu = $request->file('snu') ? $request->file('snu')->store('profil', 'public') : null;
+        $medicalVisit = $request->file('medicalVisit') ? $request->file('medicalVisit')->store('profil', 'public') : null;
+        $neph = $request->neph ? $request->neph : null;
+
+        // Update or create learner profile
+        $learnerProfile = $user->learnerProfile ?? new LearnerProfile(['user_id' => $user->id]);
+        $learnerProfile->fill(array_filter([
+            'identity' => $identity ?? $learnerProfile->identity,
+            'accommodation' => $accommodation ?? $learnerProfile->accommodation,
+            'authorize' => $authorize ?? $learnerProfile->authorize,
+            'identityPhoto' => $identityPhoto ?? $learnerProfile->identityPhoto,            
+            'assr' => $assr ?? $learnerProfile->assr,
+            'snu' => $snu ?? $learnerProfile->snu,
+            'cip' => $cip ?? $learnerProfile->cip,
+            'medicalVisit' => $medicalVisit ?? $learnerProfile->medicalVisit,
+            'neph' => $neph ?? $learnerProfile->neph,
+        ]))->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => $user->load('learnerProfile'),
+            'message' => 'Détails du profil apprenant récupérés avec succès.',
+        ], 200);
+    }
+
+    /**
      * Update admin profile.
      */
     public function updateAdminProfile(Request $request)

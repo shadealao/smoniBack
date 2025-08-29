@@ -176,6 +176,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Update profile routes
     Route::put('/profile/update/learner', [UserController::class, 'updateLearnerProfile']);
+    Route::post('/profile/update/doclearner', [UserController::class, 'updateDocLearnerProfile']);
     Route::put('/profile/update/instructor', [UserController::class, 'updateInstructorProfile']);
     Route::put('/profile/update/admin', [UserController::class, 'updateAdminProfile']);
     Route::put('/profile/update/password', [UserController::class, 'changePassword']);
