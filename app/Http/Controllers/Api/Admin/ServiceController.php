@@ -99,7 +99,7 @@ class ServiceController extends Controller
      */
     public function listService(Request $request){
         
-        $services = Service::with('items')->paginate(10);
+        $services = Service::with('items')->orderBy('created_at','desc')->paginate(10);
 
         return response()->json([
             'success' => true,
@@ -129,7 +129,7 @@ class ServiceController extends Controller
             'category_service_id' => 'required|exists:category_services,id',
             'title' => 'required',
             'price' => 'required|integer',
-            'type' => [Rule::in(['automatic', 'manual']),'required'],
+            'type' => [Rule::in(['automatic', 'manual']),'nullable'],
             'time' => 'required|integer',
             'hour' => 'required|integer',
             'items'=> 'array|nullable',
@@ -143,7 +143,7 @@ class ServiceController extends Controller
                 'category_service_id' => $request->category_service_id,
                 'title' => $request->title,
                 'price' => $request->price,
-                'type' => $request->type,
+                'type' => $request->type ? $request->type : 'manual',
                 'time' => $request->time,
                 'hour' => $request->hour,
                 'month' => $request->time/30,
@@ -198,6 +198,19 @@ class ServiceController extends Controller
             'message' => 'Service ajouté' ,
         ], 200);
     
+    }
+
+    /*Action to deactivate or activate a service */
+    
+    public function actionService(Request $request, Service $service)
+    {
+        $service->status = !$service->status;
+        $service->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Service status updated successfully',
+            'data' => $service
+        ], 200);
     }
 
     /**

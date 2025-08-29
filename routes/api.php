@@ -86,6 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/listService', [AdminServiceController::class, 'listService'])->name('admin.listService');
             Route::get('/listServiceByCategory/{categoryService}', [AdminServiceController::class, 'listServiceByCategory'])->name('admin.listServiceByCategory');
             Route::post('/addService', [AdminServiceController::class, 'addService'])->name('admin.addService');
+            Route::get('/actionService/{service}', [AdminServiceController::class, 'actionService'])->name('admin.actionService');
             Route::put('/updateService/{service}', [AdminServiceController::class, 'updateService'])->name('admin.updateService');
             // ServiceItem
             Route::get('/listserviceItem/{service}', [AdminServiceController::class, 'listserviceItem'])->name('admin.listserviceItem');
