@@ -40,7 +40,8 @@ class ServiceController extends Controller
 
         $services = Service::where([
             'category_service_id' => $category_id,
-            'type' => $type
+            'type' => $type,
+            'status' => true,
             ])->with(['category','items'])
             ->get();
 
