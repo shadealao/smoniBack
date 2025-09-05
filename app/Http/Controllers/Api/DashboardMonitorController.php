@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\ExamRegistration;
+use App\Models\Examen;
 use App\Models\Appointment;
 use App\Http\Resources\AppointmentLearnerResource;
 use Illuminate\Support\Facades\DB;
@@ -24,9 +24,9 @@ class DashboardMonitorController extends Controller
 
         $hour = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'completed')->sum('duration');
 
-        $count_learners_exam = ExamRegistration::where([
-            'monitor_id' =>  auth()->user()->id,
-            'status' => 'registered',
+        $count_learners_exam = Examen::where([
+            'instructor_id' =>  auth()->user()->id,
+            'status' => 'pending',
         ])->count();
 
         $rdv_pending = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'scheduled')->count();

@@ -120,7 +120,7 @@
 
         <h1 class="email-title">{{$header}}</h1>
 
-        <p class="content-paragraph">Hello 👋</p>
+        <p class="content-paragraph">Hello </p>
         <p class="content-paragraph">{{$data}}</p>
 
         <p class="info-text">Pour plus de renseignement, n'hésitez pas à passer par notre centre d'aide.</p>

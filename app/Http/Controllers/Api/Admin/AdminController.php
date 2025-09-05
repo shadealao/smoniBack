@@ -30,9 +30,10 @@ class AdminController extends Controller
         $q = $request->q ? : '';
         $per_page = $request->per_page ? : 10;
         $status = $request->status == 'all' ? null : ($request->status == "active" ? true : false);
+        $firstAdmin = User::where('role','admin')->where('is_active',true)->orderBy('created_at','asc')->first();
         
         if($status !== null)
-            $users = User::where('role','admin')->whereNot('id',auth()->user()->id)->where('is_active',$status)      
+            $users = User::where('role','admin')->whereNotIn('id',[auth()->user()->id,$firstAdmin->id])->where('is_active',$status)      
                 ->where(function ($query) use ($q) {
                     $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
                         ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
@@ -40,7 +41,7 @@ class AdminController extends Controller
                         ->orwhere(DB::raw('lower(phone)'),'like','%'.strtolower($q).'%');
                 })->orderBy('created_at','desc')->paginate($per_page);
         else 
-            $users = User::where('role','admin')->whereNot('id',auth()->user()->id)      
+            $users = User::where('role','admin')->whereNotIn('id',[auth()->user()->id,$firstAdmin->id])      
                 ->where(function ($query) use ($q) {
                     $query->where(DB::raw('lower(lastname)'),'like','%'.strtolower($q).'%')
                         ->orwhere(DB::raw('lower(firstname)'),'like','%'.strtolower($q).'%')
@@ -89,7 +90,7 @@ class AdminController extends Controller
         ]);
 
         // Hachage du mot de passe
-        $validated['password'] = Hash::make($validated['password']);
+        $password = Hash::make($validated['password']);
         DB::beginTransaction();
         try{
             
@@ -98,7 +99,7 @@ class AdminController extends Controller
                 'lastname' => $validated['lastname'],
                 'firstname' => $validated['firstname'],
                 'email' => $validated['email'],
-                'password' => $validated['password'],
+                'password' => $password,
                 'role' => 'admin',
                 'email_verified_at' => new \DateTime(),
             ]);
@@ -106,7 +107,7 @@ class AdminController extends Controller
             DB::commit();
 
 
-            $this->sendmailer( $user->id, 'Compte Administrateur', "Compte Administrateur", 'Bienvenu Mr/Mme '.$user->lastname.'. Veuillez vous cinnecter avec ses identifiants pour la suite: Email: '.$user->email.' Password: '.$validated['password'], 'admin');
+            $this->sendmailer( $user->id, 'Compte Administrateur', "Compte Administrateur", 'Bienvenu Mr/Mme '.$user->lastname.'. Veuillez vous connecter avec ses identifiants pour la suite: Email: '.$user->email.' Password: '.$validated['password'], 'admin');
 
 
             return response()->json([
