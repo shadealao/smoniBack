@@ -164,7 +164,7 @@
                 62 Rue De La Jarry<br>
                 94300 Vincennes<br>
                 France<br>
-                +33 7 49 46 49 78</p>
+                0953469828 - 0749464978</p>
               </div>
           
         </div>
