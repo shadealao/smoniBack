@@ -35,9 +35,9 @@ class WithdrawController extends Controller
             'cash' => $hour_no_billable * auth()->user()->instructorProfile->hourPrice,
         ];
 
-        $admin_cash = $billable['cash'] == 0 ? 0 : auth()->user()->instructorProfile->hourDiscount;
-        $tva_cash = (($billable['cash'] - $admin_cash) * auth()->user()->instructorProfile->tva)/100;
-        $my_cash = ($billable['cash'] - $admin_cash) + $tva_cash;
+        // $admin_cash = $billable['cash'] == 0 ? 0 : auth()->user()->instructorProfile->hourDiscount;
+        $tva_cash = ($billable['cash'] * auth()->user()->instructorProfile->tva)/100;
+        $my_cash = $billable['cash'] + $tva_cash;
 
         $pendingWithdraw = Withdraw::where('monitor_id', auth()->user()->id)->where('payed',false)->count();
 
@@ -45,7 +45,7 @@ class WithdrawController extends Controller
             'success' => true,
             'billable' => $billable ,
             'no_billable' => $no_billable ,
-            'admin_cash' => $admin_cash,
+            // 'admin_cash' => $admin_cash,
             'tva_cash' => $tva_cash,
             'my_cash' => $my_cash,
             'pendingWithdraw' => $pendingWithdraw,
@@ -145,7 +145,7 @@ class WithdrawController extends Controller
                 $amount = ($user->instructorProfile->hourPrice * $withdraw->duration );
                 $admin = $user->instructorProfile->hourDiscount;
 
-                $tva = ($amount-$admin) * ($user->instructorProfile->tva/100);
+                $tva = $amount* ($user->instructorProfile->tva/100);
 
                 if (!file_exists(public_path('storage/pdf/facture/'))) {
                     mkdir(public_path('storage/pdf/facture/'), 0755, true);

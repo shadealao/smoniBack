@@ -147,7 +147,19 @@
           </div>
 
           <div class="company-info">
+            
               <div>
+                <p><strong>De </strong><br>
+                {{$user->lastname.' '.$user->firstname}}<br>
+                {{$user->instructorProfile->adress}}<br>
+                {{$user->instructorProfile->city}}<br>
+                {{$user->instructorProfile->postal_code}}<br>
+                France<br>
+                {{$user->email}}</p>
+              </div>
+
+              <div>
+                <p><strong>Vers </strong><br>
                 <p><strong>SMONI AUTO-MOTO ÉCOLE</strong><br>
                 62 Rue De La Jarry<br>
                 94300 Vincennes<br>
@@ -155,15 +167,6 @@
                 +33 7 49 46 49 78</p>
               </div>
           
-                <div>
-                    <p><strong>Facturer à</strong><br>
-                    {{$user->lastname.' '.$user->firstname}}<br>
-                    {{$user->instructorProfile->adress}}<br>
-                    {{$user->instructorProfile->city}}<br>
-                    {{$user->instructorProfile->postal_code}}<br>
-                    France<br>
-                    {{$user->email}}</p>
-                </div>
         </div>
     </div>
 
@@ -176,7 +179,6 @@
           <th>Description</th>
           <th>Qté</th>
           <th>Prix unitaire</th>
-          <th>Taxe</th>
           <th>Montant</th>
         </tr>
       </thead>
@@ -186,38 +188,24 @@
           <td>Prestation : Cours</td>
           <td>{{$withdraw->duration}}</td>
           <td>{{number_format($user->instructorProfile->hourPrice)}} €</td>
-          <td>{{$user->instructorProfile->tva}} %<br><small>incl. (sur {{number_format($amount - $tva)}} €)</small></td>
-          <td class="highlight">{{number_format($amount)}} €</td>
+          <td class="highlight">{{number_format($amount,2)}} €</td>
         </tr>
       </tbody>
     </table>
 
     <table class="summary">
       <tr>
-        
-        <td>Sous-total</td>
-        <td>{{number_format($amount,2)}} €</td>
-      </tr>
-      <tr>
         <td>Total hors taxes</td>
         <td>{{number_format($amount - ($tva+$admin),2)}} €</td>
       </tr>
       <tr>
-        <td>TVA - France ({{$user->instructorProfile->tva}} % de {{number_format($amount - ($tva+$admin),2)}} € compris)</td>
-        <td>{{number_format($tva,2)}} €</td>
+        <td>TVA - France ({{$user->instructorProfile->tva}} % de {{number_format($amount,2)}} € compris)</td>
+        <td>{{number_format(($amount*$user->instructorProfile->tva)/100,2)}} €</td>
       </tr>
       
-      <tr>
-        <td>Frais de commission {{number_format($admin,2)}}€</td>
-        <td>{{number_format($admin,2)}} €</td>
-      </tr>
       <tr class="bold">
         <td>Total</td>
-        <td>{{number_format($amount,2)}} €</td>
-      </tr>
-      <tr class="bold">
-        <td>Montant dû</td>
-        <td>{{number_format($amount - ($tva+$admin),2)}} €</td>
+        <td>{{number_format(($amount + (($amount*$user->instructorProfile->tva)/100) ),2)}} €</td>
       </tr>
     </table>
 </body>
