@@ -463,7 +463,7 @@ class AppointmentController extends Controller
 
         $this->sendmailer( $user->id, 'Absence au rendez-vous', 'Absence au rendez-vous', 'Vous venez de marquer l\'absence de l\'apprenant '.$appointment->learner->lastname.' au rendez-vous '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
 
-        $this->sendmailer( $appointment->learner_id, 'Absence au rendez-vous', 'Absence au rendez-vous', 'Votre moniteur vient de marquer votre présence au cours', 'appointment');
+        $this->sendmailer( $appointment->learner_id, 'Absence au rendez-vous', 'Absence au rendez-vous', 'Vous avez été noté absent par votre moniteur au cours du '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
 
         return response()->json([
             'success' => true,
