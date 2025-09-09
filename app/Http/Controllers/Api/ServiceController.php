@@ -93,7 +93,9 @@ class ServiceController extends Controller
                 $service->title!='Fabrication Permis' &&
                 $service->title!='Extension contrat' &&
                 $service->title!='Examen code' &&
-                $service->title!='Pack code'
+                $service->title!='Pack code' &&
+                $service->title!='Location voiture manuelle' &&
+                $service->title!='Location voiture automatique'
            ) {
                 $type_service = "Conduite";
                 $gearbox = $service->type;
@@ -105,8 +107,36 @@ class ServiceController extends Controller
                 else $type_service = "Autres";
                 $gearbox = "aucun";
                 $hour = 0;
-
            }
+        }
+
+        // Vérifier si l'utilisateur a déjà une souscription de type "Conduite" active prendre le dernier
+        // if($type_service == "Conduite") {
+        //     $existingSubscription = Subscription::where([
+        //         'learner_id' => auth()->user()->id,
+        //         'type_service' => 'Conduite',
+        //         'status' => 'active',
+        //     ])->latest()->first();
+
+        //     if($existingSubscription) {
+        //         $existingSubscription->start_date = $start_date;
+        //         $existingSubscription->end_date = $end_date;
+        //         $existingSubscription->save();
+        //     }
+        // }
+
+        // Si souscription type est "Extension contrat", vérifier si l'utilisateur a une souscription de type "Conduite" active ou inactive prendre le dernier et ajouter la durée
+        if($type_service == "Extension contrat") {
+            $existingSubscription = Subscription::where([
+                'learner_id' => auth()->user()->id,
+                'type_service' => 'Conduite',
+            ])->latest()->first();
+
+            if($existingSubscription) {
+                $serviceTemp = Service::find($existingSubscription->service_id);
+                $existingSubscription->end_date = $existingSubscription->end_date->addDays((int)$serviceTemp->time);
+                $existingSubscription->save();
+            }
         }
 
         $subscription = Subscription::create([
