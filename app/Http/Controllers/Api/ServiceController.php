@@ -101,7 +101,7 @@ class ServiceController extends Controller
                 $gearbox = $service->type;
            } else {
                 if($service->title=='Pack code') $type_service = "Pack Code";
-                else if($service->title=='Extension contrat') $type_service = "Extension contact";
+                else if($service->title=='Extension contrat') $type_service = "Extension contrat";
                 else if($service->title=='Fabrication Permis') $type_service = "Fabrication Permis";
                 else if($service->title=='Examen code') $type_service = "Examen code";
                 else $type_service = "Autres";
@@ -132,9 +132,12 @@ class ServiceController extends Controller
                 'type_service' => 'Conduite',
             ])->latest()->first();
 
+            Log::info('Existing Subscription: ', ['subscription' => $existingSubscription]);
+
             if($existingSubscription) {
                 $serviceTemp = Service::find($existingSubscription->service_id);
-                $existingSubscription->end_date = $existingSubscription->end_date->addDays((int)$serviceTemp->time);
+                $existingSubscription->end_date = Carbon::parse($existingSubscription->end_date)->addDays((int)$serviceTemp->time);
+                $existingSubscription->status = "active";
                 $existingSubscription->save();
             }
         }
