@@ -109,6 +109,7 @@ class WithdrawController extends Controller
             $withdraw = Withdraw::create([
                 'monitor_id' => $user->id,
                 'ammount' => $cash,
+                'total_ttc' => $cash + ($cash * auth()->user()->instructorProfile->tva)/100,
                 'duration' => $hour,
                 'currency' => 'EUR',
                 'payed' => false,

@@ -11,7 +11,7 @@ class Withdraw extends Model
     use HasFactory;
 
     protected $fillable = [
-        'monitor_id', 'ammount', 'duration', 'payed', 'currency', 'invoice_code', 'invoice_file',
+        'monitor_id', 'ammount', 'duration', 'payed', 'currency', 'invoice_code', 'invoice_file','total_ttc',
     ];
 
     protected $casts = [
