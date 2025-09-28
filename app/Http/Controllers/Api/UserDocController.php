@@ -67,7 +67,9 @@ class UserDocController extends Controller
             'num_tva' => 'required|string|max:255',
             'num_teach_authorization' => 'required|string|max:255',
             'date_teach_permit' => 'required',
-            'date_medical_visit' => 'required'
+            'date_medical_visit' => 'required',
+            'certification_number' => 'sometimes|string',
+            'certification_issue_date' => 'sometimes',
         ]);
 
         $exist = InstructorProfile::where('user_id',auth()->user()->id)->first();
@@ -80,7 +82,9 @@ class UserDocController extends Controller
                 'num_tva' => $request->num_tva,
                 'num_teach_authorization' => $request->num_teach_authorization,
                 'date_teach_permit' => $request->date_teach_permit,
-                'date_medical_visit' => $request->date_medical_visit
+                'date_medical_visit' => $request->date_medical_visit,
+                'certification_number' => $validated['certification_number'] ?? $request->certification_number,
+                'certification_issue_date' => $validated['certification_issue_date'] ?? $request->certification_issue_date 
             ]);
         else 
             $create = InstructorProfile::create([
@@ -91,7 +95,9 @@ class UserDocController extends Controller
                 'num_tva' => $request->num_tva,
                 'num_teach_authorization' => $request->num_teach_authorization,
                 'date_teach_permit' => $request->date_teach_permit,
-                'date_medical_visit' => $request->date_medical_visit
+                'date_medical_visit' => $request->date_medical_visit,
+                'certification_number' => $validated['certification_number'] ?? $request->certification_number,
+                'certification_issue_date' => $validated['certification_issue_date'] ?? $request->certification_issue_date
             ]);
 
         return response()->json([

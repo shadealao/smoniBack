@@ -30,7 +30,7 @@ class DashboardMonitorController extends Controller
         ])->count();
 
         $rdv_pending = Appointment::where('instructor_id', auth()->user()->id)->where('status', 'scheduled')->count();
-        $cash = $hour * auth()->user()->instructorProfile->hourPrice;
+        $cash = ($hour/60) * auth()->user()->instructorProfile->hourPrice;
         $tva = ($cash * auth()->user()->instructorProfile->tva) / 100;
         return response()->json([
             'success' => true,

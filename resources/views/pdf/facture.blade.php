@@ -119,6 +119,17 @@
       font-weight: bold;
     }
 
+    .footer {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      text-align: center;
+      font-size: 14px;
+      padding: 10px 0;
+    }
+
   </style>
 </head>
 <body>
@@ -141,36 +152,36 @@
     <div class="invoice">
         <div class="top-info">
           <div>
-            <p><strong>Numéro de facture</strong>{{$withdraw->invoice_code}}</p>
-            <p><strong>Date d’émission</strong>{{date('d M Y',strtotime($withdraw->created_at))}}</p>
-            <p><strong>Date d’échéance</strong>{{date('d M Y',strtotime($withdraw->created_at))}}</p>
+            <p><strong>Numéro de facture</strong> {{$withdraw->invoice_code}}</p>
+            <p><strong>Date d’émission</strong> {{date('d M Y',strtotime($withdraw->created_at))}}</p>
           </div>
 
           <div class="company-info">
             
               <div>
-                <p><strong>De </strong><br>
+                <p><strong>DE </strong><br>
                 {{$user->lastname.' '.$user->firstname}}<br>
-                {{$user->instructorProfile->adress}}<br>
-                {{$user->instructorProfile->city}}<br>
-                {{$user->instructorProfile->postal_code}}<br>
+                {{$user->instructorProfile->juridic_form}}<br>
+                SIRET: {{$user->instructorProfile->siret}} - TVA: {{$user->instructorProfile->num_tva}}<br>
+                {{$user->instructorProfile->adress}} - {{$user->email}} - {{$user->phone}}<br>
                 France<br>
                 {{$user->email}}</p>
               </div>
 
               <div>
-                <p><strong>Vers </strong><br>
+                <p><strong>VERS </strong><br>
                 <p><strong>SMONI AUTO-MOTO ÉCOLE</strong><br>
                 62 Rue De La Jarry<br>
                 94300 Vincennes<br>
                 France<br>
-                0953469828 - 0749464978</p>
+                SIRET : 915 387 013 000 13<br>
+                TEL : 0953469828 - 0749464978</p>
               </div>
           
         </div>
     </div>
 
-    <h2 class="amount-due">{{number_format($withdraw->ammount)}} € dus le {{date('d M Y',strtotime($withdraw->created_at))}}</h2>
+    {{--<h2 class="amount-due">{{number_format($withdraw->ammount)}} € dus le {{date('d M Y',strtotime($withdraw->created_at))}}</h2>--}}
     {{--<a href="#" class="pay-link">Payer en ligne</a>--}}
 
     <table class="invoice-table">
@@ -178,14 +189,14 @@
         <tr>
           <th>Description</th>
           <th>Qté</th>
-          <th>Prix unitaire</th>
-          <th>Montant</th>
+          <th>Prix unitaire H.T.</th>
+          <th>Montant H.T.</th>
         </tr>
       </thead>
 
       <tbody>
         <tr>
-          <td>Prestation : Cours</td>
+          <td>Prestation : Cours de conduite</td>
           <td>{{$withdraw->duration}}</td>
           <td>{{number_format($user->instructorProfile->hourPrice)}} €</td>
           <td class="highlight">{{number_format($amount,2)}} €</td>
@@ -196,7 +207,7 @@
     <table class="summary">
       <tr>
         <td>Total hors taxes</td>
-        <td>{{number_format($amount - ($tva+$admin),2)}} €</td>
+        <td>{{number_format($amount,2)}} €</td>
       </tr>
       <tr>
         <td>TVA - France ({{$user->instructorProfile->tva}} % de {{number_format($amount,2)}} € compris)</td>
@@ -204,9 +215,14 @@
       </tr>
       
       <tr class="bold">
-        <td>Total</td>
+        <td>Total TTC</td>
         <td>{{number_format(($amount + (($amount*$user->instructorProfile->tva)/100) ),2)}} €</td>
       </tr>
     </table>
+
+    <div class="footer" >
+      <p style="text-align:center">SASU Arike BELLO SMONI</p>
+      <p style="text-align:center"> SIREN 915 387 013  -  code NAF 8553Z     TVA : FR65 915 387 013</p>
+    </div>
 </body>
 </html>
