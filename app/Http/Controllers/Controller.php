@@ -32,6 +32,26 @@ abstract class Controller
         // $this->sendmailer($sender_id, $receiver_id, $header, $subject, $content, $type);
     }
 
+    public function sendmailercontact($header, $subject, $content){
+        
+        // Notification::create([
+        //     'sender_id' => 1,
+        //     'receiver_id' => 'contact@smoni.fr', 
+        //     'title' => $header,
+        //     'data' => $content, 
+        //     'type' => 'contact',
+        // ]);
+        
+        $mail = new Mail;
+        $mailer = new MailService($mail);
+
+        $mailer->messageMail( null,'admin@smoni.fr', $header, $content, $subject);
+
+        return true;
+        // Utilisation
+        // $this->sendmailer($sender_id, $receiver_id, $header, $subject, $content, $type);
+    }
+
     public function checkPoint($points){
         if ($points > 12) {
             return 20; // "> 12 points" -> 20 heures

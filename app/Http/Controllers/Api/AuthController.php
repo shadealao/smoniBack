@@ -344,4 +344,23 @@ class AuthController extends Controller
         return response()->json(['message' => 'Lien de vérification envoyé','success' => true]);
     }
 
+    public function mailContact(Request $request)
+    {
+        $validated = $request->validate([
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'phone' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'message' => 'required|string',
+        ]);
+
+        // Envoyer l'email de contact
+        $this->sendmailercontact( 'Contact Form Submission', 'Contact Form Submission', 'Message de : '.$validated['firstname'].' '.$validated['lastname'].' ('.$validated['email'].')  '.$validated['phone'].'.  '.$validated['message'],'contact');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Votre message a été envoyé avec succès. Nous vous répondrons bientôt.',
+        ], 200);
+    }
+
 }

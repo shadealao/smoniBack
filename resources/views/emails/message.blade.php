@@ -92,6 +92,56 @@
             color: #333;
         }
 
+        /* Pied de page */
+        .footer {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 2px solid #8A64FF;
+            text-align: center;
+        }
+
+        .footer-logo {
+            margin-bottom: 15px;
+        }
+
+        .footer-logo img {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .footer-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8A64FF;
+            margin-bottom: 8px;
+        }
+
+        .footer-tagline {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .footer-contact {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .footer-address {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .footer-agreement {
+            font-size: 12px;
+            color: #999;
+            font-weight: bold;
+        }
+
         /* Assurer la responsivité de base pour les petits écrans */
         @media only screen and (max-width: 620px) {
             .email-container {
@@ -108,6 +158,15 @@
             .button {
                 padding: 12px 25px !important;
                 font-size: 15px !important;
+            }
+            .footer-title {
+                font-size: 16px !important;
+            }
+            .footer-tagline, .footer-contact, .footer-address {
+                font-size: 13px !important;
+            }
+            .footer-agreement {
+                font-size: 11px !important;
             }
         }
     </style>
@@ -127,6 +186,28 @@
         <p class="info-text">À très vite sur SMONI !</p>
 
         <p class="signature">L'équipe SMONI</p>
+
+        <!-- Pied de page -->
+        <div class="footer">
+            <div class="footer-logo">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo SMONI Auto-Moto École">
+            </div>
+            
+            <div class="footer-title">SMONI auto-école</div>
+            <div class="footer-tagline">Votre Apprentissage en tout sérénité</div>
+            
+            <div class="footer-contact">
+                <strong>Téléphone :</strong> 0953469828 - 0749464978
+            </div>
+            
+            <div class="footer-address">
+                62 rue de la jarry, 94300 Vincennes
+            </div>
+            
+            <div class="footer-agreement">
+                N° d'agrément E 2509400190
+            </div>
+        </div>
     </div>
 </body>
 </html>

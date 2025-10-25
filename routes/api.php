@@ -48,6 +48,7 @@ Route::post('/email/verification-notification', [AuthController::class, 'verific
 //Auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/mail-contact', [AuthController::class, 'mailContact']);
 
 Route::post('/password/send-otp', [UserController::class, 'sendOtpCode']);
 Route::post('/password/verify-otp', [UserController::class, 'verifyOtpCode']);
@@ -210,6 +211,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Availability Routes
     Route::post('/availabilities', [AvailabilityController::class, 'store']);
     Route::get('/availabilities', [AvailabilityController::class, 'index']);
+    Route::get('/availabilities/unbooked', [AvailabilityController::class, 'getUnbookedAvailabilities']);
     Route::get('/listByDate', [AvailabilityController::class, 'listByDate']);
     Route::get('/availabilities/{availability}', [AvailabilityController::class, 'show']);
     Route::put('/availabilities/{availability}', [AvailabilityController::class, 'update']);
@@ -224,6 +226,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Appointment Routes
     Route::post('/appointments', [AppointmentController::class, 'store']);
+    Route::post('/appointments/propose', [AppointmentController::class, 'propose']);
     Route::put('/appointments/{appointment}', [AppointmentController::class, 'update']);
     Route::post('/appointments/{appointment}/confirme', [AppointmentController::class, 'confirme']);
     Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel']);
@@ -236,6 +239,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/appointments/{user}/comments', [AppointmentController::class, 'comments']);
     Route::post('/appointments/addComment', [AppointmentController::class, 'addComment']);
     Route::put('/appointments/{note}/updateComment', [AppointmentController::class, 'updateComment']);
+
+    // Monitor specific routes
+    Route::get('/monitor/check-first-appointment/{learner}', [AppointmentController::class, 'checkFirstAppointment']);
+    Route::post('/monitor/reset-learner-test', [AppointmentController::class, 'resetLearnerTest']);
 
     // UserDoc Routes
     Route::post('/user-docs', [UserDocController::class, 'store']);
@@ -270,6 +277,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // SubscriptionService Routes
     Route::post('/services/makeSubscribe', [ServiceController::class, 'makeSubscribe']);
+    Route::post('/services/makeSubscribeWithLearner', [ServiceController::class, 'makeSubscribeWithLearnerId']);
     Route::get('/services/mySubscrube/{user}', [ServiceController::class, 'mySubscribe']);
     Route::get('/services/packCode', [ServiceController::class, 'packCode']);
     Route::get('/services/contrat', [ServiceController::class, 'listContrat']);
@@ -280,6 +288,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/payments/{payment}/record', [SubscriptionRegistrationController::class, 'recordPayment']);
     Route::post('/contracts/{contract}/update', [SubscriptionRegistrationController::class, 'updateContract']);
     Route::get('/subscriptions', [SubscriptionRegistrationController::class, 'index']);
+    Route::post('/subscriptions/{subscription}/deactivate', [SubscriptionRegistrationController::class, 'deactivate']);
+    Route::post('/subscriptions/{subscription}/reactivate', [SubscriptionRegistrationController::class, 'reactivate']);
 
     // ExamNote Routes
     Route::post('/exam-registrations', [ExamNoteController::class, 'registerExam']);

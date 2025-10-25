@@ -9,6 +9,7 @@ use App\Models\Availability;
 use App\Models\Note;
 use App\Models\Vehicle;
 use App\Models\Subscription;
+use App\Http\Validators\AppointmentTimeValidator;
 use Illuminate\Http\Request;
 use App\Http\Resources\AppointmentLearnerResource;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,178 @@ use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
+    /**
+     * Propose an appointment (instructor only).
+     */
+    public function propose(Request $request){
+        $user = Auth::user();
+
+        if ($user->role !== 'instructor') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seuls les moniteurs peuvent proposer des rendez-vous.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'availability_id' => 'required|exists:availabilities,id',
+            'learner_id' => 'required|exists:users,id',
+            'price' => 'nullable|numeric|min:0',
+            'tag' => 'nullable|string|max:100',
+        ]);
+
+        // Vérifier que l'apprenant existe et est bien un apprenant
+        $learner = User::findOrFail($validated['learner_id']);
+        if ($learner->role !== 'learner') {
+            return response()->json([
+                'success' => false,
+                'message' => 'L\'utilisateur spécifié n\'est pas un apprenant.',
+            ], 422);
+        }
+
+        $availability = Availability::findOrFail($validated['availability_id']);
+
+        // Vérifier que la disponibilité appartient au moniteur connecté
+        if ($availability->instructor_id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette disponibilité ne vous appartient pas.',
+            ], 403);
+        }
+
+        // Vérifier les abonnements de l'apprenant
+        $subscriptions = Subscription::where('learner_id', $learner->id)->where('status','active')->where('type_service','Conduite')->with(['service.items','learner'])->get();
+
+        // Si pas d'abonnement
+        if(!$subscriptions || !count($subscriptions)) {
+            return response()->json([
+                'success' => false,
+                'etat' => 'notSubscription',
+                'message' => 'L\'apprenant n\'a aucun abonnement de conduite disponible ou elles ont expiré',
+            ], 403);
+        }
+
+        // Si abonnement et pas d'heure
+        if($subscriptions) {
+            $hasAvailableHours = false;
+            foreach ($subscriptions as $subscription) {
+                if (isset($subscription->hour) && $subscription->hour >= 1) {
+                    $hasAvailableHours = true;
+                    break;
+                }
+            }
+
+            if (!$hasAvailableHours) {
+                return response()->json([
+                    'success' => false,
+                    'etat' => 'notSubscription',
+                    'message' => 'L\'apprenant n\'a aucune heure disponible pour ses abonnements de conduite',
+                ], 403);
+            }
+        }
+
+        // Validation des contraintes horaires selon le type de pack
+        $timeValidation = AppointmentTimeValidator::validateAppointmentTime(
+            $learner->id, 
+            $availability->date, 
+            1 // Durée par défaut d'1h
+        );
+
+        if (!$timeValidation['valid']) {
+            return response()->json([
+                'success' => false,
+                'etat' => 'timeConstraint',
+                'message' => $timeValidation['message'],
+            ], 422);
+        }
+
+        // Check if availability is active and in the future
+        if (!$availability->status || Carbon::parse($availability->date)->isPast()) {
+            return response()->json([
+                'success' => false,
+                'etat' => 'notAvailble',
+                'message' => 'Cette disponibilité n\'est pas disponible.',
+            ], 422);
+        }
+
+        // Check if the availability is already booked
+        if (Appointment::where('availability_id', $availability->id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'etat' => 'notAvailble',
+                'message' => 'Cette disponibilité est déjà réservée.',
+            ], 422);
+        }
+
+        // Verify vehicle belongs to the instructor
+        $vehicle = Vehicle::where('id', $availability->vehicle_id)
+                          ->where('instructor_id', $availability->instructor_id)
+                          ->first();
+        if (!$vehicle) {
+            return response()->json([
+                'success' => false,
+                'etat' => 'notAvailble',
+                'message' => 'Le véhicule spécifié n\'appartient pas à ce moniteur.',
+            ], 422);
+        }
+
+        // Si la boite (gearbox) de l'abonnement ne corresponds pas aux véhicule de la disponibilité choisi ou si il n'a pas d'heure restant pour l'abonnement ayant cette boite
+        if ($subscriptions) {
+            $validSubscription = null;
+            foreach ($subscriptions as $subscription) {
+                // Supposons que l'abonnement a un champ 'gearbox' et 'hour'
+                if (
+                    isset($subscription->gearbox, $subscription->hour) &&
+                    $subscription->gearbox === $availability->vehicle->gearbox_type &&
+                    $subscription->hour > 0
+                ) {
+                    $validSubscription = $subscription;
+                    break;
+                }
+            }
+
+            if (!$validSubscription) {
+                // Aucun abonnement compatible (soit pas la bonne boîte, soit pas d'heure)
+                return response()->json([
+                    'success' => false,
+                    'etat' => 'notSubscription',
+                    'message' => "Abonnement de l'apprenant incompatible avec cette boîte ou heures restantes insuffisantes."
+                ], 403);
+            } else {
+                $validSubscription->hour-=1;
+                $validSubscription->save();
+            }
+        }
+
+        $appointment = Appointment::create([
+            'learner_id' => $learner->id,
+            'instructor_id' => $user->id,
+            'availability_id' => $availability->id,
+            'vehicle_id' => $availability->vehicle_id,
+            'date' => $availability->date,
+            'start_time' => $availability->start_time,
+            'end_time' => $availability->end_time,
+            'duration' => Carbon::parse($availability->start_time)->diffInMinutes($availability->end_time),
+            'status' => 'scheduled',
+            'price' => $validated['price'] ?? 0,
+            'tag' => $validated['tag'] ?? "Proposition de cours",
+            'lesson_notes' => null,
+            'presence_student' => false,
+            'presence_monitor' => false,
+            'finished' => false,
+        ]);
+
+        $this->sendmailer( $learner->id, 'Proposition de cours', "Proposition de cours de conduite", 'Votre moniteur vous propose un cours qui aura lieu '.$availability->date.' de '.$availability->start_time.' à '.$availability->end_time, 'appointment');
+
+        $this->sendmailer( $user->id, 'Proposition de cours envoyée', "Proposition de cours de conduite", 'Vous venez de proposer un cours à '.$learner->lastname.' qui aura lieu '.$availability->date.' de '.$availability->start_time.' à '.$availability->end_time, 'appointment');
+
+        return response()->json([
+            'success' => true,
+            'data' => $appointment->load(['availability', 'vehicle', 'instructor', 'learner']),
+            'message' => 'Proposition de cours envoyée avec succès.',
+        ], 201);
+    }
+
     /**
      * Book an appointment (learner only).
      */
@@ -46,7 +219,7 @@ class AppointmentController extends Controller
         if($subscriptions) {
             $hasAvailableHours = false;
             foreach ($subscriptions as $subscription) {
-                if (isset($subscription->hour) && $subscription->hour > 1) {
+                if (isset($subscription->hour) && $subscription->hour >= 1) {
                     $hasAvailableHours = true;
                     break;
                 }
@@ -68,6 +241,21 @@ class AppointmentController extends Controller
         ]);
 
         $availability = Availability::findOrFail($validated['availability_id']);
+
+        // Validation des contraintes horaires selon le type de pack
+        $timeValidation = AppointmentTimeValidator::validateAppointmentTime(
+            $user->id, 
+            $availability->date, 
+            1 // Durée par défaut d'1h
+        );
+
+        if (!$timeValidation['valid']) {
+            return response()->json([
+                'success' => false,
+                'etat' => 'timeConstraint',
+                'message' => $timeValidation['message'],
+            ], 422);
+        }
 
         // Check if availability is active and in the future
         if (!$availability->status || Carbon::parse($availability->date)->isPast()) {
@@ -254,12 +442,12 @@ class AppointmentController extends Controller
     public function confirme(Request $request, Appointment $appointment)
     {
         $user = Auth::user();
-        if ($user->role !== 'instructor') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Seuls les moniteurs peuvent confirmer des rendez-vous.',
-            ], 403);
-        }
+        // if ($user->role !== 'instructor') {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Seuls les moniteurs peuvent confirmer des rendez-vous.',
+        //     ], 403);
+        // }
 
         // Prevent canceling already canceled or completed appointments
         if ($appointment->status === 'cancelled' || $appointment->status === 'completed') {
@@ -273,10 +461,16 @@ class AppointmentController extends Controller
             'status' => 'confirmed',
         ]);
 
-        
-        $this->sendmailer( $user->id, 'Confirmation Rendez-vous', 'Confirmation Rendez-vous', 'Vous venez de confirmer une résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
-
-        $this->sendmailer( $appointment->learner_id, 'Confirmation Rendez-vous', 'Confirmation Rendez-vous', 'Votre moniteur vient de confirmer votre résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
+        // Envoyer l'email à la personne qui n'a pas confirmé
+        if ($user->role === 'instructor') {
+            // Si c'est le moniteur qui confirme, envoyer l'email à l'apprenant
+            $this->sendmailer( $appointment->learner_id, 'Confirmation Rendez-vous', 'Confirmation Rendez-vous', 'Votre moniteur vient de confirmer votre résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
+            $this->sendmailer($user->id, 'Confirmation Rendez-vous', 'Confirmation Rendez-vous', 'Vous venez de confirmer une résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
+        } else if ($user->role === 'learner') {
+            // Si c'est l'apprenant qui confirme, envoyer l'email au moniteur
+            $this->sendmailer( $appointment->instructor_id, 'Confirmation Rendez-vous', 'Confirmation Rendez-vous', 'Votre apprenant vient de confirmer le rendez-vous pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
+            $this->sendmailer($user->id, 'Confirmation Rendez-vous', 'Confirmation Rendez-vous', 'Vous venez de confirmer une résevation pour un cours qui aura lieu '.$appointment->date.' de '.$appointment->start_time.' à '.$appointment->end_time, 'appointment');
+        }
 
         return response()->json([
             'success' => true,
@@ -683,6 +877,96 @@ class AppointmentController extends Controller
             'success' => true,
             'message' => 'Commentaire Pédagogique bien modifié.',
         ], 201);
+    }
+
+    /**
+     * Check if this is the learner's first appointment.
+     */
+    public function checkFirstAppointment(User $learner)
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'instructor') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seuls les moniteurs peuvent accéder à cette information.',
+            ], 403);
+        }
+
+        // Vérifier que l'utilisateur est bien un apprenant
+        if ($learner->role !== 'learner') {
+            return response()->json([
+                'success' => false,
+                'message' => 'L\'utilisateur spécifié n\'est pas un apprenant.',
+            ], 422);
+        }
+
+        // Compter les rendez-vous existants de l'apprenant
+        $appointmentCount = Appointment::where('learner_id', $learner->id)
+            ->whereIn('status', ['pending', 'notation', 'completed'])
+            ->count();
+
+        $isFirstAppointment = $appointmentCount === 0;
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'learner_id' => $learner->id,
+                'learner_name' => $learner->firstname . ' ' . $learner->lastname,
+                'is_first_appointment' => $isFirstAppointment,
+                'total_appointments' => $appointmentCount,
+            ],
+            'message' => $isFirstAppointment ? 'C\'est le premier rendez-vous de cet apprenant.' : 'Cet apprenant a déjà des rendez-vous.',
+        ], 200);
+    }
+
+    /**
+     * Reset learner test status.
+     */
+    public function resetLearnerTest(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'instructor') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seuls les moniteurs peuvent réinitialiser le test d\'un apprenant.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'learner_id' => 'required|exists:users,id',
+        ]);
+
+        $learner = User::findOrFail($validated['learner_id']);
+
+        // Vérifier que l'utilisateur est bien un apprenant
+        if ($learner->role !== 'learner') {
+            return response()->json([
+                'success' => false,
+                'message' => 'L\'utilisateur spécifié n\'est pas un apprenant.',
+            ], 422);
+        }
+
+        // Récupérer ou créer le profil de l'apprenant
+        $learnerProfile = $learner->learnerProfile;
+        
+        if ($learnerProfile) {
+            // Réinitialiser le statut du test
+            $learnerProfile->update([
+                'test_passed' => false,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'learner_id' => $learner->id,
+                'learner_name' => $learner->firstname . ' ' . $learner->lastname,
+                'test_passed' => false,
+            ],
+            'message' => 'Le test de l\'apprenant a été réinitialisé avec succès.',
+        ], 200);
     }
 
     public function cancelOldAppointment(){

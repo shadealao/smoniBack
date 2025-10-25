@@ -165,6 +165,89 @@ class ServiceController extends Controller
     }
 
     /** 
+     * Make subscription for a specific learner (admin/ops usage)
+     * Accepts learner_id explicitly instead of using the authenticated user id.
+     */
+    public function makeSubscribeWithLearnerId(Request $request)
+    {
+        $validated = $request->validate([
+            'learner_id' => 'required|integer|exists:users,id',
+            'mode' => 'required',
+            'transaction' => 'required',
+            'service_id' => 'required|integer|exists:services,id',
+        ]);
+
+        $service = Service::find($validated['service_id']);
+
+        $start_date = Carbon::now();
+        $end_date = Carbon::now()->addDays((int)$service->time);
+
+        $type_service = 0;
+        $gearbox = 0;
+        $hour = $service->hour;
+        if($service){
+           
+           if(
+                $service->title!='Fabrication Permis' &&
+                $service->title!='Extension contrat' &&
+                $service->title!='Examen code' &&
+                $service->title!='Pack code' &&
+                $service->title!='Location voiture manuelle' &&
+                $service->title!='Location voiture automatique'
+           ) {
+                $type_service = "Conduite";
+                $gearbox = $service->type;
+           } else {
+                if($service->title=='Pack code') $type_service = "Pack Code";
+                else if($service->title=='Extension contrat') $type_service = "Extension contrat";
+                else if($service->title=='Fabrication Permis') $type_service = "Fabrication Permis";
+                else if($service->title=='Examen code') $type_service = "Examen code";
+                else $type_service = "Autres";
+                $gearbox = "aucun";
+                $hour = 0;
+           }
+        }
+
+        // Si souscription type est "Extension contrat", vérifier si l'utilisateur a une souscription de type "Conduite" active ou inactive prendre le dernier et ajouter la durée
+        if($type_service == "Extension contrat") {
+            $existingSubscription = Subscription::where([
+                'learner_id' => $validated['learner_id'],
+                'type_service' => 'Conduite',
+            ])->latest()->first();
+
+            Log::info('Existing Subscription: ', ['subscription' => $existingSubscription]);
+
+            if($existingSubscription) {
+                $serviceTemp = Service::find($existingSubscription->service_id);
+                $existingSubscription->end_date = Carbon::parse($existingSubscription->end_date)->addDays((int)$serviceTemp->time);
+                $existingSubscription->status = "active";
+                $existingSubscription->save();
+            }
+        }
+
+        $subscription = Subscription::create([
+            'learner_id' => $validated['learner_id'], 
+            'service_id' => $service->id, 
+            'start_date' => $start_date, 
+            'end_date' => $end_date,
+            'mode' => $validated['mode'],
+            'status' => 'active',
+            'type_service' => $type_service,
+            'hour' => $hour,
+            'gearbox' => $gearbox,
+            'transaction_id' => $validated['transaction'],
+            'amount' => $service->price,
+        ]);
+
+        $this->sendmailer( $validated['learner_id'], 'Souscription à un service', 'Souscription à un service', 'Vous venez de souscrire au service '.$service->title, 'subscribe');
+
+        return response()->json([
+            'success' => true,
+            'data' => $subscription,
+        ], 200);
+    }
+
+    /** 
      * My List subsription 
      * 
     */

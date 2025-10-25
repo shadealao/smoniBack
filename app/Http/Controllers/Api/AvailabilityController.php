@@ -318,4 +318,39 @@ class AvailabilityController extends Controller
             'message' => 'Liste des disponibilités récupérée avec succès.',
         ], 200);
     }
+
+    /**
+     * Get availabilities that are not booked (no appointment associated).
+     */
+    public function getUnbookedAvailabilities(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'instructor') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seuls les moniteurs peuvent voir leurs disponibilités non réservées.',
+            ], 403);
+        }
+
+        $query = Availability::where('instructor_id', $user->id)
+            ->where('status', true)
+            ->where('date', '>=', now()->format('Y-m-d'))
+            ->whereDoesntHave('appointment')
+            ->with(['meetingPoint', 'vehicle']);
+
+        // Trier par date et heure
+        $query->orderBy('date', 'asc')
+              ->orderBy('start_time', 'asc');
+
+        // Pagination
+        $perPage = 100;
+        $availabilities = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $availabilities,
+            'message' => 'Liste des disponibilités non réservées récupérée avec succès.',
+        ], 200);
+    }
 }

@@ -78,13 +78,13 @@ class SubscriptionRegistrationController extends Controller
             // Create subscription
             $subscription = Subscription::create([
                 'learner_id' => $user->id,
-                'plan_id' => $service->id,
+                'service_id' => $service->id,
                 'start_date' => $validated['start_date'],
                 'end_date' => $validated['end_date'],
                 'type_service' => $validated['type_service'],
                 'status' => 'active',
-                'auto_renewal' => $validated['auto_renewal'] ?? false,
-                'payment_id' => $payment->id,
+                'amount' => $validated['amount'],
+                'transaction_id' => $payment->invoice_number,
             ]);
 
             // Create contract
@@ -102,7 +102,7 @@ class SubscriptionRegistrationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $subscription->load(['plan', 'payment', 'contract']),
+            'data' => $subscription->load(['service', 'contract']),
             'message' => 'Abonnement créé avec succès.',
         ], 201);
     }
@@ -131,14 +131,11 @@ class SubscriptionRegistrationController extends Controller
             'payment_date' => $validated['status'] === 'completed' ? $validated['payment_date'] : $payment->payment_date,
         ]);
 
-        // If payment is completed, ensure subscription is active
-        if ($validated['status'] === 'completed' && $payment->subscription) {
-            $payment->subscription->update(['status' => 'active']);
-        }
+        // Note: Payment completion logic can be handled separately if needed
 
         return response()->json([
             'success' => true,
-            'data' => $payment->refresh()->load('subscription'),
+            'data' => $payment->refresh(),
             'message' => 'Paiement mis à jour avec succès.',
         ], 200);
     }
@@ -191,15 +188,87 @@ class SubscriptionRegistrationController extends Controller
 
         // Admins can view all subscriptions, learners only their own
         $subscriptions = $user->role === 'admin'
-            ? Subscription::with(['learner', 'plan', 'payment', 'contract'])->get()
+            ? Subscription::with(['learner', 'service', 'contract'])->get()
             : Subscription::where('learner_id', $user->id)
-                ->with(['learner', 'plan', 'payment', 'contract'])
+                ->with(['learner', 'service', 'contract'])
                 ->get();
 
         return response()->json([
             'success' => true,
             'data' => $subscriptions,
             'message' => 'Liste des abonnements récupérée avec succès.',
+        ], 200);
+    }
+
+    /**
+     * Désactive une souscription
+     */
+    public function deactivate(Request $request, $subscriptionId)
+    {
+        $user = Auth::user();
+
+        // Trouver la souscription
+        $subscription = Subscription::findOrFail($subscriptionId);
+
+        // Vérifier les permissions
+        if ($user->role !== 'admin' && $subscription->learner_id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous n\'avez pas l\'autorisation de désactiver cette souscription.',
+            ], 403);
+        }
+
+        // Vérifier si la souscription est déjà inactive/annulée
+        if ($subscription->isInactive()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette souscription est déjà annulée.',
+            ], 400);
+        }
+
+        // Désactiver la souscription
+        $subscription->deactivate();
+
+        return response()->json([
+            'success' => true,
+            'data' => $subscription->load(['learner', 'service']),
+            'message' => 'Souscription annulée avec succès.',
+        ], 200);
+    }
+
+    /**
+     * Réactive une souscription (admin seulement)
+     */
+    public function reactivate(Request $request, $subscriptionId)
+    {
+        $user = Auth::user();
+
+        // Seuls les admins peuvent réactiver
+        if ($user->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seuls les administrateurs peuvent réactiver une souscription.',
+            ], 403);
+        }
+
+        // Trouver la souscription
+        $subscription = Subscription::findOrFail($subscriptionId);
+
+        // Vérifier si la souscription est déjà active
+        if ($subscription->isActive()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette souscription est déjà active.',
+            ], 400);
+        }
+
+        // Réactiver la souscription
+        $subscription->update(['status' => 'active']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $subscription->load(['learner', 'service']),
+            'message' => 'Souscription réactivée avec succès.',
         ], 200);
     }
 }
