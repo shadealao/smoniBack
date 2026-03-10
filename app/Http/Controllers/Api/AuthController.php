@@ -356,7 +356,7 @@ class AuthController extends Controller
         ]);
 
         // Envoyer l'email de contact
-        $this->sendmailercontact( 'Formulaire de contact', 'Message de : '.$validated['firstname'].' '.$validated['lastname'].' ('.$validated['email'].')  '.$validated['phone'].'.  '.$validated['message'],$validated['object'],);
+        $this->sendmailercontact( 'Formulaire de contact', $validated['object'], 'Message de : '.$validated['firstname'].' '.$validated['lastname'].' ('.$validated['email'].')  '.$validated['phone'].'.  '.$validated['message'],$validated['object']);
 
         return response()->json([
             'success' => true,
