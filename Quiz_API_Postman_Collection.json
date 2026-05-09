@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "Smoni Quiz API",
+    "description": "Complete quiz API endpoints for testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "attempt_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quiz",
+      "item": [
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/quiz/categories",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Start Quiz - VE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('attempt_id', jsonData.data.attempt_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question_count\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quiz/categories/1/start",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "categories", "1", "start"]
+            }
+          }
+        },
+        {
+          "name": "Submit Quiz Answers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\"question_id\": 1, \"answer\": 0},\n    {\"question_id\": 2, \"answer\": 1},\n    {\"question_id\": 3, \"answer\": 0},\n    {\"question_id\": 4, \"answer\": 2},\n    {\"question_id\": 5, \"answer\": 0},\n    {\"question_id\": 6, \"answer\": 1},\n    {\"question_id\": 7, \"answer\": 0},\n    {\"question_id\": 8, \"answer\": 3},\n    {\"question_id\": 9, \"answer\": 0},\n    {\"question_id\": 10, \"answer\": 1}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quiz/attempts/{{attempt_id}}/submit",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "attempts", "{{attempt_id}}", "submit"]
+            }
+          }
+        },
+        {
+          "name": "Get Quiz History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/quiz/history",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "history"]
+            }
+          }
+        },
+        {
+          "name": "Get Attempt Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/quiz/attempts/{{attempt_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["quiz", "attempts", "{{attempt_id}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

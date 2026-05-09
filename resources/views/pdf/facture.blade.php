@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #fff;
+      color: #000;
+    }
+
+    .line-yellow{
+        width: 100%;
+        height: 5px;
+        background-color: #f7c600;
+        position: absolute;
+        top: 0;
+        left: 0;
+
+    }
+    .header {
+      display: flex;
+      justify-content: space-between; 
+      margin-bottom: 30px;
+    }
+    img.logo {
+      max-width: 150px;
+      height: auto;
+    }
+    .invoice {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .top-info {
+      justify-content: space-between;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .company-info {
+      display: flex;
+      gap: 100px;
+    }
+
+    .top-info p {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+
+    .amount-due {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 20px 0 10px;
+    }
+
+    .pay-link {
+      color: blue;
+      text-decoration: underline;
+      font-size: 14px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .invoice-table th {
+      border-bottom: 1px solid #000;
+      padding-bottom: 5px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .invoice-table .highlight {
+      background-color: #cce5ff;
+      font-weight: bold;
+    }
+
+    .invoice-table small {
+      font-size: 12px;
+      color: #555;
+    }
+
+    .summary {
+      width: fit-content;
+      margin-left: auto;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .summary td {
+      padding: 0 12px;
+      text-align: right;
+    }
+
+    .summary td:first-child {
+      text-align: left;
+    }
+
+
+    .summary tr {
+      border-top: 0.2px dashed #958b8b;
+    }
+
+
+    .summary tr:first-child {
+      border-top: none;
+    }
+
+    .summary .bold td {
+      font-weight: bold;
+    }
+
+    .footer {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      text-align: center;
+      font-size: 14px;
+      padding: 10px 0;
+    }
+
+  </style>
+</head>
+<body>
+
+    <div class="line-yellow"></div>
+
+    </div>
+    <table style="width: 100%; border:1px solid transparent">
+        <td style="width: 25%;border:1px solid transparent">
+          <div class="header">
+            <h1>Facture</h1>
+          </div>
+        </td>
+        <td style="width: 25%;border:1px solid transparent">
+          <div style="text-align:right">
+            <img src="{{asset('image.png')}}" alt="Logo de SMONI AUTO-MOTO ÉCOLE" class="logo">
+          </div>
+        </td>
+    </table>
+    <div class="invoice">
+        <div class="top-info">
+          <div>
+            <p><strong>Numéro de facture</strong> {{$withdraw->invoice_code}}</p>
+            <p><strong>Date d’émission</strong> {{date('d M Y',strtotime($withdraw->created_at))}}</p>
+          </div>
+
+          <div class="company-info">
+            
+              <div>
+                <p><strong>DE </strong><br>
+                {{$user->lastname.' '.$user->firstname}}<br>
+                {{$user->instructorProfile->juridic_form}}<br>
+                SIRET: {{$user->instructorProfile->siret}} - TVA: {{$user->instructorProfile->num_tva}}<br>
+                {{$user->instructorProfile->adress}} - {{$user->email}} - {{$user->phone}}<br>
+                France<br>
+                {{$user->email}}</p>
+              </div>
+
+              <div>
+                <p><strong>VERS </strong><br>
+                <p><strong>SMONI AUTO-MOTO ÉCOLE</strong><br>
+                62 Rue De La Jarry<br>
+                94300 Vincennes<br>
+                France<br>
+                SIRET : 915 387 013 000 13<br>
+                TEL : 0953469828 - 0749464978</p>
+              </div>
+          
+        </div>
+    </div>
+
+    {{--<h2 class="amount-due">{{number_format($withdraw->ammount)}} € dus le {{date('d M Y',strtotime($withdraw->created_at))}}</h2>--}}
+    {{--<a href="#" class="pay-link">Payer en ligne</a>--}}
+
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Qté</th>
+          <th>Prix unitaire H.T.</th>
+          <th>Montant H.T.</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>Prestation : Cours de conduite</td>
+          <td>{{$withdraw->duration}}</td>
+          <td>{{number_format($user->instructorProfile->hourPrice)}} €</td>
+          <td class="highlight">{{number_format($amount,2)}} €</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="summary">
+      <tr>
+        <td>Total hors taxes</td>
+        <td>{{number_format($amount,2)}} €</td>
+      </tr>
+      <tr>
+        <td>TVA - France ({{$user->instructorProfile->tva}} % de {{number_format($amount,2)}} € compris)</td>
+        <td>{{number_format(($amount*$user->instructorProfile->tva)/100,2)}} €</td>
+      </tr>
+      
+      <tr class="bold">
+        <td>Total TTC</td>
+        <td>{{number_format(($amount + (($amount*$user->instructorProfile->tva)/100) ),2)}} €</td>
+      </tr>
+    </table>
+
+    <div class="footer" >
+      <p style="text-align:center">SASU Arike BELLO SMONI</p>
+      <p style="text-align:center"> SIREN 915 387 013  -  code NAF 8553Z     TVA : FR65 915 387 013</p>
+    </div>
+</body>
+</html>
