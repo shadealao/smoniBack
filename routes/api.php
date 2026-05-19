@@ -35,9 +35,9 @@ use App\Http\Controllers\Api\Admin\ServiceController as AdminServiceController;
 
 
 
-Route::post('/testEmail', [DashboardController::class, 'testEmail'])->name('testEmail');
-Route::post('/generateFacture', [WithdrawController::class, 'generate'])->name('generate');
-Route::post('/contrat', [ServiceController::class, 'contrat'])->name('contrat');
+// Admin batch jobs moved into the auth:sanctum + can:admin group below.
+// They were previously public and allowed unauthenticated bulk PDF
+// generation and arbitrary email sending.
 
 
 // Auth routes (/register, /login, /logout, /forgot-password, /reset-password,
@@ -70,6 +70,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::middleware(['can:admin'])->group(function () {
+        // Admin batch jobs (previously public — moved behind auth+admin gate).
+        // These are heavy operations: bulk PDF generation and email sending.
+        Route::post('/testEmail', [DashboardController::class, 'testEmail'])->middleware('throttle:6,1')->name('testEmail');
+        Route::post('/generateFacture', [WithdrawController::class, 'generate'])->middleware('throttle:6,1')->name('generate');
+        Route::post('/contrat', [ServiceController::class, 'contrat'])->middleware('throttle:6,1')->name('contrat');
+
         Route::prefix('admin')->group(function () {
 
             // Dashboard

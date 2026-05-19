@@ -92,16 +92,20 @@ class UserController extends Controller
                 'message' => 'Vous n\'êtes pas un apprenant.',
             ], 403);
         }
+        // All learner profile docs are PDFs or images, capped at 4MB.
+        // mimes: rule is enforced via the file's real MIME via finfo, not the
+        // client-provided extension/Content-Type, which the user controls.
+        $docRules = 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:4096';
         $validated = $request->validate([
-            'identity' => 'nullable|file',
-            'accommodation' => 'nullable|file',
-            'authorize' => 'nullable|file',            
-            'identityPhoto' => 'nullable|file',
-            'assr' => 'nullable|file',
-            'cip' => 'nullable|file',
-            'medicalVisit' => 'nullable|file',
-            'snu' => 'nullable|file',
-            'neph' => 'nullable|string',
+            'identity' => $docRules,
+            'accommodation' => $docRules,
+            'authorize' => $docRules,
+            'identityPhoto' => $docRules,
+            'assr' => $docRules,
+            'cip' => $docRules,
+            'medicalVisit' => $docRules,
+            'snu' => $docRules,
+            'neph' => 'nullable|string|max:255',
         ]);
         $identity = $request->file('identity') ? $request->file('identity')->store('profil', 'public') : null;
         $accommodation = $request->file('accommodation') ? $request->file('accommodation')->store('profil', 'public') : null;
@@ -348,7 +352,7 @@ class UserController extends Controller
     public function updateImage(Request $request)
     {
         $validated = $request->validate([
-            'photo' => 'file',
+            'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $photoPath = $request->file('photo')->store('profil', 'public');
