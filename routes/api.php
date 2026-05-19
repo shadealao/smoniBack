@@ -40,19 +40,14 @@ Route::post('/generateFacture', [WithdrawController::class, 'generate'])->name('
 Route::post('/contrat', [ServiceController::class, 'contrat'])->name('contrat');
 
 
-//Verification Email
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])->name('verification.verify');
+// Auth routes (/register, /login, /logout, /forgot-password, /reset-password,
+// /email/verification-notification, /email/verify/{id}/{hash}, /user/password)
+// are registered automatically by Laravel Fortify. See FortifyServiceProvider
+// and config/fortify.php. Custom register logic lives in
+// App\Actions\Fortify\CreateNewUser.
 
-Route::post('/email/verification-notification', [AuthController::class, 'verificationNotification'])->middleware(['throttle:6,1'])->name('verification.send');
-
-//Auth
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/mail-contact', [AuthController::class, 'mailContact']);
-
-Route::post('/password/send-otp', [UserController::class, 'sendOtpCode']);
-Route::post('/password/verify-otp', [UserController::class, 'verifyOtpCode']);
-Route::post('/password/reset', [UserController::class, 'updatePassword']);
+Route::post('/mail-contact', [AuthController::class, 'mailContact'])
+    ->middleware('throttle:contact');
 
 // TrainingModule Routes
 Route::get('/training-modules', [TrainingModuleController::class, 'index']);
@@ -65,12 +60,16 @@ Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meetin
 
 Route::middleware('auth:sanctum')->group(function () {
 
+            // SPA hydration: after /login the frontend calls GET /api/user
+            // to fetch the authenticated user via the session cookie.
+            Route::get('/user', fn (\Illuminate\Http\Request $r) => $r->user());
+
             //Auth
             Route::post('/passTest', [AuthController::class, 'checkAsk']);
             Route::get('/export', [WithdrawController::class, 'export'])->name('export');
 
 
-    Route::middleware(['admin'])->group(function () {
+    Route::middleware(['can:admin'])->group(function () {
         Route::prefix('admin')->group(function () {
 
             // Dashboard
