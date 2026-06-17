@@ -8,13 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\VerifyEmailNotification;
 
-// Email verification is disabled (see config/fortify.php). User no longer
-// implements MustVerifyEmail, so no verification notification is sent on
-// registration. The sendEmailVerificationNotification() override below is
-// kept inert for the day verification is reintroduced with a proper flow.
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
