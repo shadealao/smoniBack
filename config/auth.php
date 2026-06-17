@@ -112,4 +112,18 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-verify email (dev / preview / testing bypass)
+    |--------------------------------------------------------------------------
+    |
+    | When true, newly registered users are marked email-verified immediately
+    | and NO verification email is sent — so local dev, preview builds, and the
+    | test suite don't need a working mailbox or a link round-trip. Keep this
+    | FALSE in production so real verification emails are sent.
+    |
+    */
+
+    'auto_verify_email' => (bool) env('AUTO_VERIFY_EMAIL', false),
+
 ];

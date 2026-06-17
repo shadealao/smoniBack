@@ -19,8 +19,11 @@ class VerifyEmailNotification extends Notification
 
     public function toMail($notifiable)
     {
+        // Point at the SPA-aware, no-auth verify route (see routes/web.php).
+        // Fortify's default verification.verify requires auth and 500s when the
+        // link is opened from an email without the Sanctum session.
         $verificationUrl = URL::temporarySignedRoute(
-            'verification.verify',
+            'email.verify.account',
             now()->addMinutes(60),
             ['id' => $notifiable->getKey(), 'hash' => sha1($notifiable->getEmailForVerification())]
         );

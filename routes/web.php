@@ -4,6 +4,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LearnerController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+
+// SPA email verification. Opened from the user's inbox in a browser that does
+// NOT carry the Sanctum session, so it must NOT require auth — the `signed`
+// middleware (temporary signed URL) is the proof. Redirects back to the SPA.
+// Distinct path/name from Fortify's auth-guarded verification.verify (which
+// 500s cross-origin and is left unused). Lives in the web group so it returns
+// a browser redirect, not JSON.
+Route::get('/email/verify-account/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('email.verify.account');
 
 // Route::get('/', function () {
 //     return view('welcome');

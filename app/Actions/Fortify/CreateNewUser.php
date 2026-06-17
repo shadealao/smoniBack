@@ -159,6 +159,13 @@ class CreateNewUser implements CreatesNewUsers
                 }
             }
 
+            // Dev / preview / testing bypass: mark verified now so the
+            // Registered listener's hasVerifiedEmail() guard skips the email.
+            // Prod (flag false) leaves the user unverified → email is sent.
+            if (config('auth.auto_verify_email')) {
+                $user->forceFill(['email_verified_at' => now()])->save();
+            }
+
             return $user;
         });
     }
