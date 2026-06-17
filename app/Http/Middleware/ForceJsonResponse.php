@@ -10,7 +10,14 @@ class ForceJsonResponse
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $request->headers->set('Accept', 'application/json');
+        // The email-verification link (GET /email/verify/{id}/{hash}) is opened
+        // directly from the user's inbox in a browser and must keep its HTML
+        // 302 redirect to the SPA. Every other auth/API request is JSON, so
+        // Fortify never falls back to a browser redirect (which a cross-origin
+        // SPA fetch would follow into a CORS-blocked URL → "Failed to fetch").
+        if (! $request->routeIs('verification.verify')) {
+            $request->headers->set('Accept', 'application/json');
+        }
 
         return $next($request);
     }

@@ -13,7 +13,13 @@ return [
     // Use the 'web' middleware stack so Fortify's session, cookie, and
     // CSRF middleware run on /login, /register, /forgot-password etc.
     // Using 'api' would skip session middleware and break cookie auth.
-    'middleware' => ['web'],
+    //
+    // ForceJsonResponse sets `Accept: application/json` on every inbound auth
+    // request so Fortify ALWAYS returns JSON and never falls back to a browser
+    // 302 redirect. Without it, a request that loses the Accept header (e.g. a
+    // stale SPA bundle) gets a 302 → home, which the SPA's cross-origin fetch
+    // follows into a CORS-blocked URL and reports as "Failed to fetch".
+    'middleware' => ['web', \App\Http\Middleware\ForceJsonResponse::class],
 
     'passwords' => 'users',
 
