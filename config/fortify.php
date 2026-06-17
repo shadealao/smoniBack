@@ -50,7 +50,12 @@ return [
     'features' => [
         Features::registration(),
         Features::resetPasswords(),
-        Features::emailVerification(),
+        // emailVerification() intentionally disabled: it gated nothing (no
+        // route used the `verified` middleware, login never checked it), its
+        // cross-origin verify link 500'd, and it sent rate-limited emails.
+        // Removing it also drops the latent route('login')/route('notice')
+        // 500 footguns. Re-add with a custom SPA-aware verify controller if
+        // verification is ever actually required.
         Features::updatePasswords(),
     ],
 ];
