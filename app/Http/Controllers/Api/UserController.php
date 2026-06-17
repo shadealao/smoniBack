@@ -92,16 +92,20 @@ class UserController extends Controller
                 'message' => 'Vous n\'êtes pas un apprenant.',
             ], 403);
         }
+        // All learner profile docs are PDFs or images, capped at 4MB.
+        // mimes: rule is enforced via the file's real MIME via finfo, not the
+        // client-provided extension/Content-Type, which the user controls.
+        $docRules = 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:4096';
         $validated = $request->validate([
-            'identity' => 'nullable|file',
-            'accommodation' => 'nullable|file',
-            'authorize' => 'nullable|file',            
-            'identityPhoto' => 'nullable|file',
-            'assr' => 'nullable|file',
-            'cip' => 'nullable|file',
-            'medicalVisit' => 'nullable|file',
-            'snu' => 'nullable|file',
-            'neph' => 'nullable|string',
+            'identity' => $docRules,
+            'accommodation' => $docRules,
+            'authorize' => $docRules,
+            'identityPhoto' => $docRules,
+            'assr' => $docRules,
+            'cip' => $docRules,
+            'medicalVisit' => $docRules,
+            'snu' => $docRules,
+            'neph' => 'nullable|string|max:255',
         ]);
         $identity = $request->file('identity') ? $request->file('identity')->store('profil', 'public') : null;
         $accommodation = $request->file('accommodation') ? $request->file('accommodation')->store('profil', 'public') : null;
@@ -281,112 +285,13 @@ class UserController extends Controller
         ], 200);
     }
 
-    /**
-     * Send OTP code for password reset.
-     */
-    public function sendOtpCode(Request $request)
-    {
-        $validated = $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
-
-        $user = User::where('email', $validated['email'])->first();
-
-        // Generate a 6-digit OTP code
-        $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-
-        // Store OTP code in database
-        OtpCode::create([
-            'user_id' => $user->id,
-            'code' => $otpCode,
-            'expires_at' => Carbon::now()->addMinutes(10),
-            'is_used' => false,
-        ]);
-
-        // Send OTP code via email
-        Notification::send($user, new SendOtpCode($otpCode));
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Code OTP envoyé à votre email.',
-        ], 200);
-    }
-
-    /**
-     * Verify OTP code.
-     */
-    public function verifyOtpCode(Request $request)
-    {
-        $validated = $request->validate([
-            'email' => 'required|email|exists:users,email',
-            'code' => 'required|string|size:6',
-        ]);
-
-        $user = User::where('email', $validated['email'])->first();
-
-        $otp = OtpCode::where('user_id', $user->id)
-                      ->where('code', $validated['code'])
-                      ->where('is_used', false)
-                      ->where('expires_at', '>=', Carbon::now())
-                      ->first();
-
-        if (!$otp) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Code OTP invalide ou expiré.',
-            ], 400);
-        }
-
-        // Mark OTP as used
-        $otp->update(['is_used' => true]);
-
-        // Generate a temporary token for password reset
-        // $resetToken = Str::random(60);
-        // $user->update(['password_reset_token' => $resetToken]);
-
-        return response()->json([
-            'success' => true,
-            // 'reset_token' => $resetToken,
-            'message' => 'Code OTP vérifié avec succès.',
-        ], 200);
-    }
-
-    /**
-     * Update password after OTP verification.
-     */
-    public function updatePassword(Request $request)
-    {
-        $validated = $request->validate([
-            'email' => 'required|email|exists:users,email',
-            // 'reset_token' => 'required|string',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = User::where('email', $validated['email'])
-                    // ->where('password_reset_token', $validated['reset_token'])
-                    ->first();
-
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token de réinitialisation invalide.',
-            ], 400);
-        }
-
-        // Update password and clear reset token
-        $user->update([
-            'password' => Hash::make($validated['password']),
-            // 'password_reset_token' => null,
-        ]);
-
-        // Revoke all existing tokens (optional, for security)
-        $user->tokens()->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Mot de passe mis à jour avec succès.',
-        ], 200);
-    }
+    // Password reset (send OTP / verify / update) is now owned by Laravel
+    // Fortify: POST /forgot-password and POST /reset-password. See
+    // App\Actions\Fortify\ResetUserPassword.
+    //
+    // In-session password change is handled by Fortify too:
+    // PUT /user/password (requires current_password). See
+    // App\Actions\Fortify\UpdateUserPassword.
 
     /**
      * Update Password
@@ -447,7 +352,7 @@ class UserController extends Controller
     public function updateImage(Request $request)
     {
         $validated = $request->validate([
-            'photo' => 'file',
+            'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $photoPath = $request->file('photo')->store('profil', 'public');

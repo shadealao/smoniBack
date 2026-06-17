@@ -44,8 +44,11 @@ class TrainingModuleController extends Controller
 
         $filePath = null;
         if ($request->hasFile('file')) {
+            // Don't use getClientOriginalName() — it's attacker-controlled and
+            // can contain path separators or NUL bytes. mimes:pdf already
+            // ran, so storeAs() with a hashed name + .pdf is safe.
             $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
+            $fileName = time() . '_' . \Illuminate\Support\Str::random(16) . '.pdf';
             $filePath = $file->storeAs('modules', $fileName, 'public');
         }
 
@@ -132,7 +135,7 @@ class TrainingModuleController extends Controller
                 Storage::disk('public')->delete($trainingModule->file);
             }
             $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
+            $fileName = time() . '_' . \Illuminate\Support\Str::random(16) . '.pdf';
             $validated['file'] = $file->storeAs('modules', $fileName, 'public');
         }
 

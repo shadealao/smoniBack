@@ -35,24 +35,19 @@ use App\Http\Controllers\Api\Admin\ServiceController as AdminServiceController;
 
 
 
-Route::post('/testEmail', [DashboardController::class, 'testEmail'])->name('testEmail');
-Route::post('/generateFacture', [WithdrawController::class, 'generate'])->name('generate');
-Route::post('/contrat', [ServiceController::class, 'contrat'])->name('contrat');
+// Admin batch jobs moved into the auth:sanctum + can:admin group below.
+// They were previously public and allowed unauthenticated bulk PDF
+// generation and arbitrary email sending.
 
 
-//Verification Email
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'emailVerify'])->name('verification.verify');
+// Auth routes (/register, /login, /logout, /forgot-password, /reset-password,
+// /email/verification-notification, /email/verify/{id}/{hash}, /user/password)
+// are registered automatically by Laravel Fortify. See FortifyServiceProvider
+// and config/fortify.php. Custom register logic lives in
+// App\Actions\Fortify\CreateNewUser.
 
-Route::post('/email/verification-notification', [AuthController::class, 'verificationNotification'])->middleware(['throttle:6,1'])->name('verification.send');
-
-//Auth
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/mail-contact', [AuthController::class, 'mailContact']);
-
-Route::post('/password/send-otp', [UserController::class, 'sendOtpCode']);
-Route::post('/password/verify-otp', [UserController::class, 'verifyOtpCode']);
-Route::post('/password/reset', [UserController::class, 'updatePassword']);
+Route::post('/mail-contact', [AuthController::class, 'mailContact'])
+    ->middleware('throttle:contact');
 
 // TrainingModule Routes
 Route::get('/training-modules', [TrainingModuleController::class, 'index']);
@@ -65,12 +60,22 @@ Route::get('/meeting-points/search', [MeetingPointController::class, 'get_meetin
 
 Route::middleware('auth:sanctum')->group(function () {
 
+            // SPA hydration: after /login the frontend calls GET /api/user
+            // to fetch the authenticated user via the session cookie.
+            Route::get('/user', fn (\Illuminate\Http\Request $r) => $r->user());
+
             //Auth
             Route::post('/passTest', [AuthController::class, 'checkAsk']);
             Route::get('/export', [WithdrawController::class, 'export'])->name('export');
 
 
-    Route::middleware(['admin'])->group(function () {
+    Route::middleware(['can:admin'])->group(function () {
+        // Admin batch jobs (previously public — moved behind auth+admin gate).
+        // These are heavy operations: bulk PDF generation and email sending.
+        Route::post('/testEmail', [DashboardController::class, 'testEmail'])->middleware('throttle:6,1')->name('testEmail');
+        Route::post('/generateFacture', [WithdrawController::class, 'generate'])->middleware('throttle:6,1')->name('generate');
+        Route::post('/contrat', [ServiceController::class, 'contrat'])->middleware('throttle:6,1')->name('contrat');
+
         Route::prefix('admin')->group(function () {
 
             // Dashboard

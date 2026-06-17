@@ -12,9 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias([
-            'admin' => \App\Http\Middleware\AdminAccess::class,
-        ]);
+        $middleware->statefulApi();
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+
+        // Force JSON responses for /api/* — otherwise unauthenticated requests
+        // without Accept:application/json get a 500 from Authenticate trying
+        // to redirect to a non-existent 'login' named route.
+        $middleware->api(prepend: [\App\Http\Middleware\ForceJsonResponse::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
