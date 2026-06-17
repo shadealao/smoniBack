@@ -21,3 +21,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Embedded sibling repo & local test DB (do not track)
+/smoniFront
+smoni_test.sqlite
